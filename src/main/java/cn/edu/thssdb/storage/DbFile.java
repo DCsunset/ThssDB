@@ -22,8 +22,6 @@ public class DbFile {
         try {
             writer = new RandomAccessFile(this.filename, "rw");
             reader = new RandomAccessFile(this.filename, "r");
-            // outputStream = new FileOutputStream(this.filename);
-            // inputStream = new FileInputStream(this.filename);
         } catch (IOException e) {
             System.err.println(String.format("Create file error:%s", this.filename));
             System.exit(-1);

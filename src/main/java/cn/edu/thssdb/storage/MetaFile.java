@@ -1,41 +1,47 @@
 package cn.edu.thssdb.storage;
 
+import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.ObjectInputStream;
+import java.io.FileOutputStream;
 import java.io.ObjectOutputStream;
+import java.io.ObjectInputStream;
 
-public class MetaFile extends DbFile {
+public class MetaFile {
+    private String filename;
+    private FileInputStream in;
+    private FileOutputStream out;
+
     public MetaFile(String filename) throws IOException {
-        super(filename);
-        this.filename += ".meta";
+        this.filename = filename + ".meta";
     }
 
-    @Override
     public void createFile() {
-        super.createFile();
+        try {
+            out = new FileOutputStream(this.filename);
+            in = new FileInputStream(this.filename);
+        } catch (IOException e) {
+            System.err.println(String.format("Create file error:%s", this.filename));
+            System.exit(-1);
+        }
     }
 
     public void writeMetadata(Metadata data) {
-        // TODO:
-        // try {
-        // ObjectOutputStream out = new ObjectOutputStream(this.outputStream);
-        // out.writeObject(data);
-        // } catch (IOException e) {
-        // System.err.println(String.format("Serialize metadata failed:%s",
-        // this.filename));
-        // }
+        try {
+            ObjectOutputStream objout = new ObjectOutputStream(this.out);
+            objout.writeObject(data);
+        } catch (IOException e) {
+            System.err.println(String.format("Serialize metadata failed:%s", this.filename));
+        }
     }
 
     public Metadata readMetadata() {
         Metadata result = null;
-        // TODO:
-        // try {
-        // ObjectInputStream in = new ObjectInputStream(this.inputStream);
-        // result = (Metadata) in.readObject();
-        // } catch (Exception e) {
-        // System.err.println(String.format("Serialize metadata failed:%s",
-        // this.filename));
-        // }
+        try {
+            ObjectInputStream objin = new ObjectInputStream(this.in);
+            result = (Metadata) objin.readObject();
+        } catch (Exception e) {
+            System.err.println(String.format("Serialize metadata failed:%s", this.filename));
+        }
         return result;
     }
 }

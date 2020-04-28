@@ -2,4 +2,5 @@ target
 .DS_Store
 .idea
 rpc
-.data
+*.data
+*.meta
