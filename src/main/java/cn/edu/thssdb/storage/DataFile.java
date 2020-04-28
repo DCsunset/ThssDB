@@ -16,7 +16,6 @@ public class DataFile extends DbFile {
         // Write 0s to datafile
         try {
             byte[] b = new byte[Global.INIT_FILE_SIZE];
-            // outputStream.write(b);
             writer.write(b);
         } catch (IOException e) {
             System.err.println(String.format("create file error:%s", this.filename));
@@ -28,6 +27,12 @@ public class DataFile extends DbFile {
         try {
             assert content.length == Global.PAGE_SIZE;
             // outputStream.write(content, id * Global.PAGE_SIZE, content.length);
+            if (id >= writer.length() / Global.PAGE_SIZE) {
+                System.out.println("Allocate new 16k for " + this.filename);
+                writer.seek(writer.length());
+                byte[] b = new byte[Global.INIT_FILE_SIZE];
+                writer.write(b);
+            }
             writer.seek(id * Global.PAGE_SIZE);
             writer.write(content);
         } catch (IOException e) {

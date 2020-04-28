@@ -14,8 +14,10 @@ public class Test {
         for (byte i = 0; i < 5; i++)
             content[i] = i;
         data.writePage(0, content);
+        content[5] = 5;
         data.writePage(1, content);
-        byte[] content1 = data.readPage(1);
+        data.writePage(4, content);
+        byte[] content1 = data.readPage(4);
         for (byte c : content1) {
             System.out.format("%d", c);
         }
