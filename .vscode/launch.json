@@ -1,0 +1,35 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Debug (Launch) - Current File",
+            "request": "launch",
+            "mainClass": "${file}"
+        },
+        {
+            "type": "java",
+            "name": "Debug (Launch)-Client<ThssDB>",
+            "request": "launch",
+            "mainClass": "cn.edu.thssdb.client.Client",
+            "projectName": "ThssDB"
+        },
+        {
+            "type": "java",
+            "name": "Debug (Launch)-ThssDB<ThssDB>",
+            "request": "launch",
+            "mainClass": "cn.edu.thssdb.server.ThssDB",
+            "projectName": "ThssDB"
+        },
+        {
+            "type": "java",
+            "name": "Debug (Launch)-Test<ThssDB>",
+            "request": "launch",
+            "mainClass": "cn.edu.thssdb.storage.Test",
+            "projectName": "ThssDB"
+        }
+    ]
+}
