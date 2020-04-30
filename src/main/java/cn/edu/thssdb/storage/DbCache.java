@@ -25,9 +25,9 @@ public class DbCache {
     public DbCache(String filename, int rowSize) throws IOException {
         dataFile = new DataFile(filename);
         // FIXME
-        dataFile.createFile();
+        dataFile.init();
         metaFile = new MetaFile(filename);
-        metaFile.createFile();
+        metaFile.init();
         metadata = new Metadata(rowSize);
         cache = new byte[Global.CACHE_SIZE][Global.PAGE_SIZE];
         idIndex = new HashMap<>();
@@ -42,8 +42,7 @@ public class DbCache {
         // Hit
         if (idIndex.containsKey(id)) {
             return;
-        }
-        else {
+        } else {
             int newIndex = 0;
             // full, LFU
             if (freeCacheList.isEmpty()) {
@@ -64,8 +63,7 @@ public class DbCache {
                 writeBackPage(minId);
                 idIndex.remove(minId);
                 newIndex = minIndex;
-            }
-            else {
+            } else {
                 newIndex = freeCacheList.get(0);
                 freeCacheList.remove(0);
             }

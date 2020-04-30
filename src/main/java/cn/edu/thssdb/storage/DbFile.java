@@ -11,17 +11,15 @@ public class DbFile {
     // protected FileOutputStream outputStream;
     // protected FileInputStream inputStream;
     protected String filename;
-    RandomAccessFile reader = null;
     RandomAccessFile writer = null;
 
     public DbFile(String filename) {
         this.filename = filename;
     }
 
-    public void createFile() {
+    public void init() {
         try {
             writer = new RandomAccessFile(this.filename, "rw");
-            reader = new RandomAccessFile(this.filename, "r");
         } catch (IOException e) {
             System.err.println(String.format("Create file error:%s", this.filename));
             System.exit(-1);
@@ -30,7 +28,6 @@ public class DbFile {
 
     public void close() {
         try {
-            reader.close();
             writer.close();
         } catch (IOException e) {
             System.err.println(String.format("Close %s error", this.filename));
