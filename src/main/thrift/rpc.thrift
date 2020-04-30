@@ -50,4 +50,5 @@ service IService {
   ConnectResp connect(1: ConnectReq req);
   DisconnetResp disconnect(1: DisconnetResp req);
   ExecuteStatementResp executeStatement(1: ExecuteStatementReq req);
+  void Insert(1: binary data);
 }

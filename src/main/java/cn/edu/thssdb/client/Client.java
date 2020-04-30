@@ -19,6 +19,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.PrintStream;
+import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
 import java.util.Scanner;
 
 public class Client {
@@ -60,6 +62,13 @@ public class Client {
       while (true) {
         print(Global.CLI_PREFIX);
         String msg = SCANNER.nextLine();
+        if (msg.startsWith("insert")) {
+          String data = msg.split(" ", 0)[1];
+          try {
+            client.Insert(ByteBuffer.wrap(data.getBytes(StandardCharsets.UTF_8)));
+          } catch (TException e) {
+          }
+        }
         long startTime = System.currentTimeMillis();
         switch (msg.trim()) {
           case Global.SHOW_TIME:
@@ -95,27 +104,12 @@ public class Client {
 
   static Options createOptions() {
     Options options = new Options();
-    options.addOption(Option.builder(HELP_ARGS)
-        .argName(HELP_NAME)
-        .desc("Display help information(optional)")
-        .hasArg(false)
-        .required(false)
-        .build()
-    );
-    options.addOption(Option.builder(HOST_ARGS)
-        .argName(HOST_NAME)
-        .desc("Host (optional, default 127.0.0.1)")
-        .hasArg(false)
-        .required(false)
-        .build()
-    );
-    options.addOption(Option.builder(PORT_ARGS)
-        .argName(PORT_NAME)
-        .desc("Port (optional, default 6667)")
-        .hasArg(false)
-        .required(false)
-        .build()
-    );
+    options.addOption(Option.builder(HELP_ARGS).argName(HELP_NAME).desc("Display help information(optional)")
+        .hasArg(false).required(false).build());
+    options.addOption(Option.builder(HOST_ARGS).argName(HOST_NAME).desc("Host (optional, default 127.0.0.1)")
+        .hasArg(false).required(false).build());
+    options.addOption(Option.builder(PORT_ARGS).argName(PORT_NAME).desc("Port (optional, default 6667)").hasArg(false)
+        .required(false).build());
     return options;
   }
 

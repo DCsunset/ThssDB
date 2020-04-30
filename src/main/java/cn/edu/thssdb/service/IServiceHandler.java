@@ -9,12 +9,21 @@ import cn.edu.thssdb.rpc.thrift.GetTimeReq;
 import cn.edu.thssdb.rpc.thrift.GetTimeResp;
 import cn.edu.thssdb.rpc.thrift.IService;
 import cn.edu.thssdb.rpc.thrift.Status;
+import cn.edu.thssdb.storage.DataFile;
+import cn.edu.thssdb.storage.DbCache;
+import cn.edu.thssdb.storage.MetaFile;
+import cn.edu.thssdb.storage.Metadata;
 import cn.edu.thssdb.utils.Global;
 import org.apache.thrift.TException;
 
 import java.util.Date;
 
 public class IServiceHandler implements IService.Iface {
+  private DbCache cache;
+
+  public IServiceHandler(DbCache _cache) {
+    this.cache = _cache;
+  }
 
   @Override
   public GetTimeResp getTime(GetTimeReq req) throws TException {
@@ -40,5 +49,13 @@ public class IServiceHandler implements IService.Iface {
   public ExecuteStatementResp executeStatement(ExecuteStatementReq req) throws TException {
     // TODO
     return null;
+  }
+
+  @Override
+  public void Insert(java.nio.ByteBuffer data) throws TException {
+    System.out.println("insert,x=");
+    for (byte c : data.array()) {
+      System.out.println(String.format("byte=%c", c));
+    }
   }
 }
