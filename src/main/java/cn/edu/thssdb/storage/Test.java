@@ -28,7 +28,7 @@ public class Test {
         metafile.writeMetadata(meta);
         Metadata meta1 = metafile.readMetadata();
         System.out.print(meta1.getRowSize());
-        for (short id : meta1.getFreePageList()) {
+        for (int id : meta1.freePageList) {
             System.out.print(id);
         }
     }
