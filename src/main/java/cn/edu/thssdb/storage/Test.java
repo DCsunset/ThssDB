@@ -17,7 +17,7 @@ public class Test {
         content[5] = 5;
         data.writePage(1, content);
         data.writePage(4, content);
-        byte[] content1 = data.readPage(4);
+        // byte[] content1 = data.readPage(4);
         // for (byte c : content1) {
         // System.out.format("%d", c);
         // }
@@ -25,9 +25,20 @@ public class Test {
         DataFile data1 = new DataFile(tbName);
         data1.init();
         byte[] content2 = data1.readPage(4);
-        // for (byte c : content2) {
-        // System.out.format("%d", c);
-        // }
+        byte[] content3 = data1.readPage(1);
+        byte[] content4 = data1.readPage(0);
+        System.out.println("content2");
+        for (byte c : content2) {
+            System.out.format("%d", c);
+        }
+        System.out.println("content3");
+        for (byte c : content3) {
+            System.out.format("%d", c);
+        }
+        System.out.println("content4");
+        for (byte c : content4) {
+            System.out.format("%d", c);
+        }
 
         MetaFile metafile = new MetaFile(tbName);
         metafile.init();
@@ -38,9 +49,9 @@ public class Test {
         metafile.readMetadata();
         metafile.writeMetadata(meta);
         Metadata meta1 = metafile.readMetadata();
-        System.out.print(meta1.getRowSize());
-        for (int id : meta1.freePageList) {
-            System.out.print(id);
-        }
+        // System.out.print(meta1.getRowSize());
+        // for (int id : meta1.freePageList) {
+        // System.out.print(id);
+        // }
     }
 }

@@ -1,6 +1,8 @@
 package cn.edu.thssdb.storage;
 
 import java.io.IOException;
+import java.io.RandomAccessFile;
+
 import cn.edu.thssdb.utils.Global;
 
 public class DataFile extends DbFile {
@@ -46,8 +48,10 @@ public class DataFile extends DbFile {
     public byte[] readPage(int id) {
         byte[] buffer = new byte[Global.PAGE_SIZE];
         try {
-            writer.seek(id * Global.PAGE_SIZE);
-            writer.read(buffer);
+            RandomAccessFile reader = new RandomAccessFile(this.filename, "r");
+            reader.seek(id * Global.PAGE_SIZE);
+            reader.read(buffer);
+            reader.close();
         } catch (IOException e) {
             System.err.println(String.format("write page to file error:%s,id=%d", this.filename, id));
             System.exit(-1);
