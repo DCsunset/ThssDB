@@ -17,14 +17,16 @@ public class DbCache {
     private Map<Integer, Pair<Integer, Boolean>> idIndex;
     private DataFile dataFile;
     private MetaFile metaFile;
-    private Metadata metadata;
+    private int rowSize;
+
+    public Metadata metadata;
 
     // LFU replacement
     private int[] freqTable;
 
     public DbCache(String filename, int rowSize) throws IOException {
+        this.rowSize = rowSize;
         dataFile = new DataFile(filename);
-        // FIXME
         dataFile.createFile();
         metaFile = new MetaFile(filename);
         metaFile.createFile();
@@ -77,43 +79,23 @@ public class DbCache {
         }
     }
 
-    public byte[] readPage(int id) {
+    public Page readPage(int id) {
         // Fetch from disk if necessary
         fetchPage(id);
         Pair<Integer, Boolean> indexPair = idIndex.get(id);
         int index = indexPair.getKey();
         ++freqTable[index];
-        return cache[index];
+        return new Page(cache[index], rowSize);
     }
 
-    public void writePage(int id, byte content[]) {
-        assert content.length == Global.PAGE_SIZE;
+    public void writePage(int id, Page page) {
         // Fetch from disk if necessary
         fetchPage(id);
         Pair<Integer, Boolean> indexPair = idIndex.get(id);
         int index = indexPair.getKey();
-        cache[index] = content;
+        cache[index] = page.rawData();
         ++freqTable[index];
         idIndex.replace(id, new Pair<>(index, true));
-    }
-
-    public void removePage(int id) {
-        metadata.freePageList.add(id);
-        if (idIndex.containsKey(id)) {
-            Pair<Integer, Boolean> indexPair = idIndex.get(id);
-            int index = indexPair.getKey();
-            freeCacheList.add(index);
-            idIndex.remove(id);
-        }
-    }
-
-    // Allocate a new page id
-    public int newPage() throws Exception {
-        if (metadata.freePageList.isEmpty())
-            throw new Exception("No free pages");
-        int id = metadata.freePageList.get(0);
-        metadata.freePageList.remove(0);
-        return id;
     }
 
     public void writeBackPage(int id) {

@@ -9,14 +9,19 @@ public class CacheTest {
         String tbName = "table1";
         DbCache cache = new DbCache(tbName, 10);
 
-        byte[] content = new byte[Global.PAGE_SIZE];
+        int id = cache.metadata.freePageList.get(0);
+        Page page = cache.readPage(id);
+        assert page.isFull() == false;
+
+        byte[] row = page.readRow(0);
         for (byte i = 0; i < 5; i++)
-            content[i] = i;
-        cache.writePage(0, content);
-        content[5] = 5;
-        cache.writePage(1, content);
-        cache.writePage(4, content);
-        byte[] content1 = cache.readPage(4);
+            row[i] = i;
+        page.writeRow(0, row);
+        page.writeRow(1, row);
+        if (page.isFull())
+            cache.metadata.freePageList.remove(0);
+
+        byte[] content1 = page.readRow(0);
         for (byte c : content1) {
             System.out.format("%d", c);
         }

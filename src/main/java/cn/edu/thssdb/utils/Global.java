@@ -15,8 +15,11 @@ public class Global {
 
   public static final String S_URL_INTERNAL = "jdbc:default:connection";
 
+
   // File
   public static final int INIT_FILE_SIZE = 16 * 1024;
+  // Page
+  public static final int BITMAP_SIZE = 64; // in bit
   public static final int PAGE_SIZE = 4 * 1024;
   // Cache
   public static final int CACHE_SIZE = 16;
