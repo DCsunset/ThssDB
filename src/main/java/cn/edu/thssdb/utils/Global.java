@@ -18,4 +18,6 @@ public class Global {
   // File
   public static final int INIT_FILE_SIZE = 16 * 1024;
   public static final int PAGE_SIZE = 4 * 1024;
+  // Cache
+  public static final int CACHE_SIZE = 16;
 }
