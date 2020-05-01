@@ -65,7 +65,7 @@ public class IServiceHandler implements IService.Iface {
       cache.metadata.freePageList.remove(0);
     }
     cache.writePage(id, page);
-    cache.writeBack();
+    // cache.writeBack();
   }
 
   @Override
@@ -73,6 +73,6 @@ public class IServiceHandler implements IService.Iface {
     Page page = cache.readPage(pageID);
     page.writeRow(rowIndex, data.array());
     cache.writePage(pageID, page);
-    cache.writeBack();
+    // cache.writeBack();
   }
 }

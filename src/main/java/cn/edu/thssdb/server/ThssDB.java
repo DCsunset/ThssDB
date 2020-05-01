@@ -39,7 +39,7 @@ public class ThssDB {
       Runtime.getRuntime().addShutdownHook(new Thread() {
         public void run() {
           System.out.println("Cache write back to file");
-          // cache.writeBack();
+          cache.writeBack();
         }
       });
       handler = new IServiceHandler(cache);
