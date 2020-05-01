@@ -15,8 +15,11 @@ import cn.edu.thssdb.storage.MetaFile;
 import cn.edu.thssdb.storage.Metadata;
 import cn.edu.thssdb.utils.Global;
 import org.apache.thrift.TException;
+import cn.edu.thssdb.storage.*;
 
+import java.util.BitSet;
 import java.util.Date;
+import java.util.Iterator;
 
 public class IServiceHandler implements IService.Iface {
   private DbCache cache;
@@ -57,5 +60,17 @@ public class IServiceHandler implements IService.Iface {
     for (byte c : data.array()) {
       System.out.println(String.format("byte=%c", c));
     }
+    // Get an empty page
+    int id = cache.metadata.freePageList.get(0);
+    Page page = cache.readPage(id);
+    // Insert record into that page
+    BitSet bitmap = page.bitmap;
+    int index = bitmap.nextClearBit(0);
+    page.writeRow(index, data.array());
+    // If full, change freepagelist
+    cache.metadata.freePageList.remove(0);
+    // Write page to cache
+    cache.writePage(id, page);
+    cache.writeBack();
   }
 }

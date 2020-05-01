@@ -34,11 +34,21 @@ public class ThssDB {
 
   private void start() {
     String tbName = "table1";
-    DbCache cache = new DbCache(tbName, 10);
-    handler = new IServiceHandler(cache);
-    processor = new IService.Processor(handler);
-    Runnable setup = () -> setUp(processor);
-    new Thread(setup).start();
+    try {
+      DbCache cache = new DbCache(tbName, 10);
+      Runtime.getRuntime().addShutdownHook(new Thread() {
+        public void run() {
+          System.out.println("Cache write back to file");
+          // cache.writeBack();
+        }
+      });
+      handler = new IServiceHandler(cache);
+      processor = new IService.Processor(handler);
+      Runnable setup = () -> setUp(processor);
+      new Thread(setup).start();
+    } catch (Exception e) {
+      System.err.print("Init cache failed!");
+    }
   }
 
   private static void setUp(IService.Processor processor) {

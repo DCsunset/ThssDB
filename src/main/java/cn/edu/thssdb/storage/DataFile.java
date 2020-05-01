@@ -53,7 +53,7 @@ public class DataFile extends DbFile {
             reader.read(buffer);
             reader.close();
         } catch (IOException e) {
-            System.err.println(String.format("write page to file error:%s,id=%d", this.filename, id));
+            System.err.println(String.format("read page from file error:%s,id=%d", this.filename, id));
             System.exit(-1);
         }
         return buffer;
