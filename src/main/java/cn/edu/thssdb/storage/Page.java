@@ -24,15 +24,13 @@ public class Page {
             System.out.print(c + " ");
         }
         bitmap = BitSet.valueOf(Arrays.copyOfRange(rawData, 0, Global.BITMAP_SIZE / 8));
-        System.out.println("bitmap=" + bitmap);
-        System.out.print("bitmap.length=" + bitmap.length());
         fullBitSet = new BitSet(bitmap.length());
         fullBitSet.set(0, recordNum);
         rowData = Arrays.copyOfRange(rawData, Global.BITMAP_SIZE / 8, rawData.length);
     }
 
     public byte[] rawData() {
-        byte[] bitmapBytes = bitmap.toByteArray();
+        byte[] bitmapBytes = Arrays.copyOf(bitmap.toByteArray(), Global.BITMAP_SIZE / 8);
         System.out.print("bitmapBytes=");
         for (byte c : bitmapBytes) {
             System.out.print(c + " ");
