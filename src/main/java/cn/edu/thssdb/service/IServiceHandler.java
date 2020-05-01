@@ -67,4 +67,12 @@ public class IServiceHandler implements IService.Iface {
     cache.writePage(id, page);
     cache.writeBack();
   }
+
+  @Override
+  public void Update(java.nio.ByteBuffer data, int pageID, int rowIndex) throws TException {
+    Page page = cache.readPage(pageID);
+    page.writeRow(rowIndex, data.array());
+    cache.writePage(pageID, page);
+    cache.writeBack();
+  }
 }

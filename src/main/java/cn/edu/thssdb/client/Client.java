@@ -64,10 +64,13 @@ public class Client {
         String msg = SCANNER.nextLine();
         if (msg.startsWith("insert")) {
           String data = msg.split(" ", 0)[1];
-          try {
-            client.Insert(ByteBuffer.wrap(data.getBytes(StandardCharsets.UTF_8)));
-          } catch (TException e) {
-          }
+          client.Insert(ByteBuffer.wrap(data.getBytes(StandardCharsets.UTF_8)));
+        } else if (msg.startsWith("update")) {
+          String[] msgs = msg.split(" ", 0);
+          String data = msgs[1];
+          int pageID = Integer.parseInt(msgs[2]);
+          int rowIndex = Integer.parseInt(msgs[3]);
+          client.Update(ByteBuffer.wrap(data.getBytes(StandardCharsets.UTF_8)), pageID, rowIndex);
         }
         long startTime = System.currentTimeMillis();
         switch (msg.trim()) {
@@ -90,6 +93,8 @@ public class Client {
       transport.close();
     } catch (TTransportException e) {
       logger.error(e.getMessage());
+    } catch (TException e) {
+
     }
   }
 
