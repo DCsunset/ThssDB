@@ -18,7 +18,7 @@ public class Page {
 
     public Page(byte[] rawData, int rowSize) {
         this.rowSize = rowSize;
-        recordNum = Integer.max(Global.PAGE_SIZE / rowSize, Global.BITMAP_SIZE);
+        recordNum = Integer.min(Global.PAGE_SIZE / rowSize, Global.BITMAP_SIZE);
         System.out.println("rawbitmap=");
         for (byte c : Arrays.copyOfRange(rawData, 0, Global.BITMAP_SIZE / 8)) {
             System.out.print(c + " ");
@@ -50,9 +50,13 @@ public class Page {
         for (int i = 0; i < data.length; ++i)
             rowData[index * rowSize + i] = data[i];
         bitmap.set(index);
+        System.out.println("after set index, bitmap=" + bitmap);
     }
 
     public boolean isFull() {
+        if (bitmap.length() == 65) {
+            System.out.print("fullbitset=" + fullBitSet);
+        }
         return fullBitSet.equals(bitmap);
     }
 }
