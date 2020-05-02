@@ -68,6 +68,7 @@ public class IServiceHandler implements IService.Iface {
         cache.metadata.freePageList.add(pageId);
     }
     page.bitmap.clear(rowIndex);
+    cache.writePage(pageId, page);
     cache.writeBack();
   }
 
