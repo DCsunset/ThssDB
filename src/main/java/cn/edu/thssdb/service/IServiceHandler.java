@@ -69,7 +69,7 @@ public class IServiceHandler implements IService.Iface {
     }
     page.bitmap.clear(rowIndex);
     cache.writePage(pageId, page);
-    cache.writeBack();
+    // cache.writeBack();
   }
 
   @Override
@@ -83,7 +83,7 @@ public class IServiceHandler implements IService.Iface {
       cache.metadata.freePageList.remove(0);
     }
     cache.writePage(id, page);
-    cache.writeBack();
+    // cache.writeBack();
   }
 
   @Override
