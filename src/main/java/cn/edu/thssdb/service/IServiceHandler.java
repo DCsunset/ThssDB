@@ -17,6 +17,7 @@ import cn.edu.thssdb.utils.Global;
 import org.apache.thrift.TException;
 import cn.edu.thssdb.storage.*;
 
+import java.nio.ByteBuffer;
 import java.util.BitSet;
 import java.util.Date;
 import java.util.Iterator;
@@ -55,6 +56,22 @@ public class IServiceHandler implements IService.Iface {
   }
 
   @Override
+  public ByteBuffer Select(int pageId, int rowIndex) throws TException {
+    Page page = cache.readPage(pageId);
+    return ByteBuffer.wrap(page.readRow(rowIndex));
+  }
+
+  @Override
+  public void Delete(int pageId, int rowIndex) throws TException {
+    Page page = cache.readPage(pageId);
+    if (page.isFull()) {
+        cache.metadata.freePageList.add(pageId);
+    }
+    page.bitmap.clear(rowIndex);
+    cache.writeBack();
+  }
+
+  @Override
   public void Insert(java.nio.ByteBuffer data) throws TException {
     int id = cache.metadata.freePageList.get(0);
     Page page = cache.readPage(id);
@@ -65,7 +82,7 @@ public class IServiceHandler implements IService.Iface {
       cache.metadata.freePageList.remove(0);
     }
     cache.writePage(id, page);
-    // cache.writeBack();
+    cache.writeBack();
   }
 
   @Override

@@ -71,7 +71,18 @@ public class Client {
           int pageID = Integer.parseInt(msgs[2]);
           int rowIndex = Integer.parseInt(msgs[3]);
           client.Update(ByteBuffer.wrap(data.getBytes(StandardCharsets.UTF_8)), pageID, rowIndex);
+        } else if (msg.startsWith("select")) {
+          String[] msgs = msg.split(" ", 0);
+          int pageID = Integer.parseInt(msgs[1]);
+          int rowIndex = Integer.parseInt(msgs[2]);
+          client.Select(pageID, rowIndex);
+        } else if (msg.startsWith("delete")) {
+          String[] msgs = msg.split(" ", 0);
+          int pageID = Integer.parseInt(msgs[1]);
+          int rowIndex = Integer.parseInt(msgs[2]);
+          client.Delete(pageID, rowIndex);
         }
+
         long startTime = System.currentTimeMillis();
         switch (msg.trim()) {
           case Global.SHOW_TIME:
