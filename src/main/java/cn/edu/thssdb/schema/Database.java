@@ -2,6 +2,9 @@ package cn.edu.thssdb.schema;
 
 import cn.edu.thssdb.query.QueryResult;
 import cn.edu.thssdb.query.QueryTable;
+import com.sun.xml.internal.fastinfoset.tools.FI_DOM_Or_XML_DOM_SAX_SAXEvent;
+
+import java.io.*;
 import java.util.HashMap;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
@@ -19,15 +22,37 @@ public class Database {
   }
 
   private void persist() {
-    // TODO
+      try {
+          FileOutputStream metaFile
+                  = new FileOutputStream(name + "/" + name + ".meta");
+          ObjectOutputStream obj = new ObjectOutputStream(metaFile);
+          obj.writeObject(tables);
+          obj.close();
+          metaFile.close();
+      }
+      catch (IOException e) {
+          System.err.println(String.format("Serialize metadata failed"));
+      }
   }
 
   public void create(String name, Column[] columns) {
-    // TODO
+      if (tables.containsKey(name)) {
+          System.err.println(String.format("Table %s already exists", name));
+          return;
+      }
+      Table table = new Table(this.name, name, columns);
+      tables.put(name, table);
   }
 
   public void drop() {
-    // TODO
+      File index = new File(name);
+      if (index.isDirectory()) {
+          String[]entries = index.list();
+          for(String s: entries){
+              File currentFile = new File(index.getPath(),s);
+              currentFile.delete();
+          }
+      }
   }
 
   public String select(QueryTable[] queryTables) {
@@ -37,10 +62,34 @@ public class Database {
   }
 
   private void recover() {
-    // TODO
+    File file = new File(this.name);
+    if (file.isDirectory()) {
+        try {
+            FileInputStream metaFile =
+                    new FileInputStream(this.name + "/" + name + ".meta");
+            ObjectInputStream obj = new ObjectInputStream(metaFile);
+            tables = (HashMap) obj.readObject();
+            obj.close();
+            metaFile.close();
+        }
+        catch (IOException e) {
+            System.err.println(String.format("De-Serialize metadata failed"));
+        }
+        catch (ClassNotFoundException c) {
+            System.err.println(String.format("De-Serialize metadata failed"));
+        }
+    }
+    else {
+        boolean ok = file.mkdir();
+        if (!ok) {
+          System.err.println(String.format("create db error"));
+          System.exit(-1);
+        }
+        persist();
+    }
   }
 
   public void quit() {
-    // TODO
+      persist();
   }
 }
