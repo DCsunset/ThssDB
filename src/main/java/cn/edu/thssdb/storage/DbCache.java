@@ -30,7 +30,7 @@ public class DbCache {
         dataFile.init();
         metaFile = new MetaFile(filename);
         metaFile.init();
-        metadata = new Metadata(rowSize);
+        // metadata = new Metadata(rowSize);
         cache = new byte[Global.CACHE_SIZE][Global.PAGE_SIZE];
         idIndex = new HashMap<>();
         freqTable = new int[Global.CACHE_SIZE];

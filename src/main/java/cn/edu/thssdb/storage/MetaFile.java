@@ -29,7 +29,7 @@ public class MetaFile {
                 this.data = (Metadata) objin.readObject();
             }
         } catch (Exception e) {
-            System.err.println(String.format("Create file error:%s", this.filename));
+            System.err.println(String.format("Create file error:%s,%s", this.filename, e));
             System.exit(-1);
         }
     }

@@ -1,22 +1,26 @@
 package cn.edu.thssdb.storage;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.stream.IntStream;
+import cn.edu.thssdb.schema.*;
 
 import cn.edu.thssdb.utils.Global;
 
+// Metadata for a table
 public class Metadata implements java.io.Serializable {
     private int rowSize; // number of bytes in one row
     private static final long serialVersionUID = 42L;
 
+    public ArrayList<Column> columns;
     public List<Integer> freePageList; // each element is id of page with free rows
 
-    public Metadata(int size) {
-        this.rowSize = size;
+    public Metadata(ArrayList<Column> cls) {
+        this.columns = cls;
+        this.rowSize = 0;
+        for (int i = 0; i < cls.size(); i++) {
+            rowSize += cls.get(i).getMaxLength();
+        }
         int listSize = Global.INIT_FILE_SIZE / Global.PAGE_SIZE;
         freePageList = new LinkedList<>();
         for (int i = 0; i < listSize; i++)
