@@ -20,9 +20,11 @@ public class MetaFile {
     public void init() {
         try {
             if (!(new File(this.filename).isFile())) {
+                System.out.println("1");
                 out = new FileOutputStream(this.filename);
                 in = new FileInputStream(this.filename);
             } else {
+                System.out.println("2");
                 // Could not instanitiate fileoutputstream as it will create a new empty file
                 in = new FileInputStream(this.filename);
                 ObjectInputStream objin = new ObjectInputStream(this.in);

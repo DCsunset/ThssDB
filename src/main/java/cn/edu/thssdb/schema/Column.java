@@ -30,4 +30,8 @@ public class Column implements Comparable<Column>, Serializable {
   public int getMaxLength() {
     return this.maxLength;
   }
+
+  public boolean isPrimary() {
+    return primary;
+  }
 }

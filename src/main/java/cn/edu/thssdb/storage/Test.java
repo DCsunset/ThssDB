@@ -45,18 +45,18 @@ public class Test {
 
         MetaFile metafile = new MetaFile(tbName);
         metafile.init();
-        ArrayList<Column> columns = new ArrayList<>();
-        columns.add(new Column("name", ColumnType.STRING, true, true, 250));
-        columns.add(new Column("age", ColumnType.INT, true, true));
-        Metadata meta = new Metadata(columns);
-        metafile.writeMetadata(meta);
-        Metadata meta1 = metafile.readMetadata();
-        System.out.print(meta1.getRowSize());
-        for (int id : meta1.freePageList) {
-            System.out.print(id);
-        }
-        for (Column c : meta1.columns) {
-            System.out.println(c);
-        }
+        // ArrayList<Column> columns = new ArrayList<>();
+        // columns.add(new Column("name", ColumnType.STRING, true, true, 250));
+        // columns.add(new Column("age", ColumnType.INT, true, true));
+        // Metadata meta = new Metadata(columns);
+        // metafile.writeMetadata(meta);
+        // Metadata meta1 = metafile.readMetadata();
+        // System.out.print(meta1.getRowSize());
+        // for (int id : meta1.freePageList) {
+        // System.out.print(id);
+        // }
+        // for (Column c : meta1.columns) {
+        // System.out.println(c);
+        // }
     }
 }

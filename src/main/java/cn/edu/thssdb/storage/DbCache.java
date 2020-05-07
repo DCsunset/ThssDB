@@ -16,6 +16,7 @@ public class DbCache {
     // Map id to index, Boolean to mark if dirty
     private Map<Integer, Pair<Integer, Boolean>> idIndex;
     private DataFile dataFile;
+    // FIXME: metaFile should not be included in per-table cache
     private MetaFile metaFile;
     private int rowSize;
 

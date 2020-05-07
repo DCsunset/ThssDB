@@ -10,86 +10,84 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 public class Database {
 
-  private String name;
-  private HashMap<String, Table> tables;
-  ReentrantReadWriteLock lock;
+    private String name;
+    private HashMap<String, Table> tables;
+    ReentrantReadWriteLock lock;
 
-  public Database(String name) {
-    this.name = name;
-    this.tables = new HashMap<>();
-    this.lock = new ReentrantReadWriteLock();
-    recover();
-  }
+    public HashMap<String, Table> getTables() {
+        return tables;
+    }
 
-  private void persist() {
-      try {
-          FileOutputStream metaFile
-                  = new FileOutputStream(name + "/" + name + ".meta");
-          ObjectOutputStream obj = new ObjectOutputStream(metaFile);
-          obj.writeObject(tables);
-          obj.close();
-          metaFile.close();
-      }
-      catch (IOException e) {
-          System.err.println(String.format("Serialize metadata failed"));
-      }
-  }
+    public Database(String name) {
+        this.name = name;
+        this.tables = new HashMap<>();
+        this.lock = new ReentrantReadWriteLock();
+        recover();
+    }
 
-  public void create(String name, Column[] columns) {
-      if (tables.containsKey(name)) {
-          System.err.println(String.format("Table %s already exists", name));
-          return;
-      }
-      Table table = new Table(this.name, name, columns);
-      tables.put(name, table);
-  }
-
-  public void drop() {
-      File index = new File(name);
-      if (index.isDirectory()) {
-          String[]entries = index.list();
-          for(String s: entries){
-              File currentFile = new File(index.getPath(),s);
-              currentFile.delete();
-          }
-      }
-  }
-
-  public String select(QueryTable[] queryTables) {
-    // TODO
-    QueryResult queryResult = new QueryResult(queryTables);
-    return null;
-  }
-
-  private void recover() {
-    File file = new File(this.name);
-    if (file.isDirectory()) {
+    private void persist() {
         try {
-            FileInputStream metaFile =
-                    new FileInputStream(this.name + "/" + name + ".meta");
-            ObjectInputStream obj = new ObjectInputStream(metaFile);
-            tables = (HashMap) obj.readObject();
+            FileOutputStream metaFile = new FileOutputStream(name + "/" + name + ".meta");
+            ObjectOutputStream obj = new ObjectOutputStream(metaFile);
+            obj.writeObject(tables);
             obj.close();
             metaFile.close();
-        }
-        catch (IOException e) {
-            System.err.println(String.format("De-Serialize metadata failed"));
-        }
-        catch (ClassNotFoundException c) {
-            System.err.println(String.format("De-Serialize metadata failed"));
+        } catch (IOException e) {
+            System.err.println(String.format("Serialize metadata failed"));
         }
     }
-    else {
-        boolean ok = file.mkdir();
-        if (!ok) {
-          System.err.println(String.format("create db error"));
-          System.exit(-1);
+
+    public void create(String name, Column[] columns) {
+        if (tables.containsKey(name)) {
+            System.err.println(String.format("Table %s already exists", name));
+            return;
         }
+        Table table = new Table(this.name, name, columns);
+        tables.put(name, table);
+    }
+
+    public void drop() {
+        File index = new File(name);
+        if (index.isDirectory()) {
+            String[] entries = index.list();
+            for (String s : entries) {
+                File currentFile = new File(index.getPath(), s);
+                currentFile.delete();
+            }
+        }
+    }
+
+    public String select(QueryTable[] queryTables) {
+        // TODO
+        QueryResult queryResult = new QueryResult(queryTables);
+        return null;
+    }
+
+    private void recover() {
+        File file = new File(this.name);
+        if (file.isDirectory()) {
+            try {
+                FileInputStream metaFile = new FileInputStream(this.name + "/" + name + ".meta");
+                ObjectInputStream obj = new ObjectInputStream(metaFile);
+                tables = (HashMap) obj.readObject();
+                obj.close();
+                metaFile.close();
+            } catch (IOException e) {
+                System.err.println(String.format("De-Serialize metadata failed"));
+            } catch (ClassNotFoundException c) {
+                System.err.println(String.format("De-Serialize metadata failed"));
+            }
+        } else {
+            boolean ok = file.mkdir();
+            if (!ok) {
+                System.err.println(String.format("create db error"));
+                System.exit(-1);
+            }
+            persist();
+        }
+    }
+
+    public void quit() {
         persist();
     }
-  }
-
-  public void quit() {
-      persist();
-  }
 }
