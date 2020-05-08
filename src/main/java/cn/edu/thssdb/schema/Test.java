@@ -2,6 +2,7 @@ package cn.edu.thssdb.schema;
 
 import java.util.HashMap;
 import cn.edu.thssdb.type.*;
+import cn.edu.thssdb.storage.*;
 
 public class Test {
     public static void main(String[] args) {
@@ -11,5 +12,8 @@ public class Test {
         HashMap<String, Table> tables = db.getTables();
         Table tb = tables.get("tb1");
         System.out.println(tb.tableName);
+        Metadata metadata = tb.getMetadata();
+        System.out.println(metadata.getRowSize());
+        System.out.println(metadata.columns[0]);
     }
 }

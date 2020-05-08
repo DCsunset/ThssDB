@@ -17,7 +17,7 @@ public class DbCache {
     private Map<Integer, Pair<Integer, Boolean>> idIndex;
     private DataFile dataFile;
     // FIXME: metaFile should not be included in per-table cache
-    private MetaFile metaFile;
+    // private MetaFile metaFile;
     private int rowSize;
 
     public Metadata metadata;
@@ -29,8 +29,8 @@ public class DbCache {
         this.rowSize = rowSize;
         dataFile = new DataFile(filename);
         dataFile.init();
-        metaFile = new MetaFile(filename);
-        metaFile.init();
+        // metaFile = new MetaFile(filename);
+        // metaFile.init();
         // metadata = new Metadata(rowSize);
         cache = new byte[Global.CACHE_SIZE][Global.PAGE_SIZE];
         idIndex = new HashMap<>();
@@ -112,6 +112,6 @@ public class DbCache {
         for (int id : idIndex.keySet()) {
             writeBackPage(id);
         }
-        metaFile.writeMetadata(metadata);
+        // metaFile.writeMetadata(metadata);
     }
 }
