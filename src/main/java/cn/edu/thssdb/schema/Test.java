@@ -6,7 +6,10 @@ import cn.edu.thssdb.storage.*;
 
 public class Test {
     public static void main(String[] args) {
-        Database db = new Database("test");
+        Manager manager = new Manager();
+        manager.createDatabaseIfNotExists("db1");
+        manager.switchDatabase("db1");
+        Database db = manager.currentDatabase;
         // Column[] columns = { new Column("height", ColumnInfo.ColumnType.INT, false,
         // true) };
         // db.create("tb1", columns);

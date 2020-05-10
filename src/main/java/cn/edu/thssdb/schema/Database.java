@@ -10,7 +10,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 public class Database {
 
-    private String name;
+    public String name;
     private HashMap<String, Table> tables;
     ReentrantReadWriteLock lock;
 
@@ -25,9 +25,9 @@ public class Database {
         recover();
     }
 
-    private void persist() {
+    public void persist() {
         try {
-            FileOutputStream metaFile = new FileOutputStream(name + "/" + name + ".meta");
+            FileOutputStream metaFile = new FileOutputStream(Manager.baseDir + "/" + name + "/" + name + ".meta");
             ObjectOutputStream obj = new ObjectOutputStream(metaFile);
             obj.writeObject(tables);
             obj.close();
@@ -54,6 +54,7 @@ public class Database {
                 File currentFile = new File(index.getPath(), s);
                 currentFile.delete();
             }
+            index.delete();
         }
     }
 
@@ -64,10 +65,10 @@ public class Database {
     }
 
     private void recover() {
-        File file = new File(this.name);
+        File file = new File(Manager.baseDir + "/" + name);
         if (file.isDirectory()) {
             try {
-                FileInputStream metaFile = new FileInputStream(this.name + "/" + name + ".meta");
+                FileInputStream metaFile = new FileInputStream(Manager.baseDir + "/" + name + "/" + name + ".meta");
                 ObjectInputStream obj = new ObjectInputStream(metaFile);
                 tables = (HashMap) obj.readObject();
                 obj.close();

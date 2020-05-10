@@ -12,6 +12,8 @@ import java.util.ArrayList;
 
 import cn.edu.thssdb.storage.DbCache;
 import cn.edu.thssdb.storage.Metadata;
+import jdk.internal.org.objectweb.asm.tree.MultiANewArrayInsnNode;
+
 import java.util.Iterator;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
@@ -29,7 +31,7 @@ public class Table implements Iterable<Row>, Serializable {
     this.tableName = tableName;
     this.metadata = new Metadata(columns);
     try {
-      this.cache = new DbCache(databaseName + "/" + tableName, metadata.getRowSize());
+      this.cache = new DbCache(Manager.baseDir + "/" + databaseName + "/" + tableName, metadata.getRowSize());
     } catch (IOException e) {
       System.out.println("create cache error");
     }
