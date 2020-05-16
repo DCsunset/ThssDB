@@ -15,7 +15,7 @@ import java.util.concurrent.locks.Condition;
 
 public class Test {
     public static void main(String[] args) {
-        String str = "SELECT CUST_NAME, id FROM CUSTOMERS WHERE CUST_NAME = 'Kash%'; insert into stu where id = '101';insert into stu where id=101;";
+        String str = "SELECT CUST_NAME, id FROM CUSTOMERS WHERE CUST_NAME = 'Kash%'; insert into stu (c1,c2,c3) values(1,2,3);";
 
         SQLLexer lexer = new SQLLexer(CharStreams.fromString(str));
         CommonTokenStream tokens = new CommonTokenStream(lexer);
@@ -23,7 +23,7 @@ public class Test {
         ParseContext root = parser.parse();
         System.out.println(root.sql_stmt_list().sql_stmt().size());
         int type = root.sql_stmt_list().sql_stmt().get(0).getStart().getType();
-        if (type == parser.K_SELECT) {
+        if (type == SQLParser.K_SELECT) {
             // parse select
             SQLParser.Select_stmtContext ctx = root.sql_stmt_list().sql_stmt().get(0).select_stmt();
             System.out.println(ctx.toStringTree());
@@ -43,7 +43,7 @@ public class Test {
         }
         Sql_stmtContext s2 = root.sql_stmt_list().sql_stmt().get(1);
         type = s2.getStart().getType();
-        if (type == parser.K_INSERT) {
+        if (type == SQLParser.K_INSERT) {
             System.out.print("insert detected");
         }
     }
