@@ -8,6 +8,13 @@
             "type": "java",
             "name": "CodeLens (Launch) - Test",
             "request": "launch",
+            "mainClass": "cn.edu.thssdb.query.Test",
+            "projectName": "ThssDB"
+        },
+        {
+            "type": "java",
+            "name": "CodeLens (Launch) - Test",
+            "request": "launch",
             "mainClass": "cn.edu.thssdb.parser.Test",
             "projectName": "ThssDB"
         },
