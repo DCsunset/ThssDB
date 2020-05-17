@@ -21,16 +21,16 @@ public class Entry implements Comparable<Entry>, Serializable {
 
   public byte[] toBytes() {
     String type = value.getClass().getSimpleName();
-    if (type == "String") {
+    if (type.equals("String")) {
       byte[] b = value.toString().getBytes();
       return ByteBuffer.allocate(this.maxLength).put(b).array();
-    } else if (type == "Integer") {
+    } else if (type.equals("Integer")) {
       int num = Integer.parseInt(value.toString());
       return ByteBuffer.allocate(4).putInt(num).array();
-    } else if (type == "Long") {
+    } else if (type.equals("Long")) {
       Long num = Long.parseLong(value.toString());
       return ByteBuffer.allocate(8).putLong(num).array();
-    } else if (type == "Double") {
+    } else if (type.equals("Double")) {
       Double num = Double.parseDouble(value.toString());
       return ByteBuffer.allocate(8).putDouble(num).array();
     } else {

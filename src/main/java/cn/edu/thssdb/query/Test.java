@@ -18,8 +18,6 @@ import cn.edu.thssdb.type.ColumnInfo.ColumnType;
 public class Test {
     public static void main(String[] args) {
         // Create database
-        Float f = new Float(12.3);
-        Entry a = new Entry(f);
         Manager manager = new Manager();
         manager.createDatabaseIfNotExists("db1");
         manager.switchDatabase("db1");
@@ -33,9 +31,13 @@ public class Test {
         System.out.println("there are " + db.getTables().size() + " tables in database now");
 
         // Insert (id='101',name='alice') into table
-        // Entry[] entries = { new Entry("101"), new Entry("alice") };
-        // Row data = new Row(entries);
-        // db.getTables().get("stu").insert(data);
+        Entry[] entries = { new Entry("101", 50), new Entry("alice", 200) };
+        Row data = new Row(entries);
+        Entry[] entries1 = { new Entry("102", 50), new Entry("bob", 200) };
+        Row data1 = new Row(entries1);
+        db.getTables().get("stu").insert(data);
+        db.getTables().get("stu").insert(data1);
+        db.quit();
 
         // // Get databse info
         // HashMap<String, Table> tables = db.getTables();
@@ -72,9 +74,9 @@ public class Test {
             } else if (type == SQLParser.K_CREATE) {
                 stmt = new CreateTableStatement(manager, stmtCtx);
             }
-            stmt.parse();
-            stmt.execute();
-            System.out.println(stmt.getResult());
+            // stmt.parse();
+            // stmt.execute();
+            // System.out.println(stmt.getResult());
 
         }
         // db.quit();

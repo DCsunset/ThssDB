@@ -57,21 +57,22 @@ public class Table implements Iterable<Row>, Serializable {
   }
 
   public void insert(Row row) {
-    int id = cache.metadata.freePageList.get(0);
+    int id = metadata.freePageList.get(0);
     Page page = cache.readPage(id);
     BitSet bitmap = page.bitmap;
     int index = bitmap.nextClearBit(0);
     page.writeRow(index, row.toBytes());
     if (page.isFull()) {
-      cache.metadata.freePageList.remove(0);
+      metadata.freePageList.remove(0);
     }
     cache.writePage(id, page);
+    // cache.writeBackPage(id);   // just for file inspect in test
   }
 
   public void delete(int pageId, int rowIndex) {
     Page page = cache.readPage(pageId);
     if (page.isFull()) {
-      cache.metadata.freePageList.add(pageId);
+      metadata.freePageList.add(pageId);
     }
     page.bitmap.clear(rowIndex);
     cache.writePage(pageId, page);
