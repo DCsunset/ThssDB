@@ -1,9 +1,6 @@
 package cn.edu.thssdb.query;
 
 import org.antlr.v4.runtime.CommonTokenStream;
-
-import java.util.HashMap;
-
 import org.antlr.v4.runtime.CharStreams;
 
 import cn.edu.thssdb.parser.SQLLexer;
@@ -13,8 +10,6 @@ import cn.edu.thssdb.parser.SQLParser.Sql_stmtContext;
 import cn.edu.thssdb.schema.Column;
 import cn.edu.thssdb.schema.Database;
 import cn.edu.thssdb.schema.Manager;
-import cn.edu.thssdb.schema.Table;
-import cn.edu.thssdb.storage.Metadata;
 import cn.edu.thssdb.type.ColumnInfo;
 
 public class Test {
@@ -40,7 +35,7 @@ public class Test {
         // System.out.println(metadata.getRowSize());
         // System.out.println(metadata.columns[0]);
 
-        String str = "show table stu;drop table stu";
+        String str = "show table stu;drop table stu; drop database db1;";
 
         SQLLexer lexer = new SQLLexer(CharStreams.fromString(str));
         CommonTokenStream tokens = new CommonTokenStream(lexer);
@@ -53,18 +48,26 @@ public class Test {
             if (type == SQLParser.K_SHOW) {
                 stmt = new ShowTableStatement(manager, stmtCtx);
             } else if (type == SQLParser.K_DROP) {
-                stmt = new DropTableStatement(manager, stmtCtx);
+                if (stmtCtx.drop_db_stmt() != null) {
+                    System.out.println("drop database");
+                    stmt = new DropDatabaseStatement(manager, stmtCtx);
+                } else {
+                    System.out.println("drop table");
+                    stmt = new DropTableStatement(manager, stmtCtx);
+                }
             }
             stmt.parse();
             stmt.execute();
             System.out.println(stmt.getResult());
 
         }
-        db.quit();
+        // db.quit();
 
         // check whether stu exists
-        manager.switchDatabase("db1");
-        db = manager.currentDatabase;
-        System.out.println("there are " + db.getTables().size() + " tables in database now");
+        // manager.switchDatabase("db1");
+        // db = manager.currentDatabase;
+        // System.out.println("there are " + db.getTables().size() + " tables in
+        // database now");
+
     }
 }

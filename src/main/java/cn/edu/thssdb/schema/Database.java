@@ -63,7 +63,7 @@ public class Database {
     }
 
     public void drop() {
-        File index = new File(name);
+        File index = new File(Manager.baseDir + "/" + name);
         if (index.isDirectory()) {
             String[] entries = index.list();
             for (String s : entries) {

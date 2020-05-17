@@ -38,8 +38,7 @@ public class Manager {
         createDatabaseIfNotExists(s);
       }
       index.delete();
-    }
-    else {
+    } else {
       boolean ok = index.mkdir();
       if (!ok) {
         System.err.println(String.format("create db error"));
@@ -54,14 +53,13 @@ public class Manager {
     }
   }
 
-  private void deleteDatabase(String name) {
+  public void deleteDatabase(String name) {
     if (databases.containsKey(name)) {
       databases.get(name).drop();
       databases.remove(name);
       if (currentDatabase.name == name)
         currentDatabase = null;
-    }
-    else {
+    } else {
       System.err.println(String.format("Database %s doesn't exist", name));
     }
   }
@@ -69,14 +67,14 @@ public class Manager {
   public void switchDatabase(String name) {
     if (databases.containsKey(name)) {
       this.currentDatabase = databases.get(name);
-    }
-    else {
+    } else {
       System.err.println(String.format("Database %s doesn't exist", name));
     }
   }
 
   private static class ManagerHolder {
     private static final Manager INSTANCE = new Manager();
+
     private ManagerHolder() {
 
     }
