@@ -1,6 +1,7 @@
 package cn.edu.thssdb.schema;
 
 import cn.edu.thssdb.index.BPlusTree;
+import cn.edu.thssdb.type.ColumnInfo;
 import javafx.util.Pair;
 
 import java.io.IOException;
@@ -15,6 +16,7 @@ import cn.edu.thssdb.storage.Metadata;
 import cn.edu.thssdb.storage.Page;
 import jdk.internal.org.objectweb.asm.tree.MultiANewArrayInsnNode;
 
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.BitSet;
@@ -54,6 +56,71 @@ public class Table implements Iterable<Row>, Serializable {
 
   private void recover() {
     // TODO
+  }
+
+  public int findColumnByName(String name) {
+    for (int i = 0; i < metadata.columns.length; ++i) {
+      if (metadata.columns[i].name == name)
+        return i;
+    }
+    return -1;
+  }
+
+  public Comparable stringToValue(Column col, String str) throws Exception {
+    //System.out.println("Value " + str);
+    if (str.equals("null")) {
+      if (col.notNull)
+        throw new Exception(String.format("%s cannot be null", col.name));
+      return null;
+    }
+    if (col.type == ColumnInfo.ColumnType.INT) {
+      return Integer.parseInt(str);
+    }
+    else if (col.type == ColumnInfo.ColumnType.FLOAT) {
+      return Float.parseFloat(str);
+    }
+    else if (col.type == ColumnInfo.ColumnType.DOUBLE) {
+      return Double.parseDouble(str);
+    }
+    else if (col.type == ColumnInfo.ColumnType.LONG) {
+      return Long.parseLong(str);
+    }
+    // String
+    else {
+      if (str.length() < 2) {
+        throw new Exception("");
+      }
+      if (str.charAt(0) != '\'' || str.charAt(str.length() - 1) != '\'') {
+        throw new Exception("");
+      }
+      return str.substring(1, str.length() - 1);
+    }
+  }
+
+  public Row createRow(String[] names, String[] values) throws Exception {
+    // All cols
+    Entry entries[] = new Entry[values.length];
+    Arrays.fill(entries, null);
+    if (names.length == 0) {
+      if (values.length != metadata.columns.length)
+        throw new Exception("Wrong number of values");
+      for (int i = 0; i < values.length; ++i) {
+        Column col = metadata.columns[i];
+        entries[i] = new Entry(stringToValue(col, values[i]), col.maxLength);
+      }
+    }
+    else {
+      if (values.length != names.length)
+        throw new Exception("Wrong number of values");
+      for (int i = 0; i < names.length; ++i) {
+        int index = findColumnByName(names[i]);
+        if (index == -1)
+          throw new Exception(String.format("Column %s does not exist", names[i]));
+        Column col = metadata.columns[index];
+        entries[i] = new Entry(stringToValue(col, values[i]), col.maxLength);
+      }
+    }
+    return new Row(entries);
   }
 
   public void insert(Row row) {
