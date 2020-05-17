@@ -67,15 +67,10 @@ public class Table implements Iterable<Row>, Serializable {
   }
 
   private void readObject(ObjectInputStream input) throws Exception {
-    System.out.println("1");
     this.databaseName = input.readUTF();
-    System.out.println("2");
     this.tableName = input.readUTF();
-    System.out.println("3");
     this.metadata = (Metadata) input.readObject();
-    System.out.println("4");
     this.primaryIndex = input.readInt();
-    System.out.println("5");
     this.cache = new DbCache(this.tableName, metadata.getRowSize());
   }
 

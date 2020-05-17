@@ -24,7 +24,8 @@ public class Column implements Comparable<Column>, Serializable {
   }
 
   public String toString() {
-    return name + ',' + type + ',' + primary + ',' + notNull + ',' + maxLength + ',';
+    return name + '\t' + type + '\t' + (primary ? "Primary" : "") + '\t' + (notNull ? "not Null" : "") + '\t'
+        + maxLength;
   }
 
   public int getMaxLength() {

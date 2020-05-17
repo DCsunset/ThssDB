@@ -30,14 +30,14 @@ public class Test {
         // true, 50),
         // new Column("name", ColumnInfo.ColumnType.STRING, false, true, 200) };
         // db.create("stu", columns);
-        HashMap<String, Table> tables = db.getTables();
+        // HashMap<String, Table> tables = db.getTables();
 
-        // Get databse info
-        Table tb = tables.get("stu");
-        System.out.println(tb.tableName);
-        Metadata metadata = tb.getMetadata();
-        System.out.println(metadata.getRowSize());
-        System.out.println(metadata.columns[0]);
+        // // Get databse info
+        // Table tb = tables.get("stu");
+        // System.out.println(tb.tableName);
+        // Metadata metadata = tb.getMetadata();
+        // System.out.println(metadata.getRowSize());
+        // System.out.println(metadata.columns[0]);
 
         String str = "show table stu";
 

@@ -2,14 +2,17 @@ package cn.edu.thssdb.query;
 
 import cn.edu.thssdb.parser.SQLParser.Show_meta_stmtContext;
 import cn.edu.thssdb.parser.SQLParser.Sql_stmtContext;
+import cn.edu.thssdb.schema.Column;
+import cn.edu.thssdb.schema.Database;
 import cn.edu.thssdb.schema.Manager;
+import cn.edu.thssdb.schema.Table;
 
 public class ShowTableStatement extends Statement {
     private String tablename;
+    private String result = "";
 
     public ShowTableStatement(Manager manager, Sql_stmtContext parseCtx) {
         super(manager, parseCtx);
-        System.out.println("dbinfo:" + manager.currentDatabase.name + " " + manager.currentDatabase.getTables());
     }
 
     @Override
@@ -20,11 +23,17 @@ public class ShowTableStatement extends Statement {
 
     @Override
     public final void execute() {
-
+        Database db = this.manager.currentDatabase;
+        Table tb = db.getTables().get(this.tablename);
+        Column[] cls = tb.getMetadata().columns;
+        this.result = String.join("\t", "name", "type", "primary", "not null", "maxlength") + "\n";
+        for (int i = 0; i < cls.length; i++) {
+            this.result += cls[i].toString() + '\n';
+        }
     }
 
     @Override
     public final String getResult() {
-        return "show table";
+        return this.result;
     }
 }
