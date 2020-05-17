@@ -1,13 +1,37 @@
 package cn.edu.thssdb.schema;
 
 import java.io.Serializable;
+import java.nio.Buffer;
+import java.nio.ByteBuffer;
+
+import cn.edu.thssdb.type.ColumnInfo;
 
 public class Entry implements Comparable<Entry>, Serializable {
   private static final long serialVersionUID = -5809782578272943999L;
   public Comparable value;
 
   public Entry(Comparable value) {
+    System.out.println(value.getClass().getSimpleName());
     this.value = value;
+  }
+
+  public byte[] toBytes() {
+    String type = value.getClass().getSimpleName();
+    if (type == "String") {
+      return this.value.toString().getBytes();
+    } else if (type == "Integer") {
+      int num = Integer.parseInt(value.toString());
+      return ByteBuffer.allocate(4).putInt(num).array();
+    } else if (type == "Long") {
+      Long num = Long.parseLong(value.toString());
+      return ByteBuffer.allocate(8).putLong(num).array();
+    } else if (type == "Double") {
+      Double num = Double.parseDouble(value.toString());
+      return ByteBuffer.allocate(8).putDouble(num).array();
+    } else {
+      Float num = Float.parseFloat(value.toString());
+      return ByteBuffer.allocate(4).putFloat(num).array();
+    }
   }
 
   @Override

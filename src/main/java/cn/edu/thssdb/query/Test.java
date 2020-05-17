@@ -9,23 +9,33 @@ import cn.edu.thssdb.parser.SQLParser.ParseContext;
 import cn.edu.thssdb.parser.SQLParser.Sql_stmtContext;
 import cn.edu.thssdb.schema.Column;
 import cn.edu.thssdb.schema.Database;
+import cn.edu.thssdb.schema.Entry;
 import cn.edu.thssdb.schema.Manager;
+import cn.edu.thssdb.schema.Row;
 import cn.edu.thssdb.type.ColumnInfo;
+import cn.edu.thssdb.type.ColumnInfo.ColumnType;
 
 public class Test {
     public static void main(String[] args) {
         // Create database
+        Float f = new Float(12.3);
+        Entry a = new Entry(f);
         Manager manager = new Manager();
         manager.createDatabaseIfNotExists("db1");
         manager.switchDatabase("db1");
         Database db = manager.currentDatabase;
 
-        // Create table (commented when restart)
+        // Create table (commented when table exists)
         System.out.println("create table");
         Column[] columns = { new Column("id", ColumnInfo.ColumnType.STRING, true, true, 50),
                 new Column("name", ColumnInfo.ColumnType.STRING, false, true, 200) };
         db.create("stu", columns);
         System.out.println("there are " + db.getTables().size() + " tables in database now");
+
+        // Insert (id='101',name='alice') into table
+        // Entry[] entries = { new Entry("101"), new Entry("alice") };
+        // Row data = new Row(entries);
+        // db.getTables().get("stu").insert(data);
 
         // // Get databse info
         // HashMap<String, Table> tables = db.getTables();
@@ -35,7 +45,8 @@ public class Test {
         // System.out.println(metadata.getRowSize());
         // System.out.println(metadata.columns[0]);
 
-        String str = "show table stu;drop table stu; drop database db1;";
+        // String str = "show table stu;drop table stu; drop database db1;";
+        String str = "delete from stu where name='alice';";
 
         SQLLexer lexer = new SQLLexer(CharStreams.fromString(str));
         CommonTokenStream tokens = new CommonTokenStream(lexer);

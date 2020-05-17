@@ -12,10 +12,12 @@ import java.util.ArrayList;
 
 import cn.edu.thssdb.storage.DbCache;
 import cn.edu.thssdb.storage.Metadata;
+import cn.edu.thssdb.storage.Page;
 import jdk.internal.org.objectweb.asm.tree.MultiANewArrayInsnNode;
 
 import java.util.Iterator;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.BitSet;
 
 public class Table implements Iterable<Row>, Serializable {
   ReentrantReadWriteLock lock;
@@ -54,8 +56,16 @@ public class Table implements Iterable<Row>, Serializable {
     // TODO
   }
 
-  public void insert() {
-    // TODO
+  public void insert(Row data) {
+    int id = cache.metadata.freePageList.get(0);
+    Page page = cache.readPage(id);
+    BitSet bitmap = page.bitmap;
+    int index = bitmap.nextClearBit(0);
+    // page.writeRow(index, data);
+    if (page.isFull()) {
+      cache.metadata.freePageList.remove(0);
+    }
+    cache.writePage(id, page);
   }
 
   public void delete() {

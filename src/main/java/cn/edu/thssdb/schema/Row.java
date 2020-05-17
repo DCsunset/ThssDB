@@ -13,7 +13,7 @@ public class Row implements Serializable {
     this.entries = new ArrayList<>();
   }
 
-  public Row(Entry[] entries) {
+  public Row(Entry[] entries, Column[] cls) {
     this.entries = new ArrayList<>(Arrays.asList(entries));
   }
 
