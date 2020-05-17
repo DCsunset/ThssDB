@@ -9,6 +9,7 @@ import org.antlr.v4.runtime.CharStreams;
 import cn.edu.thssdb.parser.SQLLexer;
 import cn.edu.thssdb.parser.SQLParser;
 import cn.edu.thssdb.parser.SQLParser.ParseContext;
+import cn.edu.thssdb.parser.SQLParser.Sql_stmtContext;
 import cn.edu.thssdb.schema.Column;
 import cn.edu.thssdb.schema.Database;
 import cn.edu.thssdb.schema.Manager;
@@ -44,10 +45,11 @@ public class Test {
         CommonTokenStream tokens = new CommonTokenStream(lexer);
         SQLParser parser = new SQLParser(tokens);
         ParseContext root = parser.parse();
+        Sql_stmtContext stmtCtx = root.sql_stmt_list().sql_stmt().get(0);
         Statement stmt = null;
-        int type = root.sql_stmt_list().sql_stmt().get(0).getStart().getType();
+        int type = stmtCtx.getStart().getType();
         if (type == SQLParser.K_SHOW) {
-            stmt = new ShowTableStatement(manager, root);
+            stmt = new ShowTableStatement(manager, stmtCtx);
         }
         stmt.parse();
         stmt.execute();

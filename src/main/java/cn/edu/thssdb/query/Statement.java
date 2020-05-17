@@ -1,13 +1,14 @@
 package cn.edu.thssdb.query;
 
 import cn.edu.thssdb.parser.SQLParser.ParseContext;
+import cn.edu.thssdb.parser.SQLParser.Sql_stmtContext;
 import cn.edu.thssdb.schema.Manager;
 
 public class Statement {
-    private Manager manager;
-    private ParseContext parseCtx;
+    protected Manager manager;
+    protected Sql_stmtContext parseCtx;
 
-    public Statement(Manager manager, ParseContext parseCtx) {
+    public Statement(Manager manager, Sql_stmtContext parseCtx) {
         this.manager = manager;
         this.parseCtx = parseCtx;
     }
