@@ -46,8 +46,24 @@ public class Database {
         tables.put(name, table);
     }
 
+    public void dropTable(String name) throws Exception {
+        if (tables.containsKey(name)) {
+            // remove file
+            File tbFile = new File(Manager.baseDir + "/" + this.name + "/" + name + ".data");
+            if (tbFile.exists()) {
+                tbFile.delete();
+                // remove cache and metadata
+                tables.remove(name);
+            } else {
+                throw new Exception("no such file:" + tbFile.getPath());
+            }
+        } else {
+            throw new Exception("no such table:" + name);
+        }
+    }
+
     public void drop() {
-        File index = new File(name);
+        File index = new File(Manager.baseDir + "/" + name);
         if (index.isDirectory()) {
             String[] entries = index.list();
             for (String s : entries) {
