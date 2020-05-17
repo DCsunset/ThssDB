@@ -47,6 +47,9 @@ public class Test {
 
         // String str = "show table stu;drop table stu; drop database db1;";
         String str = "delete from stu where name='alice';";
+        // String str = "create TABLE person (name String(256), ID Int not null, PRIMARY
+        // KEY(ID))";
+        // String str = "show table stu;drop table stu; drop database db1;";
 
         SQLLexer lexer = new SQLLexer(CharStreams.fromString(str));
         CommonTokenStream tokens = new CommonTokenStream(lexer);
@@ -66,6 +69,8 @@ public class Test {
                     System.out.println("drop table");
                     stmt = new DropTableStatement(manager, stmtCtx);
                 }
+            } else if (type == SQLParser.K_CREATE) {
+                stmt = new CreateTableStatement(manager, stmtCtx);
             }
             stmt.parse();
             stmt.execute();
@@ -79,6 +84,5 @@ public class Test {
         // db = manager.currentDatabase;
         // System.out.println("there are " + db.getTables().size() + " tables in
         // database now");
-
     }
 }
