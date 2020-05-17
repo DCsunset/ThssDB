@@ -39,7 +39,8 @@ public class Test {
         // System.out.println(metadata.getRowSize());
         // System.out.println(metadata.columns[0]);
 
-        String str = "show table stu";
+        String str = "create TABLE person (name String(256), ID Int not null, PRIMARY KEY(ID))";
+        //String str = "show table person";
 
         SQLLexer lexer = new SQLLexer(CharStreams.fromString(str));
         CommonTokenStream tokens = new CommonTokenStream(lexer);
@@ -50,6 +51,9 @@ public class Test {
         int type = stmtCtx.getStart().getType();
         if (type == SQLParser.K_SHOW) {
             stmt = new ShowTableStatement(manager, stmtCtx);
+        }
+        else if (type == SQLParser.K_CREATE) {
+            stmt = new CreateTableStatement(manager, stmtCtx);
         }
         stmt.parse();
         stmt.execute();
