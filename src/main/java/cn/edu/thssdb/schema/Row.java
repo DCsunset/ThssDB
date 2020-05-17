@@ -1,5 +1,7 @@
 package cn.edu.thssdb.schema;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -32,5 +34,17 @@ public class Row implements Serializable {
     for (Entry e : entries)
       sj.add(e.toString());
     return sj.toString();
+  }
+
+  public byte[] toBytes() {
+    ByteArrayOutputStream os = new ByteArrayOutputStream();
+    for (Entry entry : entries) {
+      byte[] b = entry.toBytes();
+      try {
+        os.write(b);
+      } catch (IOException e) {
+      }
+    }
+    return os.toByteArray();
   }
 }

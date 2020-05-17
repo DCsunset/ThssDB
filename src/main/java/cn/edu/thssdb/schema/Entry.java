@@ -9,16 +9,21 @@ import cn.edu.thssdb.type.ColumnInfo;
 public class Entry implements Comparable<Entry>, Serializable {
   private static final long serialVersionUID = -5809782578272943999L;
   public Comparable value;
+  private int maxLength = -1;
 
-  public Entry(Comparable value) {
+  public Entry(Comparable value, int... maxLength) {
     System.out.println(value.getClass().getSimpleName());
     this.value = value;
+    if (maxLength.length > 0) {
+      this.maxLength = maxLength[0];
+    }
   }
 
   public byte[] toBytes() {
     String type = value.getClass().getSimpleName();
     if (type == "String") {
-      return this.value.toString().getBytes();
+      byte[] b = value.toString().getBytes();
+      return ByteBuffer.allocate(this.maxLength).put(b).array();
     } else if (type == "Integer") {
       int num = Integer.parseInt(value.toString());
       return ByteBuffer.allocate(4).putInt(num).array();

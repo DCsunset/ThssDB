@@ -56,24 +56,31 @@ public class Table implements Iterable<Row>, Serializable {
     // TODO
   }
 
-  public void insert(Row data) {
+  public void insert(Row row) {
     int id = cache.metadata.freePageList.get(0);
     Page page = cache.readPage(id);
     BitSet bitmap = page.bitmap;
     int index = bitmap.nextClearBit(0);
-    // page.writeRow(index, data);
+    page.writeRow(index, row.toBytes());
     if (page.isFull()) {
       cache.metadata.freePageList.remove(0);
     }
     cache.writePage(id, page);
   }
 
-  public void delete() {
-    // TODO
+  public void delete(int pageId, int rowIndex) {
+    Page page = cache.readPage(pageId);
+    if (page.isFull()) {
+      cache.metadata.freePageList.add(pageId);
+    }
+    page.bitmap.clear(rowIndex);
+    cache.writePage(pageId, page);
   }
 
-  public void update() {
-    // TODO
+  public void update(Row row, int pageID, int rowIndex) {
+    Page page = cache.readPage(pageID);
+    page.writeRow(rowIndex, row.toBytes());
+    cache.writePage(pageID, page);
   }
 
   private void readObject(ObjectInputStream input) throws Exception {
