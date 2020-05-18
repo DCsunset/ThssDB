@@ -26,7 +26,7 @@ import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 
-public class Table implements Iterable<VRow>, Serializable {
+public class Table implements Iterable<Pair<Entry, VRow>>, Serializable {
   ReentrantReadWriteLock lock;
   private String databaseName;
   public String tableName;
@@ -76,7 +76,7 @@ public class Table implements Iterable<VRow>, Serializable {
   }
 
   public Comparable stringToValue(Column col, String str) throws Exception {
-    //System.out.println("Value " + str);
+    // System.out.println("Value " + str);
     if (str.equals("null")) {
       if (col.notNull)
         throw new Exception(String.format("%s cannot be null", col.name));
@@ -84,14 +84,11 @@ public class Table implements Iterable<VRow>, Serializable {
     }
     if (col.type == ColumnInfo.ColumnType.INT) {
       return (Integer) engine.eval(str);
-    }
-    else if (col.type == ColumnInfo.ColumnType.FLOAT) {
+    } else if (col.type == ColumnInfo.ColumnType.FLOAT) {
       return (Float) engine.eval(str);
-    }
-    else if (col.type == ColumnInfo.ColumnType.DOUBLE) {
+    } else if (col.type == ColumnInfo.ColumnType.DOUBLE) {
       return (Double) engine.eval(str);
-    }
-    else if (col.type == ColumnInfo.ColumnType.LONG) {
+    } else if (col.type == ColumnInfo.ColumnType.LONG) {
       return (Long) engine.eval(str);
     }
     // String
@@ -117,8 +114,7 @@ public class Table implements Iterable<VRow>, Serializable {
         Column col = metadata.columns[i];
         entries[i] = new Entry(stringToValue(col, values[i]), col.maxLength);
       }
-    }
-    else {
+    } else {
       if (values.length != names.length)
         throw new Exception("Wrong number of values");
       for (int i = 0; i < names.length; ++i) {
@@ -146,20 +142,16 @@ public class Table implements Iterable<VRow>, Serializable {
       if (col.type == ColumnInfo.ColumnType.STRING) {
         entries[i] = new Entry(new String(Arrays.copyOfRange(bytes, pos, pos + col.maxLength)), col.maxLength);
         pos += col.maxLength;
-      }
-      else if (col.type == ColumnInfo.ColumnType.INT) {
+      } else if (col.type == ColumnInfo.ColumnType.INT) {
         entries[i] = new Entry(ByteBuffer.wrap(Arrays.copyOfRange(bytes, pos, pos + 4)).getInt());
         pos += 4;
-      }
-      else if (col.type == ColumnInfo.ColumnType.LONG) {
+      } else if (col.type == ColumnInfo.ColumnType.LONG) {
         entries[i] = new Entry(ByteBuffer.wrap(Arrays.copyOfRange(bytes, pos, pos + 8)).getLong());
         pos += 8;
-      }
-      else if (col.type == ColumnInfo.ColumnType.FLOAT) {
+      } else if (col.type == ColumnInfo.ColumnType.FLOAT) {
         entries[i] = new Entry(ByteBuffer.wrap(Arrays.copyOfRange(bytes, pos, pos + 4)).getFloat());
         pos += 4;
-      }
-      else if (col.type == ColumnInfo.ColumnType.DOUBLE) {
+      } else if (col.type == ColumnInfo.ColumnType.DOUBLE) {
         entries[i] = new Entry(ByteBuffer.wrap(Arrays.copyOfRange(bytes, pos, pos + 8)).getDouble());
         pos += 8;
       }
@@ -178,22 +170,30 @@ public class Table implements Iterable<VRow>, Serializable {
       metadata.freePageList.remove(0);
     }
     cache.writePage(id, page);
-    // cache.writeBackPage(id);   // just for file inspect in test
+    // cache.writeBackPage(id); // just for file inspect in test
+    this.index.put(row.entries.get(primaryIndex), new VRow(id, index));
   }
 
-  public void delete(int pageId, int rowIndex) {
-    Page page = cache.readPage(pageId);
+  public void delete(Entry key) {
+    VRow row = this.index.get(key);
+    Page page = cache.readPage(row.pageID);
     if (page.isFull()) {
-      metadata.freePageList.add(pageId);
+      metadata.freePageList.add(row.pageID);
     }
-    page.bitmap.clear(rowIndex);
-    cache.writePage(pageId, page);
+    page.bitmap.clear(row.rowIndex);
+    cache.writePage(row.pageID, page);
+    this.index.remove(key);
   }
 
-  public void update(Row row, int pageID, int rowIndex) {
+  public void update(Row row, Entry key) {
+    VRow vrow = this.index.get(key);
+    int pageID = vrow.pageID;
+    int rowIndex = vrow.rowIndex;
     Page page = cache.readPage(pageID);
     page.writeRow(rowIndex, row.toBytes());
     cache.writePage(pageID, page);
+    this.index.remove(key);
+    this.index.put(row.getEntries().get(primaryIndex), vrow);
   }
 
   private void readObject(ObjectInputStream input) throws Exception {
@@ -233,7 +233,7 @@ public class Table implements Iterable<VRow>, Serializable {
     }
   }
 
-  private class TableIterator implements Iterator<VRow> {
+  private class TableIterator implements Iterator<Pair<Entry, VRow>> {
     private Iterator<Pair<Entry, VRow>> iterator;
 
     TableIterator(Table table) {
@@ -246,13 +246,13 @@ public class Table implements Iterable<VRow>, Serializable {
     }
 
     @Override
-    public VRow next() {
-      return iterator.next().getValue();
+    public Pair<Entry, VRow> next() {
+      return iterator.next();
     }
   }
 
   @Override
-  public Iterator<VRow> iterator() {
+  public Iterator<Pair<Entry, VRow>> iterator() {
     return new TableIterator(this);
   }
 }
