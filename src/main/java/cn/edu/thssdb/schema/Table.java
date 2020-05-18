@@ -20,6 +20,9 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.BitSet;
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineManager;
+import javax.script.ScriptException;
 
 public class Table implements Iterable<Row>, Serializable {
   ReentrantReadWriteLock lock;
@@ -58,6 +61,9 @@ public class Table implements Iterable<Row>, Serializable {
     // TODO
   }
 
+  static ScriptEngineManager manager = new ScriptEngineManager();
+  static ScriptEngine engine = manager.getEngineByName("JavaScript");
+
   public int findColumnByName(String name) {
     for (int i = 0; i < metadata.columns.length; ++i) {
       if (metadata.columns[i].name == name)
@@ -74,16 +80,16 @@ public class Table implements Iterable<Row>, Serializable {
       return null;
     }
     if (col.type == ColumnInfo.ColumnType.INT) {
-      return Integer.parseInt(str);
+      return (Integer) engine.eval(str);
     }
     else if (col.type == ColumnInfo.ColumnType.FLOAT) {
-      return Float.parseFloat(str);
+      return (Float) engine.eval(str);
     }
     else if (col.type == ColumnInfo.ColumnType.DOUBLE) {
-      return Double.parseDouble(str);
+      return (Double) engine.eval(str);
     }
     else if (col.type == ColumnInfo.ColumnType.LONG) {
-      return Long.parseLong(str);
+      return (Long) engine.eval(str);
     }
     // String
     else {
