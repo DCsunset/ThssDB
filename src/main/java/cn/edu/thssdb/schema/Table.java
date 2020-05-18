@@ -9,6 +9,7 @@ import java.io.ObjectInput;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 
 import cn.edu.thssdb.storage.DbCache;
@@ -18,17 +19,18 @@ import jdk.internal.org.objectweb.asm.tree.MultiANewArrayInsnNode;
 
 import java.util.Arrays;
 import java.util.Iterator;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.BitSet;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 
-public class Table implements Iterable<Row>, Serializable {
+public class Table implements Iterable<VRow>, Serializable {
   ReentrantReadWriteLock lock;
   private String databaseName;
   public String tableName;
-  public BPlusTree<Entry, Row> index;
+  public BPlusTree<Entry, VRow> index;
   private Metadata metadata;
   private DbCache cache;
   private int primaryIndex;
@@ -37,6 +39,7 @@ public class Table implements Iterable<Row>, Serializable {
     this.databaseName = databaseName;
     this.tableName = tableName;
     this.metadata = new Metadata(columns);
+    this.index = new BPlusTree<>();
     try {
       this.cache = new DbCache(Manager.baseDir + "/" + databaseName + "/" + tableName, metadata.getRowSize());
     } catch (IOException e) {
@@ -129,6 +132,42 @@ public class Table implements Iterable<Row>, Serializable {
     return new Row(entries);
   }
 
+  public Row read(VRow vrow) {
+    return read(vrow.pageID, vrow.rowIndex);
+  }
+
+  public Row read(int pageID, int rowIndex) {
+    Page page = cache.readPage(pageID);
+    byte[] bytes = page.readRow(rowIndex);
+    int pos = 0;
+    Entry[] entries = new Entry[metadata.columns.length];
+    for (int i = 0; i < metadata.columns.length; ++i) {
+      Column col = metadata.columns[i];
+      if (col.type == ColumnInfo.ColumnType.STRING) {
+        entries[i] = new Entry(new String(Arrays.copyOfRange(bytes, pos, pos + col.maxLength)), col.maxLength);
+        pos += col.maxLength;
+      }
+      else if (col.type == ColumnInfo.ColumnType.INT) {
+        entries[i] = new Entry(ByteBuffer.wrap(Arrays.copyOfRange(bytes, pos, pos + 4)).getInt());
+        pos += 4;
+      }
+      else if (col.type == ColumnInfo.ColumnType.LONG) {
+        entries[i] = new Entry(ByteBuffer.wrap(Arrays.copyOfRange(bytes, pos, pos + 8)).getLong());
+        pos += 8;
+      }
+      else if (col.type == ColumnInfo.ColumnType.FLOAT) {
+        entries[i] = new Entry(ByteBuffer.wrap(Arrays.copyOfRange(bytes, pos, pos + 4)).getFloat());
+        pos += 4;
+      }
+      else if (col.type == ColumnInfo.ColumnType.DOUBLE) {
+        entries[i] = new Entry(ByteBuffer.wrap(Arrays.copyOfRange(bytes, pos, pos + 8)).getDouble());
+        pos += 8;
+      }
+    }
+
+    return new Row(entries);
+  }
+
   public void insert(Row row) {
     int id = metadata.freePageList.get(0);
     Page page = cache.readPage(id);
@@ -163,6 +202,15 @@ public class Table implements Iterable<Row>, Serializable {
     this.metadata = (Metadata) input.readObject();
     this.primaryIndex = input.readInt();
     this.cache = new DbCache(this.tableName, metadata.getRowSize());
+    this.index = new BPlusTree<>();
+    int size = input.readInt();
+    for (int i = 0; i < size; ++i) {
+      Entry entry = (Entry) input.readObject();
+      int pageID = input.readInt();
+      int rowIndex = input.readInt();
+      VRow vrow = new VRow(pageID, rowIndex);
+      index.put(entry, vrow);
+    }
   }
 
   private void writeObject(ObjectOutputStream output) {
@@ -171,13 +219,22 @@ public class Table implements Iterable<Row>, Serializable {
       output.writeUTF(tableName);
       output.writeObject(this.metadata);
       output.writeInt(primaryIndex);
-
+      output.writeInt(index.size());
+      Iterator<Pair<Entry, VRow>> it = index.iterator();
+      while (it.hasNext()) {
+        Pair<Entry, VRow> node = it.next();
+        Entry entry = node.getKey();
+        VRow vrow = node.getValue();
+        output.writeObject(entry);
+        output.writeInt(vrow.pageID);
+        output.writeInt(vrow.rowIndex);
+      }
     } catch (IOException e) {
     }
   }
 
-  private class TableIterator implements Iterator<Row> {
-    private Iterator<Pair<Entry, Row>> iterator;
+  private class TableIterator implements Iterator<VRow> {
+    private Iterator<Pair<Entry, VRow>> iterator;
 
     TableIterator(Table table) {
       this.iterator = table.index.iterator();
@@ -189,13 +246,13 @@ public class Table implements Iterable<Row>, Serializable {
     }
 
     @Override
-    public Row next() {
+    public VRow next() {
       return iterator.next().getValue();
     }
   }
 
   @Override
-  public Iterator<Row> iterator() {
+  public Iterator<VRow> iterator() {
     return new TableIterator(this);
   }
 }
