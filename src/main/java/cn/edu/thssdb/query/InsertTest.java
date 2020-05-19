@@ -19,7 +19,7 @@ public class InsertTest {
 
         // Create table (commented when table exists)
         String str = "create TABLE person (name String(256), ID Int not null, PRIMARY KEY(ID));" +
-                "insert into person (name) values ('Bob', 15);";
+                "insert into person values ('Bob', 15);";
 
         SQLLexer lexer = new SQLLexer(CharStreams.fromString(str));
         CommonTokenStream tokens = new CommonTokenStream(lexer);
