@@ -58,6 +58,6 @@ public class JoinTest {
 
         new QueryTable(person).join(new QueryTable(info), "name", "name", null);
         new QueryTable(person).join(new QueryTable(info), "name", "name",
-                new Condition(person, "name", OpType.EQ, "Bob"));
+                new Condition(person, "name", OpType.EQ, "'Bob'"));
     }
 }
