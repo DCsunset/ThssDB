@@ -69,7 +69,7 @@ public class Table implements Iterable<Pair<Entry, VRow>>, Serializable {
 
   public int findColumnByName(String name) {
     for (int i = 0; i < metadata.columns.length; ++i) {
-      if (metadata.columns[i].name == name)
+      if (metadata.columns[i].name.equals(name))
         return i;
     }
     return -1;
@@ -94,10 +94,10 @@ public class Table implements Iterable<Pair<Entry, VRow>>, Serializable {
     // String
     else {
       if (str.length() < 2) {
-        throw new Exception("");
+        throw new Exception(String.format("Invalid String %s", str));
       }
       if (str.charAt(0) != '\'' || str.charAt(str.length() - 1) != '\'') {
-        throw new Exception("");
+        throw new Exception(String.format("Invalid String %s", str));
       }
       return str.substring(1, str.length() - 1);
     }
@@ -165,7 +165,8 @@ public class Table implements Iterable<Pair<Entry, VRow>>, Serializable {
     Page page = cache.readPage(id);
     BitSet bitmap = page.bitmap;
     int index = bitmap.nextClearBit(0);
-    page.writeRow(index, row.toBytes());
+    byte[] bytes = row.toBytes();
+    page.writeRow(index, bytes);
     if (page.isFull()) {
       metadata.freePageList.remove(0);
     }
