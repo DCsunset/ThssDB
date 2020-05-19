@@ -33,15 +33,9 @@ public class CreateTableStatement extends Statement {
             return;
         }
         /*
-        else {
-            SQLParser.Column_defContext def = ctx.column_def(1);
-            result = String.format("%s %s %s",
-                    def.column_name().getText(),
-                    def.type_name().getText(),
-                    def.column_constraint(0).getText()
-            );
-            return;
-        }
+         * else { SQLParser.Column_defContext def = ctx.column_def(1); result =
+         * String.format("%s %s %s", def.column_name().getText(),
+         * def.type_name().getText(), def.column_constraint(0).getText() ); return; }
          */
 
         SQLParser.Table_constraintContext tbCst = ctx.table_constraint();
@@ -60,8 +54,7 @@ public class CreateTableStatement extends Statement {
                 String cst = def.column_constraint(j).getText();
                 if (cst.equals("notnull")) {
                     notnull = true;
-                }
-                else if (cst.equals("primarykey")) {
+                } else if (cst.equals("primarykey")) {
                     primary = true;
                 }
             }
@@ -69,27 +62,21 @@ public class CreateTableStatement extends Statement {
             int maxLength = 0;
             if (type.equals("Int")) {
                 colType = ColumnInfo.ColumnType.INT;
-            }
-            else if (type.equals("Long")) {
+            } else if (type.equals("Long")) {
                 colType = ColumnInfo.ColumnType.LONG;
-            }
-            else if (type.equals("Float")) {
+            } else if (type.equals("Float")) {
                 colType = ColumnInfo.ColumnType.FLOAT;
-            }
-            else if (type.equals("Double")) {
+            } else if (type.equals("Double")) {
                 colType = ColumnInfo.ColumnType.DOUBLE;
-            }
-            else if (type.matches("^String\\(\\d+\\)$")) {
+            } else if (type.matches("^String\\(\\d+\\)$")) {
                 colType = ColumnInfo.ColumnType.STRING;
                 maxLength = Integer.parseInt(type.substring(7, type.length() - 1));
             }
-            columns[i] = new Column(
-                    name,
-                    colType,
-                    primary,
-                    notnull,
-                    maxLength
-                );
+            if (maxLength == 0) {
+                columns[i] = new Column(name, colType, primary, notnull);
+            } else {
+                columns[i] = new Column(name, colType, primary, notnull, maxLength);
+            }
         }
 
         db.create(tableName, columns);
