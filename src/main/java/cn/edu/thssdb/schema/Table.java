@@ -143,8 +143,12 @@ public class Table implements Iterable<Pair<Entry, VRow>>, Serializable {
     for (int i = 0; i < metadata.columns.length; ++i) {
       Column col = metadata.columns[i];
       if (col.type == ColumnInfo.ColumnType.STRING) {
-        entries[i] = new Entry(new String(Arrays.copyOfRange(bytes, pos, pos + col.maxLength)), col.maxLength);
-        pos += col.maxLength;
+        for (int j = 0; j <= col.maxLength; ++j) {
+          if (j == col.maxLength || bytes[j+pos] == 0) {
+            entries[i] = new Entry(new String(Arrays.copyOfRange(bytes, pos, pos + j)), col.maxLength);
+            break;
+          }
+        }
       } else if (col.type == ColumnInfo.ColumnType.INT) {
         entries[i] = new Entry(ByteBuffer.wrap(Arrays.copyOfRange(bytes, pos, pos + 4)).getInt());
         pos += 4;
