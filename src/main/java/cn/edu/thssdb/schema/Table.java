@@ -2,6 +2,7 @@ package cn.edu.thssdb.schema;
 
 import cn.edu.thssdb.index.BPlusTree;
 import cn.edu.thssdb.type.ColumnInfo;
+import cn.edu.thssdb.utils.Global.OpType;
 import javafx.util.Pair;
 
 import java.io.IOException;
@@ -10,6 +11,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.nio.ByteBuffer;
+import java.security.cert.PKIXRevocationChecker.Option;
 import java.util.ArrayList;
 
 import cn.edu.thssdb.storage.DbCache;
@@ -256,4 +258,5 @@ public class Table implements Iterable<Pair<Entry, VRow>>, Serializable {
   public Iterator<Pair<Entry, VRow>> iterator() {
     return new TableIterator(this);
   }
+
 }

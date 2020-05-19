@@ -6,6 +6,20 @@
     "configurations": [
         {
             "type": "java",
+            "name": "CodeLens (Launch) - UpdateTest",
+            "request": "launch",
+            "mainClass": "cn.edu.thssdb.query.UpdateTest",
+            "projectName": "ThssDB"
+        },
+        {
+            "type": "java",
+            "name": "CodeLens (Launch) - DeleteTest",
+            "request": "launch",
+            "mainClass": "cn.edu.thssdb.query.DeleteTest",
+            "projectName": "ThssDB"
+        },
+        {
+            "type": "java",
             "name": "CodeLens (Launch) - Test",
             "request": "launch",
             "mainClass": "cn.edu.thssdb.query.Test",

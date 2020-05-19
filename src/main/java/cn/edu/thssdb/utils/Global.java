@@ -22,4 +22,9 @@ public class Global {
   public static final int PAGE_SIZE = 4 * 1024;
   // Cache
   public static final int CACHE_SIZE = 16;
+
+  public static enum OpType {
+    EQ, LT, GT, LE, GE, NE
+  }
+
 }
