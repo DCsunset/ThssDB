@@ -149,6 +149,7 @@ public class Table implements Iterable<Pair<Entry, VRow>>, Serializable {
             break;
           }
         }
+        pos += col.maxLength;
       } else if (col.type == ColumnInfo.ColumnType.INT) {
         entries[i] = new Entry(ByteBuffer.wrap(Arrays.copyOfRange(bytes, pos, pos + 4)).getInt());
         pos += 4;
