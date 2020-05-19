@@ -42,29 +42,32 @@ public class DeleteStatement extends Statement {
         // TODO: condition
         Multiple_conditionContext conditions = ctx.multiple_condition();
         while (true) {
-            ConditionContext conditionCtx = conditions.condition();
-            // process this condition
-            ExpressionContext attrCtx = conditionCtx.expression().get(0);
-            ComparatorContext opCtx = conditionCtx.comparator();
-            ExpressionContext valueCtx = conditionCtx.expression().get(1);
-            OpType type = OpType.EQ;
-            if (opCtx.EQ() != null) {
-                type = OpType.EQ;
-            } else if (opCtx.GE() != null) {
-                type = OpType.GE;
-            } else if (opCtx.GT() != null) {
-                type = OpType.GT;
-            } else if (opCtx.LE() != null) {
-                type = OpType.LE;
-            } else if (opCtx.LT() != null) {
-                type = OpType.LT;
-            }
-            Condition condition = new Condition(this.table, attrCtx.getText(), type, valueCtx.getText());
-            this.conditions.add(condition);
-
-            // check for next condition
-            if (conditions.multiple_condition().size() == 0)
+            Multiple_conditionContext left = conditions.multiple_condition(0);
+            Multiple_conditionContext right = conditions.multiple_condition(1);
+            if (left == null && right == null) {
+                ConditionContext conditionCtx = conditions.condition();
+                // process this condition
+                ExpressionContext attrCtx = conditionCtx.expression().get(0);
+                ComparatorContext opCtx = conditionCtx.comparator();
+                ExpressionContext valueCtx = conditionCtx.expression().get(1);
+                OpType type = OpType.EQ;
+                if (opCtx.EQ() != null) {
+                    type = OpType.EQ;
+                } else if (opCtx.GE() != null) {
+                    type = OpType.GE;
+                } else if (opCtx.GT() != null) {
+                    type = OpType.GT;
+                } else if (opCtx.LE() != null) {
+                    type = OpType.LE;
+                } else if (opCtx.LT() != null) {
+                    type = OpType.LT;
+                }
+                Condition condition = new Condition(this.table, attrCtx.getText(), type, valueCtx.getText());
+                this.conditions.add(condition);
                 break;
+            } else {
+
+            }
         }
     }
 
