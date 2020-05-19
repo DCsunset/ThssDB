@@ -8,7 +8,17 @@ public class Condition {
     private Comparable value;
     private OpType op;
     private Table table;
+    private Table queryTable;
 
+    public String getAttr() {
+        return attr;
+    }
+
+    public Table getTable() {
+        return table;
+    }
+
+    // TODO: constructor for querytable
     public Condition(Table table, String attr, OpType op, String value) {
         this.table = table;
         this.attr = attr;

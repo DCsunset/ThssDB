@@ -1,6 +1,7 @@
 package cn.edu.thssdb.schema;
 
 import cn.edu.thssdb.index.BPlusTree;
+import cn.edu.thssdb.query.QueryTable;
 import cn.edu.thssdb.type.ColumnInfo;
 import cn.edu.thssdb.utils.Global.OpType;
 import javafx.util.Pair;
@@ -258,5 +259,4 @@ public class Table implements Iterable<Pair<Entry, VRow>>, Serializable {
   public Iterator<Pair<Entry, VRow>> iterator() {
     return new TableIterator(this);
   }
-
 }
