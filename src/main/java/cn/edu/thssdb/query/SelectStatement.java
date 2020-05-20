@@ -4,6 +4,7 @@ import cn.edu.thssdb.parser.SQLParser;
 import cn.edu.thssdb.parser.SQLParser.Sql_stmtContext;
 import cn.edu.thssdb.schema.*;
 import cn.edu.thssdb.utils.Global;
+import com.sun.org.apache.xpath.internal.operations.Mult;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -33,14 +34,6 @@ public class SelectStatement extends Statement {
          */
 
         SQLParser.Table_queryContext tbCtx = ctx.table_query(0);
-        SQLParser.ConditionContext onCtx = null;
-        String attr1 = null, attr2 = null;
-        if (tbCtx.multiple_condition() != null)
-            onCtx = tbCtx.multiple_condition().condition();
-        if (onCtx != null) {
-            attr1 = onCtx.expression(0).getText();
-            attr2 = onCtx.expression(1).getText();
-        }
 
         for (int i = 0; i < tbCtx.table_name().size(); ++i) {
             String tableName = tbCtx.table_name(i).getText();
@@ -52,8 +45,13 @@ public class SelectStatement extends Statement {
                 resultTable = new QueryTable(db.getTables().get(tableName), tbCtx.table_name().size() > 1);
             else {
                 QueryTable newTable = new QueryTable(db.getTables().get(tableName), true);
-                resultTable = resultTable.join(newTable, attr1, attr2);
+                resultTable = resultTable.join(newTable);
             }
+        }
+
+        if (tbCtx.table_name().size() > 1 && tbCtx.multiple_condition() != null) {
+            MultipleCondition onCondition = new MultipleCondition(resultTable, tbCtx.multiple_condition());
+            resultTable.filter(onCondition);
         }
 
         if (ctx.multiple_condition() != null) {

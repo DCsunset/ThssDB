@@ -11,7 +11,7 @@ public abstract class AbstractTable {
     static ScriptEngineManager manager = new ScriptEngineManager();
     static ScriptEngine engine = manager.getEngineByName("JavaScript");
 
-    public Comparable stringToValue(Column col, String str) throws Exception {
+    static public Comparable stringToValue(Column col, String str) throws Exception {
         // System.out.println("Value " + str);
         if (str.equals("null")) {
             if (col.notNull)
@@ -45,6 +45,6 @@ public abstract class AbstractTable {
                 return i;
             }
         }
-        throw new Exception(String.format("No column named %s", name));
+        return -1;
     }
 }

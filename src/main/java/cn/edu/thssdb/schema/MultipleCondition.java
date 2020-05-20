@@ -45,10 +45,11 @@ public class MultipleCondition {
     private void parseTerminalNode(Multiple_conditionContext ctx) throws Exception {
         if (ctx.AND() == null) {
             ConditionContext cctx = ctx.condition();
-            String colName = cctx.expression().get(0).getText();
-            int colIndex = table.findColumnByName(colName);
-            Condition condition = new Condition(table, colName, ctxtotype(cctx.comparator()),
-                    table.stringToValue(table.columns[colIndex], cctx.expression().get(1).getText()));
+            Condition condition = new Condition(table,
+                    cctx.expression().get(0).getText(),
+                    ctxtotype(cctx.comparator()),
+                    cctx.expression().get(1).getText()
+            );
             conditions.get(conditions.size() - 1).add(condition);
         } else {
             parseTerminalNode(ctx.multiple_condition(0));

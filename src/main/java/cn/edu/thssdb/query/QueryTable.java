@@ -1,5 +1,6 @@
 package cn.edu.thssdb.query;
 
+import cn.edu.thssdb.parser.SQLParser;
 import cn.edu.thssdb.schema.*;
 
 import java.util.ArrayList;
@@ -104,25 +105,12 @@ public class QueryTable extends AbstractTable implements Iterator<Row> {
   }
 
   // another must be constructed by a table
-  public QueryTable join(QueryTable another, String attr1, String attr2) throws Exception {
+  public QueryTable join(QueryTable another) {
     QueryTable me = this;
     QueryTable result = new QueryTable(me, another);
     for (Row row : me.data) {
       for (Row row1 : another.data) {
-        if (attr1 != null) {
-          int index1 = me.findColumnByName(attr1);
-          int index2 = another.findColumnByName(attr2);
-          if (index1 != -1 && index2 != -1) {
-            Entry entry = row.getEntries().get(index1);
-            Entry entry1 = row1.getEntries().get(index2);
-            if (entry.equals(entry1)) {
-              result.insertRow(combineRow(row, row1));
-            }
-          } else {
-            result.insertRow(combineRow(row, row1));
-          }
-        } else
-          result.insertRow(combineRow(row, row1));
+        result.insertRow(combineRow(row, row1));
       }
     }
     return result;

@@ -1,35 +1,62 @@
 package cn.edu.thssdb.schema;
 
 import cn.edu.thssdb.schema.Table;
+import cn.edu.thssdb.type.ColumnInfo;
 import cn.edu.thssdb.utils.Global.OpType;
+import com.sun.javafx.geom.transform.GeneralTransform3D;
+import com.sun.xml.internal.ws.api.model.wsdl.WSDLFault;
+
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineManager;
 
 public class Condition {
-    private String attr;
-    private Comparable value;
+    private String attrOrValue1;
+    private String attrOrValue2;
     private OpType op;
     private AbstractTable table;
-    private Table queryTable;
-
-    public String getAttr() {
-        return attr;
-    }
 
     public AbstractTable getTable() {
         return table;
     }
 
     // TODO: constructor for querytable
-    public Condition(AbstractTable table, String attr, OpType op, Comparable value) {
+    public Condition(AbstractTable table, String attrOrValue1, OpType op, String attrOrValue2) {
         this.table = table;
-        this.attr = attr;
-        this.value = value;
+        this.attrOrValue1 = attrOrValue1;
+        this.attrOrValue2 = attrOrValue2;
+
         this.op = op;
     }
 
     public boolean satisfy(Row row) throws Exception {
-        int colIdx = table.findColumnByName(attr);
-        Entry entry = row.getEntries().get(colIdx);
-        int ret = entry.value.compareTo(this.value);
+        int index1 = table.findColumnByName(attrOrValue1);
+        int index2 = table.findColumnByName(attrOrValue2);
+        if (index1 == -1 && index2 == -1) {
+            String message = String.format("Invalid column name %s or %s", attrOrValue1, attrOrValue2);
+            throw new Exception(message);
+        }
+
+        Comparable value1 = null, value2 = null;
+        if (index1 != -1) {
+            Entry entry = row.getEntries().get(index1);
+            value1 = entry.value;
+        }
+        else {
+            Column col = table.columns[index2];
+            value1 = AbstractTable.stringToValue(col, attrOrValue1);
+        }
+
+        if (index2 != -1) {
+            Entry entry = row.getEntries().get(index2);
+            value2 = entry.value;
+        }
+        else {
+            Column col = table.columns[index1];
+            value2 = AbstractTable.stringToValue(col, attrOrValue2);
+        }
+
+
+        int ret = value1.compareTo(value2);
         if (this.op == OpType.EQ) {
             return ret == 0;
         } else if (this.op == OpType.LT) {

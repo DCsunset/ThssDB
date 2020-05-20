@@ -33,7 +33,7 @@ public class SelectTest {
                 + "insert into grade values (2, 90);"
                 + "insert into grade values (3, 92);"
                 //+ "select * from person where ID = 10;";
-                + "select * from person join info on person.name = info.name;";
+                + "select * from person join info join grade on grade.ID = person.ID && person.name = info.name;";
 
         SQLLexer lexer = new SQLLexer(CharStreams.fromString(str));
         CommonTokenStream tokens = new CommonTokenStream(lexer);
