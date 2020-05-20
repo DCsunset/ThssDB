@@ -48,11 +48,21 @@ public class UpdateStatement extends Statement {
         }
 
         try {
+            SQLParser.ConditionContext conditionCtx = ctx.multiple_condition().condition();
+            // set attr=value
             Comparable value = table.stringToValue(
                     table.getMetadata().columns[index],
                     ctx.expression().getText()
             );
-            SQLParser.ComparatorContext opCtx = ctx.multiple_condition().condition().comparator();
+
+            // where attr=value
+            SQLParser.ExpressionContext attrCtx = conditionCtx.expression().get(0);
+            SQLParser.ComparatorContext opCtx = conditionCtx.comparator();
+            SQLParser.ExpressionContext valueCtx = conditionCtx.expression().get(1);
+            Comparable conditionValue = table.stringToValue(
+                    table.getMetadata().columns[index],
+                    valueCtx.getText()
+            );
             Global.OpType type = Global.OpType.EQ;
             if (opCtx.EQ() != null) {
                 type = Global.OpType.EQ;
@@ -65,7 +75,7 @@ public class UpdateStatement extends Statement {
             } else if (opCtx.LT() != null) {
                 type = Global.OpType.LT;
             }
-            Condition condition = new Condition(table, ctx.column_name().getText(), type, value);
+            Condition condition = new Condition(table, attrCtx.getText(), type, conditionValue);
 
             // TODO: multiple conditions
             int condition_cnt = 1;
