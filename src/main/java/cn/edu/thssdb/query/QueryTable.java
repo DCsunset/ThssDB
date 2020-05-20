@@ -10,6 +10,8 @@ import cn.edu.thssdb.schema.VRow;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
+import java.util.StringJoiner;
+
 import javafx.util.Pair;
 
 public class QueryTable implements Iterator<Row> {
@@ -29,8 +31,49 @@ public class QueryTable implements Iterator<Row> {
     System.arraycopy(cls2, 0, this.cls, cls1.length, cls2.length);
   }
 
+  private QueryTable() {
+
+  }
+
   public void insertRow(Row row) {
     this.data.add(row);
+  }
+
+  public QueryTable project(String[] columnNames) {
+    QueryTable result = new QueryTable();
+    result.cls = new Column[columnNames.length];
+    int[] indices = new int[columnNames.length];
+    // columns
+    for (int i = 0; i < columnNames.length; i++) {
+      for (int j = 0; j < this.cls.length; j++) {
+        if (columnNames[i].equals(cls[j].name)) {
+          indices[i] = j;
+          result.cls[i] = this.cls[j];
+          break;
+        }
+      }
+    }
+    // data
+    for (Row row : data) {
+      Row rowslice = new Row();
+      for (int index : indices) {
+        rowslice.appendEntry(row.getEntries().get(index));
+      }
+      result.data.add(rowslice);
+    }
+    return result;
+  }
+
+  public void output() {
+    StringJoiner sj = new StringJoiner("\t");
+    for (Column c : cls) {
+      sj.add(c.name);
+    }
+    System.out.println(sj.toString());
+
+    for (Row row : data) {
+      System.out.println(row.toString());
+    }
   }
 
   public static Row combineRow(Row row1, Row row2) {
@@ -94,12 +137,10 @@ public class QueryTable implements Iterator<Row> {
             if (entry.equals(entry1)) {
               result.insertRow(combineRow(row, row1));
             }
-          }
-          else {
+          } else {
             result.insertRow(combineRow(row, row1));
           }
-        }
-        else
+        } else
           result.insertRow(combineRow(row, row1));
       }
     }

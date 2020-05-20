@@ -56,8 +56,11 @@ public class JoinTest {
         Table person = db.getTables().get("person");
         Table info = db.getTables().get("info");
 
+        String[] names = { "name" };
+        new QueryTable(person, false).project(names);
+        new QueryTable(person, false).output();
         // new QueryTable(person).join(new QueryTable(info), "name", "name", null);
         // new QueryTable(person).join(new QueryTable(info), "name", "name",
-        //         new Condition(person, "name", OpType.EQ, "'Bob'"));
+        // new Condition(person, "name", OpType.EQ, "'Bob'"));
     }
 }

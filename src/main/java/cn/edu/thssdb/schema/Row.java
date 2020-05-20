@@ -27,10 +27,14 @@ public class Row implements Serializable {
     this.entries.addAll(entries);
   }
 
+  public void appendEntry(Entry entry) {
+    this.entries.add(entry);
+  }
+
   public String toString() {
     if (entries == null)
       return "EMPTY";
-    StringJoiner sj = new StringJoiner(", ");
+    StringJoiner sj = new StringJoiner("\t");
     for (Entry e : entries)
       sj.add(e.toString());
     return sj.toString();
