@@ -8,11 +8,11 @@ import cn.edu.thssdb.schema.Table;
 import cn.edu.thssdb.schema.VRow;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import javafx.util.Pair;
 
 public class QueryTable implements Iterator<Row> {
-  private Table table; // not necessary
   private ArrayList<Row> data = new ArrayList<Row>();
   private Column[] cls;
 
@@ -40,16 +40,23 @@ public class QueryTable implements Iterator<Row> {
     return result;
   }
 
-  public QueryTable(Table table) { // leaf node
-    this.table = table;
+  public QueryTable(Table table, boolean joinable) { // leaf node
     // copy data from table
-    Iterator<Pair<Entry, VRow>> it = this.table.iterator();
+    Iterator<Pair<Entry, VRow>> it = table.iterator();
     while (it.hasNext()) {
       Pair<Entry, VRow> item = it.next();
-      Row row = this.table.read(item.getValue());
+      Row row = table.read(item.getValue());
       data.add(row);
     }
-    cls = table.getMetadata().columns;
+
+    Column[] columns = table.getMetadata().columns;
+    this.cls = new Column[columns.length];
+    System.arraycopy(columns, 0, this.cls, 0, columns.length);
+    if (joinable) {
+      for (int i = 0; i < cls.length; ++i) {
+        cls[i].name = table.tableName + "." + cls[i].name;
+      }
+    }
   }
 
   public int findColumnByName(String name) {
@@ -59,10 +66,6 @@ public class QueryTable implements Iterator<Row> {
       }
     }
     return -1;
-  }
-
-  public Table getTable() {
-    return table;
   }
 
   public void filter(Condition condition) {
@@ -83,9 +86,16 @@ public class QueryTable implements Iterator<Row> {
     for (Row row : me.data) {
       for (Row row1 : another.data) {
         if (attr1 != null) {
-          Entry entry = row.getEntries().get(me.findColumnByName(attr1));
-          Entry entry1 = row1.getEntries().get(another.findColumnByName(attr2));
-          if (entry.equals(entry1)) {
+          int index1 = me.findColumnByName(attr1);
+          int index2 = another.findColumnByName(attr2);
+          if (index1 != -1 && index2 != -1) {
+            Entry entry = row.getEntries().get(index1);
+            Entry entry1 = row1.getEntries().get(index2);
+            if (entry.equals(entry1)) {
+              result.insertRow(combineRow(row, row1));
+            }
+          }
+          else {
             result.insertRow(combineRow(row, row1));
           }
         }
