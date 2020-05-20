@@ -65,24 +65,32 @@ public class QueryTable implements Iterator<Row> {
     return table;
   }
 
-  // another must be constructed by a table
-  public QueryTable join(QueryTable another, String attr1, String attr2, Condition condition) {
-    QueryTable me = this;
-    if (condition != null && condition.getTable() == another.getTable()) { // condition is for the caller
-      QueryTable temp = me;
-      me = another;
-      another = temp;
+  public void filter(Condition condition) {
+    if (condition == null)
+      return;
+    for (int i = 0; i < data.size(); ++i) {
+      if (!condition.satisfy(data.get(i))) {
+        data.remove(i);
+        --i;
+      }
     }
+  }
+
+  // another must be constructed by a table
+  public QueryTable join(QueryTable another, String attr1, String attr2) {
+    QueryTable me = this;
     QueryTable result = new QueryTable(me, another);
     for (Row row : me.data) {
-      if (condition == null || condition.satisfy(row)) {
-        for (Row row1 : another.data) {
+      for (Row row1 : another.data) {
+        if (attr1 != null) {
           Entry entry = row.getEntries().get(me.findColumnByName(attr1));
           Entry entry1 = row1.getEntries().get(another.findColumnByName(attr2));
           if (entry.equals(entry1)) {
             result.insertRow(combineRow(row, row1));
           }
         }
+        else
+          result.insertRow(combineRow(row, row1));
       }
     }
     return result;
