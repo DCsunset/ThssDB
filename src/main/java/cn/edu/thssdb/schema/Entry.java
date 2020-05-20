@@ -12,7 +12,6 @@ public class Entry implements Comparable<Entry>, Serializable {
   private int maxLength = -1;
 
   public Entry(Comparable value, int... maxLength) {
-    System.out.println(value.getClass().getSimpleName());
     this.value = value;
     if (maxLength.length > 0) {
       this.maxLength = maxLength[0];
