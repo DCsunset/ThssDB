@@ -6,7 +6,7 @@ import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 
 public abstract class AbstractTable {
-    abstract int findColumnByName(String name);
+    abstract protected int findColumnByName(String name);
 
     static ScriptEngineManager manager = new ScriptEngineManager();
     static ScriptEngine engine = manager.getEngineByName("JavaScript");
