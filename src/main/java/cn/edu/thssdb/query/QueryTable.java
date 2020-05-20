@@ -1,11 +1,6 @@
 package cn.edu.thssdb.query;
 
-import cn.edu.thssdb.schema.Column;
-import cn.edu.thssdb.schema.Condition;
-import cn.edu.thssdb.schema.Entry;
-import cn.edu.thssdb.schema.Row;
-import cn.edu.thssdb.schema.Table;
-import cn.edu.thssdb.schema.VRow;
+import cn.edu.thssdb.schema.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -14,7 +9,7 @@ import java.util.StringJoiner;
 
 import javafx.util.Pair;
 
-public class QueryTable implements Iterator<Row> {
+public class QueryTable extends AbstractTable implements Iterator<Row> {
   private ArrayList<Row> data = new ArrayList<Row>();
   private Column[] cls;
 
@@ -102,6 +97,7 @@ public class QueryTable implements Iterator<Row> {
     }
   }
 
+  @Override
   public int findColumnByName(String name) {
     for (int i = 0; i < this.cls.length; i++) {
       if (this.cls[i].name.equals(name)) {

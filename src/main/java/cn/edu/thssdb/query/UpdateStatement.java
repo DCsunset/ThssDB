@@ -3,6 +3,7 @@ package cn.edu.thssdb.query;
 import cn.edu.thssdb.parser.SQLParser;
 import cn.edu.thssdb.parser.SQLParser.Sql_stmtContext;
 import cn.edu.thssdb.schema.*;
+import cn.edu.thssdb.utils.Global;
 import javafx.util.Pair;
 
 import java.util.Iterator;
@@ -51,6 +52,20 @@ public class UpdateStatement extends Statement {
                     table.getMetadata().columns[index],
                     ctx.expression().getText()
             );
+            SQLParser.ComparatorContext opCtx = ctx.multiple_condition().condition().comparator();
+            Global.OpType type = Global.OpType.EQ;
+            if (opCtx.EQ() != null) {
+                type = Global.OpType.EQ;
+            } else if (opCtx.GE() != null) {
+                type = Global.OpType.GE;
+            } else if (opCtx.GT() != null) {
+                type = Global.OpType.GT;
+            } else if (opCtx.LE() != null) {
+                type = Global.OpType.LE;
+            } else if (opCtx.LT() != null) {
+                type = Global.OpType.LT;
+            }
+            Condition condition = new Condition(table, ctx.column_name().getText(), type, value);
 
             // TODO: multiple conditions
             int condition_cnt = 1;
@@ -76,8 +91,7 @@ public class UpdateStatement extends Statement {
                 Row row = table.read(item.getValue());
                 boolean ok = false;
                 for (int i = 0; i < condition_cnt; ++i) {
-                    Comparable recordValue = row.getEntries().get(condition_indices[i]).value;
-                    if (recordValue.equals(condition_values[i])) {
+                    if (condition.satisfy(row)) {
                         ok = true;
                     }
                 }

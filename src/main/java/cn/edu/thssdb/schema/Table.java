@@ -29,7 +29,7 @@ import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 
-public class Table implements Iterable<Pair<Entry, VRow>>, Serializable {
+public class Table extends AbstractTable implements Iterable<Pair<Entry, VRow>>, Serializable {
   ReentrantReadWriteLock lock;
   private String databaseName;
   public String tableName;
@@ -67,43 +67,13 @@ public class Table implements Iterable<Pair<Entry, VRow>>, Serializable {
     // TODO
   }
 
-  static ScriptEngineManager manager = new ScriptEngineManager();
-  static ScriptEngine engine = manager.getEngineByName("JavaScript");
-
+  @Override
   public int findColumnByName(String name) {
     for (int i = 0; i < metadata.columns.length; ++i) {
       if (metadata.columns[i].name.equals(name))
         return i;
     }
     return -1;
-  }
-
-  public Comparable stringToValue(Column col, String str) throws Exception {
-    // System.out.println("Value " + str);
-    if (str.equals("null")) {
-      if (col.notNull)
-        throw new Exception(String.format("%s cannot be null", col.name));
-      return null;
-    }
-    if (col.type == ColumnInfo.ColumnType.INT) {
-      return (Integer) engine.eval(str);
-    } else if (col.type == ColumnInfo.ColumnType.FLOAT) {
-      return (Float) engine.eval(str);
-    } else if (col.type == ColumnInfo.ColumnType.DOUBLE) {
-      return (Double) engine.eval(str);
-    } else if (col.type == ColumnInfo.ColumnType.LONG) {
-      return (Long) engine.eval(str);
-    }
-    // String
-    else {
-      if (str.length() < 2) {
-        throw new Exception(String.format("Invalid String %s", str));
-      }
-      if (str.charAt(0) != '\'' || str.charAt(str.length() - 1) != '\'') {
-        throw new Exception(String.format("Invalid String %s", str));
-      }
-      return str.substring(1, str.length() - 1);
-    }
   }
 
   public Row createRow(String[] names, String[] values) throws Exception {

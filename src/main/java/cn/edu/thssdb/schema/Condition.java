@@ -7,26 +7,22 @@ public class Condition {
     private String attr;
     private Comparable value;
     private OpType op;
-    private Table table;
+    private AbstractTable table;
     private Table queryTable;
 
     public String getAttr() {
         return attr;
     }
 
-    public Table getTable() {
+    public AbstractTable getTable() {
         return table;
     }
 
     // TODO: constructor for querytable
-    public Condition(Table table, String attr, OpType op, String value) {
+    public Condition(AbstractTable table, String attr, OpType op, Comparable value) {
         this.table = table;
         this.attr = attr;
-        int idx = table.findColumnByName(attr);
-        try {
-            this.value = table.stringToValue(table.getMetadata().columns[idx], value);
-        } catch (Exception e) {
-        }
+        this.value = value;
         this.op = op;
     }
 

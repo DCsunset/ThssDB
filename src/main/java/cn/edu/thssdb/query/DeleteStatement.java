@@ -44,6 +44,8 @@ public class DeleteStatement extends Statement {
         while (true) {
             Multiple_conditionContext left = conditions.multiple_condition(0);
             Multiple_conditionContext right = conditions.multiple_condition(1);
+            System.out.println(left.getText());
+            System.out.println(right.getText());
             if (left == null && right == null) {
                 ConditionContext conditionCtx = conditions.condition();
                 // process this condition
@@ -62,8 +64,24 @@ public class DeleteStatement extends Statement {
                 } else if (opCtx.LT() != null) {
                     type = OpType.LT;
                 }
-                Condition condition = new Condition(this.table, attrCtx.getText(), type, valueCtx.getText());
-                this.conditions.add(condition);
+
+                int idx = table.findColumnByName(attrCtx.getText());
+                if (idx == -1) {
+                    result = String.format("No column named %s", attrCtx.getText());
+                    return;
+                }
+                try {
+                    Comparable value = table.stringToValue(
+                            table.getMetadata().columns[idx],
+                            valueCtx.getText()
+                    );
+                    Condition condition = new Condition(this.table, attrCtx.getText(), type, value);
+                    this.conditions.add(condition);
+                }
+                catch (Exception e) {
+                    result = e.getMessage();
+                    return;
+                }
                 break;
             } else {
 
