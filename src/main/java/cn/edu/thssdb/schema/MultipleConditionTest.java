@@ -9,7 +9,7 @@ import cn.edu.thssdb.parser.SQLParser.Multiple_conditionContext;
 import cn.edu.thssdb.parser.SQLParser.ParseContext;
 
 public class MultipleConditionTest {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
         String str = "select * from table where id=1 && name='hello' || password='c' && q=1234 || p='1212'";
 
         SQLLexer lexer = new SQLLexer(CharStreams.fromString(str));

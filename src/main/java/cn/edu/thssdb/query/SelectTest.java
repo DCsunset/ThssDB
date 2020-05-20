@@ -58,9 +58,15 @@ public class SelectTest {
             } else if (type == SQLParser.K_SELECT) {
                 stmt = new SelectStatement(manager, stmtCtx);
             }
-            stmt.parse();
-            stmt.execute();
-            System.out.println(stmt.getResult());
+            try {
+                stmt.parse();
+                stmt.execute();
+                System.out.println(stmt.getResult());
+            }
+            catch (Exception e) {
+                e.printStackTrace();
+                System.out.println(e.getMessage());
+            }
         }
 
         // join

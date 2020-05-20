@@ -4,7 +4,7 @@ import cn.edu.thssdb.parser.SQLParser.ParseContext;
 import cn.edu.thssdb.parser.SQLParser.Sql_stmtContext;
 import cn.edu.thssdb.schema.Manager;
 
-public class Statement {
+public abstract class Statement {
     protected Manager manager;
     protected Sql_stmtContext parseCtx;
 
@@ -13,11 +13,9 @@ public class Statement {
         this.parseCtx = parseCtx;
     }
 
-    public void parse() {
-    }
+    public abstract void parse() throws Exception;
 
-    public void execute() {
-    }
+    public abstract void execute() throws Exception;
 
     public String getResult() { // string displayed at client's console
         return "";

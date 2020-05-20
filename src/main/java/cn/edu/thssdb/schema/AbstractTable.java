@@ -6,7 +6,7 @@ import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 
 public abstract class AbstractTable {
-    abstract protected int findColumnByName(String name);
+    public Column[] columns;
 
     static ScriptEngineManager manager = new ScriptEngineManager();
     static ScriptEngine engine = manager.getEngineByName("JavaScript");
@@ -37,5 +37,14 @@ public abstract class AbstractTable {
             }
             return str.substring(1, str.length() - 1);
         }
+    }
+
+    public int findColumnByName(String name) throws Exception {
+        for (int i = 0; i < this.columns.length; i++) {
+            if (this.columns[i].name.equals(name)) {
+                return i;
+            }
+        }
+        throw new Exception(String.format("No column named %s", name));
     }
 }

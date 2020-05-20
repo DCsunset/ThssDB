@@ -11,10 +11,9 @@ public class MultipleCondition {
     public ArrayList<ArrayList<Condition>> conditions = new ArrayList<ArrayList<Condition>>();
     private AbstractTable table;
 
-    public MultipleCondition(AbstractTable table, Multiple_conditionContext ctx) {
+    public MultipleCondition(AbstractTable table, Multiple_conditionContext ctx) throws Exception {
         this.table = table;
         parseCtx(ctx);
-
     }
 
     public static OpType ctxtotype(ComparatorContext opCtx) {
@@ -33,7 +32,7 @@ public class MultipleCondition {
         return type;
     }
 
-    private void parseCtx(Multiple_conditionContext ctx) {
+    private void parseCtx(Multiple_conditionContext ctx) throws Exception {
         if (ctx.OR() == null) { // terminal node
             conditions.add(new ArrayList<Condition>());
             parseTerminalNode(ctx);
@@ -43,11 +42,13 @@ public class MultipleCondition {
         }
     }
 
-    private void parseTerminalNode(Multiple_conditionContext ctx) {
+    private void parseTerminalNode(Multiple_conditionContext ctx) throws Exception {
         if (ctx.AND() == null) {
             ConditionContext cctx = ctx.condition();
-            Condition condition = new Condition(table, cctx.expression().get(0).getText(), ctxtotype(cctx.comparator()),
-                    cctx.expression().get(1).getText());
+            String colName = cctx.expression().get(0).getText();
+            int colIndex = table.findColumnByName(colName);
+            Condition condition = new Condition(table, colName, ctxtotype(cctx.comparator()),
+                    table.stringToValue(table.columns[colIndex], cctx.expression().get(1).getText()));
             conditions.get(conditions.size() - 1).add(condition);
         } else {
             parseTerminalNode(ctx.multiple_condition(0));
@@ -55,7 +56,7 @@ public class MultipleCondition {
         }
     }
 
-    public boolean satisfy(Row row) {
+    public boolean satisfy(Row row) throws Exception {
         for (ArrayList<Condition> andConditions : this.conditions) {
             boolean result = true;
             for (Condition condition : andConditions) {

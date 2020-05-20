@@ -22,7 +22,7 @@ public class SelectStatement extends Statement {
     }
 
     @Override
-    public final void execute() {
+    public final void execute() throws Exception {
         Database db = this.manager.currentDatabase;
         QueryTable resultTable = null;
 
@@ -56,39 +56,9 @@ public class SelectStatement extends Statement {
             }
         }
 
-        Condition condition = null;
         if (ctx.multiple_condition() != null) {
-            SQLParser.ConditionContext conditionCtx = ctx.multiple_condition().condition();
-            // process this condition
-            SQLParser.ExpressionContext attrCtx = conditionCtx.expression().get(0);
-            SQLParser.ComparatorContext opCtx = conditionCtx.comparator();
-            SQLParser.ExpressionContext valueCtx = conditionCtx.expression().get(1);
-            Global.OpType type = Global.OpType.EQ;
-            if (opCtx.EQ() != null) {
-                type = Global.OpType.EQ;
-            } else if (opCtx.GE() != null) {
-                type = Global.OpType.GE;
-            } else if (opCtx.GT() != null) {
-                type = Global.OpType.GT;
-            } else if (opCtx.LE() != null) {
-                type = Global.OpType.LE;
-            } else if (opCtx.LT() != null) {
-                type = Global.OpType.LT;
-            }
-            int index = resultTable.findColumnByName(attrCtx.getText());
-            if (index == -1) {
-                result = String.format("No column named %s", attrCtx.getText());
-                return;
-            }
-            try {
-                Comparable value = resultTable.stringToValue(resultTable.getCls()[index], valueCtx.getText());
-                condition = new Condition(resultTable, attrCtx.getText(), type, value);
-                resultTable.filter(condition);
-            }
-            catch (Exception e) {
-                result = e.getMessage();
-                return;
-            }
+            MultipleCondition condition = new MultipleCondition(resultTable, ctx.multiple_condition());
+            resultTable.filter(condition);
         }
 
         String columnNames[] = new String[ctx.result_column().size()];

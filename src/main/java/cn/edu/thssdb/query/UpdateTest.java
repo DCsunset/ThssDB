@@ -46,9 +46,15 @@ public class UpdateTest {
             } else if (type == SQLParser.K_UPDATE) {
                 stmt = new UpdateStatement(manager, stmtCtx);
             }
-            stmt.parse();
-            stmt.execute();
-            System.out.println(stmt.getResult());
+            try {
+                stmt.parse();
+                stmt.execute();
+                System.out.println(stmt.getResult());
+            }
+            catch (Exception e) {
+                e.printStackTrace();
+                System.out.println(e.getMessage());
+            }
         }
     }
 }

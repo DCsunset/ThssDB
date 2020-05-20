@@ -26,7 +26,7 @@ public class Condition {
         this.op = op;
     }
 
-    public boolean satisfy(Row row) {
+    public boolean satisfy(Row row) throws Exception {
         int colIdx = table.findColumnByName(attr);
         Entry entry = row.getEntries().get(colIdx);
         int ret = entry.value.compareTo(this.value);

@@ -39,6 +39,7 @@ public class Table extends AbstractTable implements Iterable<Pair<Entry, VRow>>,
   private int primaryIndex;
 
   public Table(String databaseName, String tableName, Column[] columns) {
+    this.columns = columns;
     this.databaseName = databaseName;
     this.tableName = tableName;
     this.metadata = new Metadata(columns);
@@ -65,15 +66,6 @@ public class Table extends AbstractTable implements Iterable<Pair<Entry, VRow>>,
 
   private void recover() {
     // TODO
-  }
-
-  @Override
-  public int findColumnByName(String name) {
-    for (int i = 0; i < metadata.columns.length; ++i) {
-      if (metadata.columns[i].name.equals(name))
-        return i;
-    }
-    return -1;
   }
 
   public Row createRow(String[] names, String[] values) throws Exception {

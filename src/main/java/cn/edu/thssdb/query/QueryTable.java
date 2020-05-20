@@ -11,19 +11,14 @@ import javafx.util.Pair;
 
 public class QueryTable extends AbstractTable implements Iterator<Row> {
   private ArrayList<Row> data = new ArrayList<Row>();
-  private Column[] cls;
-
-  public Column[] getCls() {
-    return cls;
-  }
 
   public QueryTable(QueryTable tb1, QueryTable tb2) {
     // combine cls
-    Column[] cls1 = tb1.getCls();
-    Column[] cls2 = tb2.getCls();
-    this.cls = new Column[cls1.length + cls2.length];
-    System.arraycopy(cls1, 0, this.cls, 0, cls1.length);
-    System.arraycopy(cls2, 0, this.cls, cls1.length, cls2.length);
+    Column[] cls1 = tb1.columns;
+    Column[] cls2 = tb2.columns;
+    this.columns = new Column[cls1.length + cls2.length];
+    System.arraycopy(cls1, 0, this.columns, 0, cls1.length);
+    System.arraycopy(cls2, 0, this.columns, cls1.length, cls2.length);
   }
 
   private QueryTable() {
@@ -36,14 +31,14 @@ public class QueryTable extends AbstractTable implements Iterator<Row> {
 
   public QueryTable project(String[] columnNames) {
     QueryTable result = new QueryTable();
-    result.cls = new Column[columnNames.length];
+    result.columns = new Column[columnNames.length];
     int[] indices = new int[columnNames.length];
     // columns
     for (int i = 0; i < columnNames.length; i++) {
-      for (int j = 0; j < this.cls.length; j++) {
-        if (columnNames[i].equals(cls[j].name)) {
+      for (int j = 0; j < this.columns.length; j++) {
+        if (columnNames[i].equals(columns[j].name)) {
           indices[i] = j;
-          result.cls[i] = this.cls[j];
+          result.columns[i] = this.columns[j];
           break;
         }
       }
@@ -61,7 +56,7 @@ public class QueryTable extends AbstractTable implements Iterator<Row> {
 
   public void output() {
     StringJoiner sj = new StringJoiner("\t");
-    for (Column c : cls) {
+    for (Column c : columns) {
       sj.add(c.name);
     }
     System.out.println(sj.toString());
@@ -88,26 +83,16 @@ public class QueryTable extends AbstractTable implements Iterator<Row> {
     }
 
     Column[] columns = table.getMetadata().columns;
-    this.cls = new Column[columns.length];
-    System.arraycopy(columns, 0, this.cls, 0, columns.length);
+    this.columns = new Column[columns.length];
+    System.arraycopy(columns, 0, this.columns, 0, columns.length);
     if (joinable) {
-      for (int i = 0; i < cls.length; ++i) {
-        cls[i].name = table.tableName + "." + cls[i].name;
+      for (int i = 0; i < columns.length; ++i) {
+        columns[i].name = table.tableName + "." + columns[i].name;
       }
     }
   }
 
-  @Override
-  public int findColumnByName(String name) {
-    for (int i = 0; i < this.cls.length; i++) {
-      if (this.cls[i].name.equals(name)) {
-        return i;
-      }
-    }
-    return -1;
-  }
-
-  public void filter(Condition condition) {
+  public void filter(MultipleCondition condition) throws Exception {
     if (condition == null)
       return;
     for (int i = 0; i < data.size(); ++i) {
@@ -119,7 +104,7 @@ public class QueryTable extends AbstractTable implements Iterator<Row> {
   }
 
   // another must be constructed by a table
-  public QueryTable join(QueryTable another, String attr1, String attr2) {
+  public QueryTable join(QueryTable another, String attr1, String attr2) throws Exception {
     QueryTable me = this;
     QueryTable result = new QueryTable(me, another);
     for (Row row : me.data) {
