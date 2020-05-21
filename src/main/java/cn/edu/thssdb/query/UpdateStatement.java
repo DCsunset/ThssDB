@@ -10,6 +10,10 @@ import java.util.Iterator;
 
 public class UpdateStatement extends Statement {
     private String result = "";
+    private Table table;
+    // Column index
+    private int index;
+    private Comparable value;
     private SQLParser.Update_stmtContext ctx;
 
     public UpdateStatement(Manager manager, Sql_stmtContext parseCtx) {
@@ -17,38 +21,29 @@ public class UpdateStatement extends Statement {
     }
 
     @Override
-    public final void parse() {
+    public final void parse() throws Exception {
         ctx = this.parseCtx.update_stmt();
+        Database db = this.manager.currentDatabase;
+        String tableName = ctx.table_name().getText();
+        if (!db.getTables().containsKey(tableName)) {
+            throw new Exception("Table does not exist");
+        }
+
+        table = db.getTables().get(tableName);
+
+        index = table.findColumnByName(ctx.column_name().getText());
+        if (index < 0)
+            throw new Exception(String.format("Column %s does not exist", ctx.column_name().getText()));
+
+        // set attr=value
+        value = table.stringToValue(
+                table.getMetadata().columns[index],
+                ctx.expression().getText()
+        );
     }
 
     @Override
     public final void execute() throws Exception {
-        Database db = this.manager.currentDatabase;
-        String tableName = ctx.table_name().getText();
-        if (!db.getTables().containsKey(tableName)) {
-            result = "Table does not exist\n";
-            return;
-        }
-        /*
-        else {
-            result = String.format("%s %s",
-                    ctx.column_name().getText(),
-                    ctx.multiple_condition().condition().expression(1).getText()
-            );
-            return;
-        }
-         */
-
-        Table table = db.getTables().get(tableName);
-
-        int index = table.findColumnByName(ctx.column_name().getText());
-
-        // set attr=value
-        Comparable value = table.stringToValue(
-                table.getMetadata().columns[index],
-                ctx.expression().getText()
-        );
-
         MultipleCondition condition = new MultipleCondition(table, ctx.multiple_condition());
 
         // where attr=value
