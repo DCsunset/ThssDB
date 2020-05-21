@@ -14,7 +14,6 @@ public class Entry implements Comparable<Entry>, Serializable {
   public Comparable value;
   private int maxLength = -1;
   private String type = "";
-  private Boolean isNull = false;
 
   // p[0]: type; p[1]:
   public Entry(Comparable value, Object... p) throws Exception {
@@ -30,12 +29,10 @@ public class Entry implements Comparable<Entry>, Serializable {
     int l = p.length;
     if (l == 2) {
       type = p[0].toString();
-      isNull = true;
       maxLength = (Integer) p[1];
     } else if (l == 1) {
       if (String.class.isInstance(p[0])) {
         type = p[0].toString();
-        isNull = true;
       } else {
         maxLength = (Integer) p[0];
       }
@@ -43,10 +40,10 @@ public class Entry implements Comparable<Entry>, Serializable {
   }
 
   public byte[] toBytes() {
-    String type = !isNull ? value.getClass().getSimpleName() : this.type;
+    String type = value != null ? value.getClass().getSimpleName() : this.type;
     if (type.equals("String")) {
       byte[] b = null;
-      if (isNull) {
+      if (value == null) {
         b = new byte[this.maxLength];
         Arrays.fill(b, (byte) 0xff);
       } else {
@@ -54,16 +51,16 @@ public class Entry implements Comparable<Entry>, Serializable {
       }
       return ByteBuffer.allocate(this.maxLength).put(b).array();
     } else if (type.equals("Integer")) {
-      int num = isNull ? Integer.MIN_VALUE : Integer.parseInt(value.toString());
+      int num = value == null ? Integer.MIN_VALUE : Integer.parseInt(value.toString());
       return ByteBuffer.allocate(4).putInt(num).array();
     } else if (type.equals("Long")) {
-      Long num = isNull ? Long.MIN_VALUE : Long.parseLong(value.toString());
+      Long num = value == null ? Long.MIN_VALUE : Long.parseLong(value.toString());
       return ByteBuffer.allocate(8).putLong(num).array();
     } else if (type.equals("Double")) {
-      Double num = isNull ? Double.NaN : Double.parseDouble(value.toString());
+      Double num = value == null ? Double.NaN : Double.parseDouble(value.toString());
       return ByteBuffer.allocate(8).putDouble(num).array();
     } else {
-      Float num = isNull ? Float.NaN : Float.parseFloat(value.toString());
+      Float num = value == null ? Float.NaN : Float.parseFloat(value.toString());
       return ByteBuffer.allocate(4).putFloat(num).array();
     }
   }
