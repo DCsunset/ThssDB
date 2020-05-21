@@ -18,9 +18,8 @@ public class InsertTest {
         Database db = manager.currentDatabase;
 
         // Create table (commented when table exists)
-        String str = "create TABLE person (name String(256), ID Int not null, PRIMARY KEY(ID));" +
-                "insert into person values ('Bob', 15);" +
-                "insert into person(ID) values (15);";
+        String str = "create TABLE person (name String(256), ID Int not null, PRIMARY KEY(ID));"
+                + "insert into person values ('Bob', 15);" + "insert into person(ID) values (19);";
 
         SQLLexer lexer = new SQLLexer(CharStreams.fromString(str));
         CommonTokenStream tokens = new CommonTokenStream(lexer);
@@ -47,8 +46,7 @@ public class InsertTest {
                 stmt.parse();
                 stmt.execute();
                 System.out.println(stmt.getResult());
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 e.printStackTrace();
                 System.out.println(e.getMessage());
             }

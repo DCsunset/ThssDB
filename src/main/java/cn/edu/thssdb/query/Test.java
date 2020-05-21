@@ -31,13 +31,13 @@ public class Test {
         System.out.println("there are " + db.getTables().size() + " tables in database now");
 
         // Insert (id='101',name='alice') into table
-        Entry[] entries = { new Entry("101", 50), new Entry("alice", 200) };
-        Row data = new Row(entries);
-        Entry[] entries1 = { new Entry("102", 50), new Entry("bob", 200) };
-        Row data1 = new Row(entries1);
-        db.getTables().get("stu").insert(data);
-        db.getTables().get("stu").insert(data1);
-        db.quit();
+        // Entry[] entries = { new Entry("101", 50), new Entry("alice", 200) };
+        // Row data = new Row(entries);
+        // Entry[] entries1 = { new Entry("102", 50), new Entry("bob", 200) };
+        // Row data1 = new Row(entries1);
+        // db.getTables().get("stu").insert(data);
+        // db.getTables().get("stu").insert(data1);
+        // db.quit();
 
         // // Get databse info
         // HashMap<String, Table> tables = db.getTables();

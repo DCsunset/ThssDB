@@ -6,6 +6,20 @@
     "configurations": [
         {
             "type": "java",
+            "name": "CodeLens (Launch) - InsertTest",
+            "request": "launch",
+            "mainClass": "cn.edu.thssdb.query.InsertTest",
+            "projectName": "ThssDB"
+        },
+        {
+            "type": "java",
+            "name": "CodeLens (Launch) - EntryTest",
+            "request": "launch",
+            "mainClass": "cn.edu.thssdb.schema.EntryTest",
+            "projectName": "ThssDB"
+        },
+        {
+            "type": "java",
             "name": "CodeLens (Launch) - JoinTest",
             "request": "launch",
             "mainClass": "cn.edu.thssdb.query.JoinTest",

@@ -13,6 +13,7 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.nio.ByteBuffer;
 import java.security.cert.PKIXRevocationChecker.Option;
+import java.security.spec.ECGenParameterSpec;
 import java.util.ArrayList;
 
 import cn.edu.thssdb.storage.DbCache;
@@ -95,8 +96,15 @@ public class Table extends AbstractTable implements Iterable<Pair<Entry, VRow>>,
       }
 
       for (int i = 0; i < columns.length; ++i) {
-        if (!inserted[i])
-          entries[i] = new Entry(null, columns[i].maxLength, columns[i].maxLength);
+        if (!inserted[i]) {
+          Column col = metadata.columns[i];
+          String type = ColumnInfo.getColumnType(col.type);
+          if (type.equals("String")) {
+            entries[i] = new Entry(null, type, columns[i].maxLength);
+          } else {
+            entries[i] = new Entry(null, type);
+          }
+        }
       }
     }
     return new Row(entries);
@@ -112,27 +120,32 @@ public class Table extends AbstractTable implements Iterable<Pair<Entry, VRow>>,
     int pos = 0;
     Entry[] entries = new Entry[metadata.columns.length];
     for (int i = 0; i < metadata.columns.length; ++i) {
-      Column col = metadata.columns[i];
-      if (col.type == ColumnInfo.ColumnType.STRING) {
-        for (int j = 0; j <= col.maxLength; ++j) {
-          if (j == col.maxLength || bytes[j+pos] == 0) {
-            entries[i] = new Entry(new String(Arrays.copyOfRange(bytes, pos, pos + j)), col.maxLength);
-            break;
+      try {
+        Column col = metadata.columns[i];
+        if (col.type == ColumnInfo.ColumnType.STRING) {
+          for (int j = 0; j <= col.maxLength; ++j) {
+            if (j == col.maxLength || bytes[j + pos] == 0) {
+              entries[i] = new Entry(new String(Arrays.copyOfRange(bytes, pos, pos + j)), col.maxLength);
+              break;
+            }
           }
+          pos += col.maxLength;
+        } else if (col.type == ColumnInfo.ColumnType.INT) {
+          entries[i] = new Entry(ByteBuffer.wrap(Arrays.copyOfRange(bytes, pos, pos + 4)).getInt());
+          pos += 4;
+        } else if (col.type == ColumnInfo.ColumnType.LONG) {
+          entries[i] = new Entry(ByteBuffer.wrap(Arrays.copyOfRange(bytes, pos, pos + 8)).getLong());
+          pos += 8;
+        } else if (col.type == ColumnInfo.ColumnType.FLOAT) {
+          entries[i] = new Entry(ByteBuffer.wrap(Arrays.copyOfRange(bytes, pos, pos + 4)).getFloat());
+          pos += 4;
+        } else if (col.type == ColumnInfo.ColumnType.DOUBLE) {
+          entries[i] = new Entry(ByteBuffer.wrap(Arrays.copyOfRange(bytes, pos, pos + 8)).getDouble());
+          pos += 8;
         }
-        pos += col.maxLength;
-      } else if (col.type == ColumnInfo.ColumnType.INT) {
-        entries[i] = new Entry(ByteBuffer.wrap(Arrays.copyOfRange(bytes, pos, pos + 4)).getInt());
-        pos += 4;
-      } else if (col.type == ColumnInfo.ColumnType.LONG) {
-        entries[i] = new Entry(ByteBuffer.wrap(Arrays.copyOfRange(bytes, pos, pos + 8)).getLong());
-        pos += 8;
-      } else if (col.type == ColumnInfo.ColumnType.FLOAT) {
-        entries[i] = new Entry(ByteBuffer.wrap(Arrays.copyOfRange(bytes, pos, pos + 4)).getFloat());
-        pos += 4;
-      } else if (col.type == ColumnInfo.ColumnType.DOUBLE) {
-        entries[i] = new Entry(ByteBuffer.wrap(Arrays.copyOfRange(bytes, pos, pos + 8)).getDouble());
-        pos += 8;
+      } catch (Exception e) {
+        e.printStackTrace();
+        System.out.println(e.getMessage());
       }
     }
 
