@@ -7,6 +7,7 @@ import cn.edu.thssdb.schema.Manager;
 
 public class CreateDatabaseStatement extends Statement {
     private String dbname;
+    private String result;
 
     public CreateDatabaseStatement(Manager manager, Sql_stmtContext ctx) {
         super(manager, ctx);
@@ -20,11 +21,16 @@ public class CreateDatabaseStatement extends Statement {
 
     @Override
     public final void execute() {
-        this.manager.createDatabaseIfNotExists(this.dbname);
+        if (manager.hasDatabase(this.dbname))
+            result = String.format("Database %s already exists", dbname);
+        else {
+            this.manager.createDatabaseIfNotExists(this.dbname);
+            String.format("Create database %s success!", this.dbname);
+        }
     }
 
     @Override
     public final String getResult() {
-        return String.format("Create database %s success!", this.dbname);
+        return result;
     }
 }

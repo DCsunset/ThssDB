@@ -23,8 +23,12 @@ public class Manager {
     recover();
   }
 
+  public boolean hasDatabase(String name) {
+    return !databases.containsKey(name);
+  }
+
   public void createDatabaseIfNotExists(String name) {
-    if (!databases.containsKey(name)) {
+    if (hasDatabase(name)) {
       Database db = new Database(name);
       databases.put(name, db);
     }
