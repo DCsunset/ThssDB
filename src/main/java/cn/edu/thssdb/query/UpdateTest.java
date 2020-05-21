@@ -20,8 +20,8 @@ public class UpdateTest {
         // Create table (commented when table exists)
         String str = "create TABLE person (name String(256), id Int not null, PRIMARY KEY(ID));" +
                 "insert into person values('test-1', 1);" +
-                "update person set id = 2 where id = 1;" +
-                "update person set id = 3 where id = 2;";
+                "update person set id = 2+2 where id = 1 * (2 - 1);" +
+                "update person set id = 0 where id = 4;";
 
         SQLLexer lexer = new SQLLexer(CharStreams.fromString(str));
         CommonTokenStream tokens = new CommonTokenStream(lexer);

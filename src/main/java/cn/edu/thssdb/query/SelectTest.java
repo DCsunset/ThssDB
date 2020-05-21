@@ -23,16 +23,20 @@ public class SelectTest {
         // Create table (commented when table exists)
         String str = "create TABLE person (name String(256), ID Int not null, PRIMARY KEY(ID));"
                 + "create table info (name String(256), password String(256), primary key(name));"
-                + "create table grade (ID Int not null, grade Int, primary key(ID));"
+                + "create table grade (ID Int not null, grade Int, grade2 Int, primary key(ID));"
                 + "insert into person values ('Bob', 1);"
                 + "insert into person values ('Alice',2);"
                 + "insert into person values ('Ted',3);"
                 + "insert into info values ('Alice','151515');"
                 + "insert into info values ('Bob','123456');"
-                + "insert into grade values (1, 80);"
-                + "insert into grade values (2, 90);"
-                + "insert into grade values (3, 92);"
-                //+ "select * from person where ID = 10;";
+                + "insert into grade values (1, 80, 90);"
+                + "insert into grade values (2, 90, 100);"
+                + "insert into grade values (3, 92, 60);"
+                + "insert into grade values (4, 70, 60);"
+                + "insert into grade values (5, 90, 100);"
+                + "select * from person where ID > 1 + 1 -1;"
+                + "select * from grade where grade > grade2;"
+                + "select * from grade where ID = 1 || ID = 2 || grade > 80 && grade2 > 80;"
                 + "select * from person join info join grade on grade.ID = person.ID && person.name = info.name;";
 
         SQLLexer lexer = new SQLLexer(CharStreams.fromString(str));

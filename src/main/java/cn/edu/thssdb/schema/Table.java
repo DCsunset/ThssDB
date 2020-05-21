@@ -70,7 +70,7 @@ public class Table extends AbstractTable implements Iterable<Pair<Entry, VRow>>,
 
   public Row createRow(String[] names, String[] values) throws Exception {
     // All cols
-    Entry entries[] = new Entry[values.length];
+    Entry entries[] = new Entry[columns.length];
     Arrays.fill(entries, null);
     if (names.length == 0) {
       if (values.length != metadata.columns.length)
@@ -82,12 +82,21 @@ public class Table extends AbstractTable implements Iterable<Pair<Entry, VRow>>,
     } else {
       if (values.length != names.length)
         throw new Exception("Wrong number of values");
+
+      boolean inserted[] = new boolean[columns.length];
+      Arrays.fill(inserted, false);
       for (int i = 0; i < names.length; ++i) {
         int index = findColumnByName(names[i]);
         if (index == -1)
           throw new Exception(String.format("Column %s does not exist", names[i]));
+        inserted[index] = true;
         Column col = metadata.columns[index];
-        entries[i] = new Entry(stringToValue(col, values[i]), col.maxLength);
+        entries[index] = new Entry(stringToValue(col, values[i]), col.maxLength);
+      }
+
+      for (int i = 0; i < columns.length; ++i) {
+        if (!inserted[i])
+          entries[i] = new Entry(null, columns[i].maxLength, columns[i].maxLength);
       }
     }
     return new Row(entries);
