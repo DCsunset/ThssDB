@@ -9,6 +9,8 @@ import javafx.scene.control.Tab;
 public class InsertStatement extends Statement {
     private String result = "";
     private SQLParser.Insert_stmtContext ctx;
+    private String names[];
+    private String values[];
 
     public InsertStatement(Manager manager, Sql_stmtContext parseCtx) {
         super(manager, parseCtx);
@@ -17,10 +19,20 @@ public class InsertStatement extends Statement {
     @Override
     public final void parse() {
         ctx = this.parseCtx.insert_stmt();
+
+        names = new String[ctx.column_name().size()];
+        for (int i = 0; i < names.length; ++i) {
+            names[i] = ctx.column_name(i).getText();
+        }
+
+        values = new String[ctx.value_entry(0).literal_value().size()];
+        for (int i = 0; i < values.length; ++i) {
+            values[i] = ctx.value_entry(0).literal_value(i).getText();
+        }
     }
 
     @Override
-    public final void execute() {
+    public final void execute() throws Exception {
         Database db = this.manager.currentDatabase;
         String tableName = ctx.table_name().getText();
         if (!db.getTables().containsKey(tableName)) {
@@ -36,27 +48,11 @@ public class InsertStatement extends Statement {
             return;
         }
         */
-        String[] names = new String[ctx.column_name().size()];
-        for (int i = 0; i < names.length; ++i) {
-            names[i] = ctx.column_name(i).getText();
-        }
-
-        String[] values = new String[ctx.value_entry(0).literal_value().size()];
-        for (int i = 0; i < values.length; ++i) {
-            values[i] = ctx.value_entry(0).literal_value(i).getText();
-        }
 
         Table table = db.getTables().get(tableName);
-        try {
-            Row row = table.createRow(names, values);
-            table.insert(row);
-            result = "Insert successfully\n";
-        }
-        catch (Exception e) {
-            e.printStackTrace();
-            result = e.toString();
-            //result = Integer.toString(values.length) + " " + Integer.toString(names.length);
-        }
+        Row row = table.createRow(names, values);
+        table.insert(row);
+        result = "Insert successfully\n";
     }
 
     @Override
