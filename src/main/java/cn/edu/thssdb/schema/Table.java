@@ -74,10 +74,10 @@ public class Table extends AbstractTable implements Iterable<Pair<Entry, VRow>>,
     Entry entries[] = new Entry[columns.length];
     Arrays.fill(entries, null);
     if (names.length == 0) {
-      if (values.length != metadata.columns.length)
+      if (values.length != columns.length)
         throw new Exception("Wrong number of values");
       for (int i = 0; i < values.length; ++i) {
-        Column col = metadata.columns[i];
+        Column col = columns[i];
         entries[i] = new Entry(stringToValue(col, values[i]), col.maxLength);
       }
     } else {
@@ -97,6 +97,8 @@ public class Table extends AbstractTable implements Iterable<Pair<Entry, VRow>>,
 
       for (int i = 0; i < columns.length; ++i) {
         if (!inserted[i]) {
+          if (columns[i].isPrimary())
+            throw new Exception(String.format("Primary key %s can't be null", columns[i].name));
           Column col = metadata.columns[i];
           String type = ColumnInfo.getColumnType(col.type);
           if (type.equals("String")) {
