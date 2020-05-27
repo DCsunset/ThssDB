@@ -3,6 +3,7 @@ package cn.edu.thssdb.query;
 import cn.edu.thssdb.parser.SQLParser;
 import cn.edu.thssdb.parser.SQLParser.Sql_stmtContext;
 import cn.edu.thssdb.schema.*;
+import cn.edu.thssdb.transaction.Transaction;
 import cn.edu.thssdb.utils.Global;
 import javafx.util.Pair;
 
@@ -15,9 +16,11 @@ public class UpdateStatement extends Statement {
     private int index;
     private Comparable value;
     private SQLParser.Update_stmtContext ctx;
+    private Transaction transaction;
 
-    public UpdateStatement(Manager manager, Sql_stmtContext parseCtx) {
+    public UpdateStatement(Manager manager, Sql_stmtContext parseCtx, Transaction transaction) {
         super(manager, parseCtx);
+        this.transaction = transaction;
     }
 
     @Override
@@ -36,14 +39,12 @@ public class UpdateStatement extends Statement {
             throw new Exception(String.format("Column %s does not exist", ctx.column_name().getText()));
 
         // set attr=value
-        value = table.stringToValue(
-                table.getMetadata().columns[index],
-                ctx.expression().getText()
-        );
+        value = table.stringToValue(table.getMetadata().columns[index], ctx.expression().getText());
     }
 
     @Override
     public final void execute() throws Exception {
+        this.transaction.acquireLock(this.table.lock);
         MultipleCondition condition = new MultipleCondition(table, ctx.multiple_condition());
 
         // where attr=value

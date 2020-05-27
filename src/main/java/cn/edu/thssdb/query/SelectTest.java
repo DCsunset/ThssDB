@@ -24,18 +24,12 @@ public class SelectTest {
         String str = "create TABLE person (name String(256), ID Int not null, PRIMARY KEY(ID));"
                 + "create table info (name String(256), password String(256), primary key(name));"
                 + "create table grade (ID Int not null, grade Int, grade2 Int, primary key(ID));"
-                + "insert into person values ('Bob', 1);"
-                + "insert into person values ('Alice',2);"
-                + "insert into person values ('Ted',3);"
-                + "insert into info values ('Alice','151515');"
-                + "insert into info values ('Bob','123456');"
-                + "insert into grade values (1, 80, 90);"
-                + "insert into grade values (2, 90, 100);"
-                + "insert into grade values (3, 92, 60);"
-                + "insert into grade values (4, 70, 60);"
-                + "insert into grade values (5, 90, 100);"
-                + "select * from person where ID > 1 + 1 -1;"
-                + "select * from grade where grade > grade2;"
+                + "insert into person values ('Bob', 1);" + "insert into person values ('Alice',2);"
+                + "insert into person values ('Ted',3);" + "insert into info values ('Alice','151515');"
+                + "insert into info values ('Bob','123456');" + "insert into grade values (1, 80, 90);"
+                + "insert into grade values (2, 90, 100);" + "insert into grade values (3, 92, 60);"
+                + "insert into grade values (4, 70, 60);" + "insert into grade values (5, 90, 100);"
+                + "select * from person where ID > 1 + 1 -1;" + "select * from grade where grade > grade2;"
                 + "select * from grade where ID = 1 || ID = 2 || grade > 80 && grade2 > 80;"
                 + "select * from person join info join grade on grade.ID = person.ID && person.name = info.name;";
 
@@ -58,16 +52,15 @@ public class SelectTest {
             } else if (type == SQLParser.K_CREATE) {
                 stmt = new CreateTableStatement(manager, stmtCtx);
             } else if (type == SQLParser.K_INSERT) {
-                stmt = new InsertStatement(manager, stmtCtx);
+                // stmt = new InsertStatement(manager, stmtCtx);
             } else if (type == SQLParser.K_SELECT) {
-                stmt = new SelectStatement(manager, stmtCtx);
+                // stmt = new SelectStatement(manager, stmtCtx);
             }
             try {
                 stmt.parse();
                 stmt.execute();
                 System.out.println(stmt.getResult());
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 e.printStackTrace();
                 System.out.println(e.getMessage());
             }
@@ -75,13 +68,13 @@ public class SelectTest {
 
         // join
         /*
-        Table person = db.getTables().get("person");
-        Table info = db.getTables().get("info");
-
-        new QueryTable(person).join(new QueryTable(info), "name", "name", null);
-        new QueryTable(person).join(new QueryTable(info), "name", "name",
-                new Condition(person, "name", OpType.EQ, "Bob"));
-
+         * Table person = db.getTables().get("person"); Table info =
+         * db.getTables().get("info");
+         * 
+         * new QueryTable(person).join(new QueryTable(info), "name", "name", null); new
+         * QueryTable(person).join(new QueryTable(info), "name", "name", new
+         * Condition(person, "name", OpType.EQ, "Bob"));
+         * 
          */
     }
 }

@@ -18,10 +18,9 @@ public class UpdateTest {
         Database db = manager.currentDatabase;
 
         // Create table (commented when table exists)
-        String str = "create TABLE person (name String(256), id Int not null, PRIMARY KEY(ID));" +
-                "insert into person values('test-1', 1);" +
-                "update person set id = 2+2 where id = 1 * (2 - 1);" +
-                "update person set name = null where id = 4;";
+        String str = "create TABLE person (name String(256), id Int not null, PRIMARY KEY(ID));"
+                + "insert into person values('test-1', 1);" + "update person set id = 2+2 where id = 1 * (2 - 1);"
+                + "update person set name = null where id = 4;";
 
         SQLLexer lexer = new SQLLexer(CharStreams.fromString(str));
         CommonTokenStream tokens = new CommonTokenStream(lexer);
@@ -42,16 +41,15 @@ public class UpdateTest {
             } else if (type == SQLParser.K_CREATE) {
                 stmt = new CreateTableStatement(manager, stmtCtx);
             } else if (type == SQLParser.K_INSERT) {
-                stmt = new InsertStatement(manager, stmtCtx);
+                // stmt = new InsertStatement(manager, stmtCtx);
             } else if (type == SQLParser.K_UPDATE) {
-                stmt = new UpdateStatement(manager, stmtCtx);
+                // stmt = new UpdateStatement(manager, stmtCtx);
             }
             try {
                 stmt.parse();
                 stmt.execute();
                 System.out.println(stmt.getResult());
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 e.printStackTrace();
                 System.out.println(e.getMessage());
             }

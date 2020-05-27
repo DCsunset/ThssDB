@@ -3,6 +3,7 @@ package cn.edu.thssdb.query;
 import cn.edu.thssdb.parser.SQLParser;
 import cn.edu.thssdb.parser.SQLParser.Sql_stmtContext;
 import cn.edu.thssdb.schema.*;
+import cn.edu.thssdb.transaction.Transaction;
 import cn.edu.thssdb.utils.Global;
 import com.sun.org.apache.xpath.internal.operations.Mult;
 
@@ -12,9 +13,11 @@ import java.util.LinkedList;
 public class SelectStatement extends Statement {
     private String result = "";
     private SQLParser.Select_stmtContext ctx;
+    private Transaction transaction;
 
-    public SelectStatement(Manager manager, Sql_stmtContext parseCtx) {
+    public SelectStatement(Manager manager, Sql_stmtContext parseCtx, Transaction transaction) {
         super(manager, parseCtx);
+        this.transaction = transaction;
     }
 
     @Override
@@ -28,12 +31,13 @@ public class SelectStatement extends Statement {
         QueryTable resultTable = null;
 
         /*
-        System.out.println(ctx.table_query(0).getText());
-        System.out.println(ctx.table_query(0).table_name().size());
-        System.out.println(ctx.table_query(0).table_name(0).getText());
+         * System.out.println(ctx.table_query(0).getText());
+         * System.out.println(ctx.table_query(0).table_name().size());
+         * System.out.println(ctx.table_query(0).table_name(0).getText());
          */
 
         SQLParser.Table_queryContext tbCtx = ctx.table_query(0);
+        ArrayList<Table> tables = new ArrayList<Table>();
 
         for (int i = 0; i < tbCtx.table_name().size(); ++i) {
             String tableName = tbCtx.table_name(i).getText();
@@ -41,6 +45,8 @@ public class SelectStatement extends Statement {
                 result = "Table does not exist\n";
                 return;
             }
+            tables.add(db.getTables().get(tableName));
+            this.transaction.acquireLock(tables.get(tables.size() - 1).lock);
             if (i == 0)
                 resultTable = new QueryTable(db.getTables().get(tableName), tbCtx.table_name().size() > 1);
             else {
@@ -66,6 +72,10 @@ public class SelectStatement extends Statement {
         if (!columnNames[0].equals("*"))
             resultTable = resultTable.project(columnNames);
         resultTable.output();
+        // release lock after read request
+        for (Table table : tables) {
+            this.transaction.releaseLock(table.lock);
+        }
     }
 
     @Override

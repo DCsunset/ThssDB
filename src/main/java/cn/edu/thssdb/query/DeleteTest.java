@@ -19,8 +19,7 @@ public class DeleteTest {
 
         // Create table (commented when table exists)
         String str = "create TABLE person (name String(256), id Int not null, PRIMARY KEY(ID));"
-                + "insert into person values('test-1', 1);"
-                + "insert into person values('hello', 2);"
+                + "insert into person values('test-1', 1);" + "insert into person values('hello', 2);"
                 + "delete from person where id = 2 || name='test-1';";
 
         SQLLexer lexer = new SQLLexer(CharStreams.fromString(str));
@@ -41,19 +40,19 @@ public class DeleteTest {
                 }
             } else if (type == SQLParser.K_CREATE) {
                 stmt = new CreateTableStatement(manager, stmtCtx);
-            } else if (type == SQLParser.K_INSERT) {
-                stmt = new InsertStatement(manager, stmtCtx);
-            } else if (type == SQLParser.K_UPDATE) {
-                stmt = new UpdateStatement(manager, stmtCtx);
-            } else if (type == SQLParser.K_DELETE) {
-                stmt = new DeleteStatement(manager, stmtCtx);
             }
+            // else if (type == SQLParser.K_INSERT) {
+            // stmt = new InsertStatement(manager, stmtCtx);
+            // } else if (type == SQLParser.K_UPDATE) {
+            // stmt = new UpdateStatement(manager, stmtCtx);
+            // } else if (type == SQLParser.K_DELETE) {
+            // stmt = new DeleteStatement(manager, stmtCtx);
+            // }
             try {
                 stmt.parse();
                 stmt.execute();
                 System.out.println(stmt.getResult());
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 e.printStackTrace();
                 System.out.println(e.getMessage());
             }

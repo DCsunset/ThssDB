@@ -24,6 +24,7 @@ import jdk.internal.org.objectweb.asm.tree.MultiANewArrayInsnNode;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.BitSet;
 import javax.script.ScriptEngine;
@@ -31,7 +32,7 @@ import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 
 public class Table extends AbstractTable implements Iterable<Pair<Entry, VRow>>, Serializable {
-  ReentrantReadWriteLock lock;
+  public ReentrantLock lock;
   private String databaseName;
   public String tableName;
   public BPlusTree<Entry, VRow> index;
@@ -40,6 +41,7 @@ public class Table extends AbstractTable implements Iterable<Pair<Entry, VRow>>,
   private int primaryIndex;
 
   public Table(String databaseName, String tableName, Column[] columns) {
+    lock = new ReentrantLock();
     this.columns = columns;
     this.databaseName = databaseName;
     this.tableName = tableName;

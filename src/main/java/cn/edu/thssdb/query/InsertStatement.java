@@ -3,6 +3,7 @@ package cn.edu.thssdb.query;
 import cn.edu.thssdb.parser.SQLParser;
 import cn.edu.thssdb.parser.SQLParser.Sql_stmtContext;
 import cn.edu.thssdb.schema.*;
+import cn.edu.thssdb.transaction.Transaction;
 import cn.edu.thssdb.type.ColumnInfo;
 import javafx.scene.control.Tab;
 
@@ -12,8 +13,11 @@ public class InsertStatement extends Statement {
     private String names[];
     private String values[];
 
-    public InsertStatement(Manager manager, Sql_stmtContext parseCtx) {
+    private Transaction transaction;
+
+    public InsertStatement(Manager manager, Sql_stmtContext parseCtx, Transaction transaction) {
         super(manager, parseCtx);
+        this.transaction = transaction;
     }
 
     @Override
@@ -40,16 +44,12 @@ public class InsertStatement extends Statement {
             return;
         }
         /*
-        else {
-            result = String.format("%s %s",
-                    ctx.column_name(),
-                    ctx.value_entry(0).literal_value().get(0)
-            );
-            return;
-        }
-        */
+         * else { result = String.format("%s %s", ctx.column_name(),
+         * ctx.value_entry(0).literal_value().get(0) ); return; }
+         */
 
         Table table = db.getTables().get(tableName);
+        transaction.acquireLock(table.lock);
         Row row = table.createRow(names, values);
         table.insert(row);
         result = "Insert successfully\n";

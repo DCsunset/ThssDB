@@ -7,6 +7,7 @@ import java.util.Comparator;
 import java.util.Iterator;
 
 import cn.edu.thssdb.schema.*;
+import cn.edu.thssdb.transaction.Transaction;
 import javafx.util.Pair;
 
 import javax.swing.*;
@@ -25,9 +26,11 @@ public class DeleteStatement extends Statement {
     private Table table;
     private MultipleCondition condition;
     private String result;
+    private Transaction transaction;
 
-    public DeleteStatement(Manager manager, Sql_stmtContext ctx) {
+    public DeleteStatement(Manager manager, Sql_stmtContext ctx, Transaction transaction) {
         super(manager, ctx);
+        this.transaction = transaction;
     }
 
     @Override
@@ -41,6 +44,7 @@ public class DeleteStatement extends Statement {
 
     @Override
     public final void execute() throws Exception {
+        this.transaction.acquireLock(this.table.lock);
         Iterator<Pair<Entry, VRow>> it = this.table.iterator();
         int count = 0;
         while (it.hasNext()) {

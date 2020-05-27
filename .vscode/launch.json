@@ -6,6 +6,13 @@
     "configurations": [
         {
             "type": "java",
+            "name": "CodeLens (Launch) - TransactionTest",
+            "request": "launch",
+            "mainClass": "cn.edu.thssdb.transaction.TransactionTest",
+            "projectName": "ThssDB"
+        },
+        {
+            "type": "java",
             "name": "CodeLens (Launch) - InsertTest",
             "request": "launch",
             "mainClass": "cn.edu.thssdb.query.InsertTest",

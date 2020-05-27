@@ -45,14 +45,13 @@ public class JoinTest {
             } else if (type == SQLParser.K_CREATE) {
                 stmt = new CreateTableStatement(manager, stmtCtx);
             } else if (type == SQLParser.K_INSERT) {
-                stmt = new InsertStatement(manager, stmtCtx);
+                // stmt = new InsertStatement(manager, stmtCtx);
             }
             try {
                 stmt.parse();
                 stmt.execute();
                 System.out.println(stmt.getResult());
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 e.printStackTrace();
                 System.out.println(e.getMessage());
             }
