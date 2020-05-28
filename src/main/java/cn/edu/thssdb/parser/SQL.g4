@@ -25,7 +25,9 @@ sql_stmt :
     | show_table_stmt
     | show_meta_stmt
     | quit_stmt
-    | update_stmt ;
+    | update_stmt
+    | transaction_stmt
+    | commit_stmt ;
 
 create_db_stmt :
     K_CREATE K_DATABASE database_name ;
