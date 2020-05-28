@@ -3,8 +3,6 @@ package cn.edu.thssdb.schema;
 import cn.edu.thssdb.schema.Table;
 import cn.edu.thssdb.type.ColumnInfo;
 import cn.edu.thssdb.utils.Global.OpType;
-import com.sun.javafx.geom.transform.GeneralTransform3D;
-import com.sun.xml.internal.ws.api.model.wsdl.WSDLFault;
 
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;

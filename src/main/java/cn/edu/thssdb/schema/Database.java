@@ -2,7 +2,6 @@ package cn.edu.thssdb.schema;
 
 import cn.edu.thssdb.query.QueryResult;
 import cn.edu.thssdb.query.QueryTable;
-import com.sun.xml.internal.fastinfoset.tools.FI_DOM_Or_XML_DOM_SAX_SAXEvent;
 
 import java.io.*;
 import java.util.HashMap;
