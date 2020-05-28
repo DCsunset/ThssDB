@@ -67,6 +67,8 @@ public class SQLExecutor {
                     stmt.parse();
                     stmt.execute();
                     System.out.println(stmt.getResult());
+                    if (transaction == null)
+                        t.commit();
                 }
             } catch (Exception e) {
                 e.printStackTrace();
