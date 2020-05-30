@@ -190,9 +190,18 @@ public class Table extends AbstractTable implements Iterable<Pair<Entry, VRow>>,
     this.index.put(row.entries.get(primaryIndex), new VRow(id, index));
   }
 
-  public void delete(Entry key) {
+  public void delete(UUID uuid, Entry key) {
     VRow row = this.index.get(key);
     Page page = cache.readPage(row.pageID);
+    Dictionary dic = new Hashtable<>();
+    dic.put("tableName", this.tableName);
+    dic.put("pageNumber", row.pageID);
+    dic.put("rowIndex", row.rowIndex);
+    try {
+      new Log(uuid, LogType.Normal, dic).serialize();
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
     if (page.isFull()) {
       metadata.freePageList.add(row.pageID);
     }
@@ -201,11 +210,24 @@ public class Table extends AbstractTable implements Iterable<Pair<Entry, VRow>>,
     this.index.remove(key);
   }
 
-  public void update(Row row, Entry key) {
+  public void update(UUID uuid, Row row, Entry key) {
     VRow vrow = this.index.get(key);
     int pageID = vrow.pageID;
     int rowIndex = vrow.rowIndex;
     Page page = cache.readPage(pageID);
+
+    Dictionary dic = new Hashtable<>();
+    dic.put("tableName", this.tableName);
+    dic.put("pageNumber", pageID);
+    dic.put("rowIndex", rowIndex);
+    dic.put("oldData", page.readRow(rowIndex));
+    dic.put("newData", row.toBytes());
+    try {
+      new Log(uuid, LogType.Normal, dic).serialize();
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+
     page.writeRow(rowIndex, row.toBytes());
     cache.writePage(pageID, page);
     this.index.remove(key);
