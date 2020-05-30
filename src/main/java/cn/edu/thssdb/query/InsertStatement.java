@@ -1,9 +1,14 @@
 package cn.edu.thssdb.query;
 
+import java.util.Dictionary;
+import java.util.Hashtable;
+
 import cn.edu.thssdb.parser.SQLParser;
 import cn.edu.thssdb.parser.SQLParser.Sql_stmtContext;
 import cn.edu.thssdb.schema.*;
+import cn.edu.thssdb.transaction.Log;
 import cn.edu.thssdb.transaction.Transaction;
+import cn.edu.thssdb.transaction.Log.LogType;
 import cn.edu.thssdb.type.ColumnInfo;
 import javafx.scene.control.Tab;
 
@@ -51,7 +56,7 @@ public class InsertStatement extends Statement {
         Table table = db.getTables().get(tableName);
         transaction.acquireLock(table.lock);
         Row row = table.createRow(names, values);
-        table.insert(row);
+        table.insert(transaction.uuid, row);
         result = "Insert successfully\n";
     }
 

@@ -4,7 +4,11 @@ import cn.edu.thssdb.parser.SQLLexer;
 import cn.edu.thssdb.parser.SQLParser;
 import cn.edu.thssdb.query.*;
 import cn.edu.thssdb.schema.Manager;
+import cn.edu.thssdb.transaction.Log;
 import cn.edu.thssdb.transaction.Transaction;
+
+import java.io.IOException;
+
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 
@@ -43,10 +47,22 @@ public class SQLExecutor {
                 // Begin transaction
                 transaction = t;
                 System.out.println("Transaction begins");
+                try {
+                    new Log(transaction.uuid, Log.LogType.Start, null).serialize();
+                } catch (IOException e) {
+                    System.err.println(e.getMessage());
+                    e.printStackTrace();
+                }
             } else if (stmtCtx.commit_stmt() != null) {
                 if (transaction == null) {
                     System.err.println("No transaction begins");
                     return;
+                }
+                try {
+                    new Log(transaction.uuid, Log.LogType.Commit, null).serialize();
+                } catch (IOException e) {
+                    System.err.println(e.getMessage());
+                    e.printStackTrace();
                 }
                 transaction.commit();
                 transaction = null;

@@ -19,13 +19,20 @@ import java.util.ArrayList;
 import cn.edu.thssdb.storage.DbCache;
 import cn.edu.thssdb.storage.Metadata;
 import cn.edu.thssdb.storage.Page;
+import cn.edu.thssdb.transaction.Log;
+import cn.edu.thssdb.transaction.Transaction;
+import cn.edu.thssdb.transaction.Log.LogType;
 
 import java.util.Arrays;
 import java.util.Iterator;
+import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.BitSet;
+import java.util.Dictionary;
+import java.util.Hashtable;
+
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
@@ -155,12 +162,25 @@ public class Table extends AbstractTable implements Iterable<Pair<Entry, VRow>>,
     return new Row(entries);
   }
 
-  public void insert(Row row) {
+  public void insert(UUID uuid, Row row) {
     int id = metadata.freePageList.get(0);
     Page page = cache.readPage(id);
     BitSet bitmap = page.bitmap;
     int index = bitmap.nextClearBit(0);
     byte[] bytes = row.toBytes();
+
+    Dictionary dic = new Hashtable<>();
+    dic.put("tableName", this.tableName);
+    dic.put("pageNumber", id);
+    dic.put("rowIndex", index);
+    dic.put("oldData", page.readRow(index));
+    dic.put("newData", bytes);
+    try {
+      new Log(uuid, LogType.Normal, dic).serialize();
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+
     page.writeRow(index, bytes);
     if (page.isFull()) {
       metadata.freePageList.remove(0);
