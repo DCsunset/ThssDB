@@ -1,19 +1,26 @@
+
 package cn.edu.thssdb.transaction;
 
 import java.io.IOException;
+import java.io.RandomAccessFile;
 import java.util.Dictionary;
 import java.util.UUID;
 
-public class DeleteLog extends Log {
-    public String tableName;
+public class InsertUpdateLog extends Log {
+
     public int pageNumber;
     public int rowIndex;
+    public byte[] oldData;
+    public byte[] newData;
+    public String tableName;
 
-    public DeleteLog(UUID id, Dictionary data) {
-        super(id, LogType.Delete);
+    public InsertUpdateLog(UUID id, Dictionary data) {
+        super(id, LogType.Insert);
         this.tableName = (String) data.get("tableName");
         this.pageNumber = (int) data.get("pageNumber");
         this.rowIndex = (int) data.get("rowIndex");
+        this.oldData = (byte[]) data.get("oldData");
+        this.newData = (byte[]) data.get("newData");
     }
 
     @Override
@@ -23,5 +30,7 @@ public class DeleteLog extends Log {
         handler.write(this.tableName.getBytes());
         handler.writeInt(this.pageNumber);
         handler.writeInt(this.rowIndex);
+        handler.write(this.oldData);
+        handler.write(this.newData);
     }
 }

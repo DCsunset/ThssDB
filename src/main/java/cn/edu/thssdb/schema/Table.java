@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import cn.edu.thssdb.storage.DbCache;
 import cn.edu.thssdb.storage.Metadata;
 import cn.edu.thssdb.storage.Page;
+import cn.edu.thssdb.transaction.DeleteLog;
 import cn.edu.thssdb.transaction.Log;
 import cn.edu.thssdb.transaction.Transaction;
 import cn.edu.thssdb.transaction.Log.LogType;
@@ -198,7 +199,7 @@ public class Table extends AbstractTable implements Iterable<Pair<Entry, VRow>>,
     dic.put("pageNumber", row.pageID);
     dic.put("rowIndex", row.rowIndex);
     try {
-      new Log(uuid, LogType.Normal, dic).serialize();
+      new DeleteLog(uuid, dic).serialize();
     } catch (IOException e) {
       e.printStackTrace();
     }
