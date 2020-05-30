@@ -12,6 +12,7 @@ public class Database {
     public String name;
     private HashMap<String, Table> tables;
     ReentrantReadWriteLock lock;
+    public RandomAccessFile logFileHandler;
 
     public HashMap<String, Table> getTables() {
         return tables;
@@ -88,6 +89,8 @@ public class Database {
                 tables = (HashMap) obj.readObject();
                 obj.close();
                 metaFile.close();
+
+                // TODO: recover log
             } catch (IOException e) {
                 System.err.println(String.format("De-Serialize metadata failed"));
             } catch (ClassNotFoundException c) {
@@ -95,6 +98,13 @@ public class Database {
             }
         } else {
             boolean ok = file.mkdir();
+            // Create log
+            try {
+                logFileHandler = new RandomAccessFile(Manager.baseDir + "/" + name + "/" + name + ".log", "rwd");
+            } catch (Exception e) {
+                System.err.println(e.getMessage());
+                e.printStackTrace();
+            }
             if (!ok) {
                 System.err.println(String.format("create db error"));
                 System.exit(-1);

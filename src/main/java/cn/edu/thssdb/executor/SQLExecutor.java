@@ -51,6 +51,7 @@ public class SQLExecutor {
                 transaction.commit();
                 transaction = null;
                 System.out.println("Transaction committed");
+
             } else if (stmtCtx.delete_stmt() != null) {
                 stmt = new DeleteStatement(manager, stmtCtx, t);
             } else if (stmtCtx.drop_db_stmt() != null) {
