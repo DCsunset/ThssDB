@@ -12,6 +12,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.nio.ByteBuffer;
+import java.rmi.server.ExportException;
 import java.security.cert.PKIXRevocationChecker.Option;
 import java.security.spec.ECGenParameterSpec;
 import java.util.ArrayList;
@@ -47,7 +48,7 @@ public class Table extends AbstractTable implements Iterable<Pair<Entry, VRow>>,
   public BPlusTree<Entry, VRow> index;
   private Metadata metadata;
   private DbCache cache;
-  private int primaryIndex;
+  public int primaryIndex;
 
   public Table(String databaseName, String tableName, Column[] columns) {
     lock = new ReentrantLock();
@@ -127,9 +128,7 @@ public class Table extends AbstractTable implements Iterable<Pair<Entry, VRow>>,
     return read(vrow.pageID, vrow.rowIndex);
   }
 
-  public Row read(int pageID, int rowIndex) {
-    Page page = cache.readPage(pageID);
-    byte[] bytes = page.readRow(rowIndex);
+  public Row createRow(byte[] bytes) {
     int pos = 0;
     Entry[] entries = new Entry[metadata.columns.length];
     for (int i = 0; i < metadata.columns.length; ++i) {
@@ -165,7 +164,31 @@ public class Table extends AbstractTable implements Iterable<Pair<Entry, VRow>>,
     return new Row(entries);
   }
 
-  public void insert(UUID uuid, Row row) {
+  public Row read(int pageID, int rowIndex) {
+    Page page = cache.readPage(pageID);
+    byte[] bytes = page.readRow(rowIndex);
+    return createRow(bytes);
+  }
+
+  public void write(int pageId, int rowIndex, Row row) {
+    update(pageId, rowIndex, row);
+    Entry key = row.entries.get(primaryIndex);
+    if (!this.index.contains(key))
+      this.index.put(row.entries.get(primaryIndex), new VRow(pageId, rowIndex));
+  }
+
+  public void update(int pageId, int rowIndex, Row row) {
+    Page page = cache.readPage(pageId);
+    byte[] bytes = row.toBytes();
+
+    page.writeRow(rowIndex, bytes);
+    if (page.isFull()) {
+      metadata.freePageList.remove(0);
+    }
+    cache.writePage(pageId, page);
+  }
+
+  public void insert(UUID uuid, Row row) throws Exception {
     int id = metadata.freePageList.get(0);
     Page page = cache.readPage(id);
     BitSet bitmap = page.bitmap;
@@ -190,27 +213,49 @@ public class Table extends AbstractTable implements Iterable<Pair<Entry, VRow>>,
     }
     cache.writePage(id, page);
     // cache.writeBackPage(id); // just for file inspect in test
-    this.index.put(row.entries.get(primaryIndex), new VRow(id, index));
+    Entry key = row.entries.get(primaryIndex);
+    if (this.index.contains(key))
+        throw new Exception(String.format("Duplicate Primary key %s", key.value));
+    this.index.put(key, new VRow(id, index));
+  }
+
+  public void delete(int pageId, int rowIndex, Entry key) {
+    Page page = cache.readPage(pageId);
+    if (page.isFull()) {
+      metadata.freePageList.add(pageId);
+    }
+    page.bitmap.clear(rowIndex);
+    cache.writePage(pageId, page);
+    this.index.remove(key);
   }
 
   public void delete(UUID uuid, Entry key) {
     VRow row = this.index.get(key);
-    Page page = cache.readPage(row.pageID);
+
     Dictionary dic = new Hashtable<>();
     dic.put("tableName", this.tableName);
     dic.put("pageNumber", row.pageID);
     dic.put("rowIndex", row.rowIndex);
+    dic.put("oldData", read(row).toBytes());
     try {
       new DeleteLog(uuid, dic).serialize();
     } catch (IOException e) {
       e.printStackTrace();
     }
-    if (page.isFull()) {
-      metadata.freePageList.add(row.pageID);
-    }
-    page.bitmap.clear(row.rowIndex);
-    cache.writePage(row.pageID, page);
+
+    delete(row.pageID, row.rowIndex, key);
+  }
+
+  public void update(Row row, Entry key) {
+    VRow vrow = this.index.get(key);
+    int pageID = vrow.pageID;
+    int rowIndex = vrow.rowIndex;
+    Page page = cache.readPage(pageID);
+
+    page.writeRow(rowIndex, row.toBytes());
+    cache.writePage(pageID, page);
     this.index.remove(key);
+    this.index.put(row.getEntries().get(primaryIndex), vrow);
   }
 
   public void update(UUID uuid, Row row, Entry key) {
