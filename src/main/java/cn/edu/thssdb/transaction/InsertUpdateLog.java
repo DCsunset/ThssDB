@@ -30,6 +30,7 @@ public class InsertUpdateLog extends Log {
         handler.write(this.tableName.getBytes());
         handler.writeInt(this.pageNumber);
         handler.writeInt(this.rowIndex);
+        handler.writeInt(this.oldData.length);
         handler.write(this.oldData);
         handler.write(this.newData);
     }
