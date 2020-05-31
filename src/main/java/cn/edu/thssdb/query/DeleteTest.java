@@ -26,6 +26,7 @@ public class DeleteTest {
         CommonTokenStream tokens = new CommonTokenStream(lexer);
         SQLParser parser = new SQLParser(tokens);
         ParseContext root = parser.parse();
+        /*
         for (int i = 0; i < root.sql_stmt_list().sql_stmt().size(); i++) {
             Sql_stmtContext stmtCtx = root.sql_stmt_list().sql_stmt().get(i);
             Statement stmt = null;
@@ -38,9 +39,10 @@ public class DeleteTest {
                 } else {
                     stmt = new DropTableStatement(manager, stmtCtx);
                 }
-            } else if (type == SQLParser.K_CREATE) {
-                stmt = new CreateTableStatement(manager, stmtCtx);
             }
+            // else if (type == SQLParser.K_CREATE) {
+            //     stmt = new CreateTableStatement(manager, stmtCtx);
+            // }
             // else if (type == SQLParser.K_INSERT) {
             // stmt = new InsertStatement(manager, stmtCtx);
             // } else if (type == SQLParser.K_UPDATE) {
@@ -57,5 +59,6 @@ public class DeleteTest {
                 System.out.println(e.getMessage());
             }
         }
+         */
     }
 }
