@@ -36,11 +36,13 @@ public class SQLExecutor {
             if (stmtCtx.create_db_stmt() != null) {
                 stmt = new CreateDatabaseStatement(manager, stmtCtx);
             } else if (stmtCtx.create_table_stmt() != null) {
-                stmt = new CreateTableStatement(manager, stmtCtx);
+                stmt = new CreateTableStatement(manager, stmtCtx, t);
             } else if (stmtCtx.insert_stmt() != null) {
                 stmt = new InsertStatement(manager, stmtCtx, t);
             } else if (stmtCtx.update_stmt() != null) {
                 stmt = new UpdateStatement(manager, stmtCtx, t);
+            } else if (stmtCtx.select_stmt() != null) {
+                stmt = new SelectStatement(manager, stmtCtx, t);
             } else if (stmtCtx.transaction_stmt() != null) {
                 if (transaction != null) {
                     System.err.println("Already in transaction");
