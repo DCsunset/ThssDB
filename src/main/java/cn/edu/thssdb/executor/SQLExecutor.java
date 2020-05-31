@@ -77,7 +77,7 @@ public class SQLExecutor {
             } else if (stmtCtx.drop_db_stmt() != null) {
                 stmt = new DropDatabaseStatement(manager, stmtCtx);
             } else if (stmtCtx.drop_table_stmt() != null) {
-                stmt = new DropTableStatement(manager, stmtCtx);
+                stmt = new DropTableStatement(manager, stmtCtx, t);
             } else {
                 System.err.println("Invalid SQL statement");
                 return;

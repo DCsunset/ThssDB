@@ -5,13 +5,16 @@ import cn.edu.thssdb.parser.SQLParser.Drop_table_stmtContext;
 import cn.edu.thssdb.parser.SQLParser.Sql_stmtContext;
 import cn.edu.thssdb.schema.Database;
 import cn.edu.thssdb.schema.Manager;
+import cn.edu.thssdb.transaction.Transaction;
 
 public class DropTableStatement extends Statement {
     private String tablename;
     private boolean success;
+    private Transaction transaction;
 
-    public DropTableStatement(Manager manager, Sql_stmtContext ctx) {
+    public DropTableStatement(Manager manager, Sql_stmtContext ctx, Transaction transaction) {
         super(manager, ctx);
+        this.transaction = transaction;
     }
 
     @Override

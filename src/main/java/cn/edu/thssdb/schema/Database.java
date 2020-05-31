@@ -5,6 +5,7 @@ import cn.edu.thssdb.query.QueryResult;
 import cn.edu.thssdb.query.QueryTable;
 import cn.edu.thssdb.rpc.thrift.IService;
 import cn.edu.thssdb.transaction.CreateLog;
+import cn.edu.thssdb.transaction.DropLog;
 import cn.edu.thssdb.transaction.InsertLog;
 import cn.edu.thssdb.transaction.Log;
 
@@ -77,6 +78,15 @@ public class Database {
         }
     }
 
+    public void dropTable(UUID uuid, String name) throws Exception {
+        dropTable(name);
+        try {
+            new DropLog(uuid, name).serialize();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     public void drop() {
         File index = new File(Manager.baseDir + "/" + name);
         if (index.isDirectory()) {
@@ -107,9 +117,7 @@ public class Database {
 
                 logFileHandler = new RandomAccessFile(Manager.baseDir + "/" + name + "/" + name + ".log", "rwd");
                 recoverFromLog();
-            } catch (IOException e) {
-                System.err.println(String.format("De-Serialize metadata failed"));
-            } catch (ClassNotFoundException c) {
+            } catch (Exception e) {
                 System.err.println(String.format("De-Serialize metadata failed"));
             }
         } else {
@@ -129,7 +137,7 @@ public class Database {
         }
     }
 
-    private void recoverFromLog() throws IOException, ClassNotFoundException {
+    private void recoverFromLog() throws Exception {
         System.out.println(logFileHandler.getFilePointer());
         SQLExecutor executor = new SQLExecutor();
         while (true) {
@@ -191,6 +199,13 @@ public class Database {
                     );
                     Column[] columns = (Column[]) is.readObject();
                     create(tableName, columns);
+                }
+                else if (type == Log.LogType.Drop) {
+                    int tableNameLength = logFileHandler.readInt();
+                    bytes = new byte[tableNameLength];
+                    logFileHandler.read(bytes);
+                    String tableName = new String(bytes);
+                    dropTable(tableName);
                 }
             }
             catch (IOException e) {
