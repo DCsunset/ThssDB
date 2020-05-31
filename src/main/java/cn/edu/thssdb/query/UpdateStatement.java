@@ -59,7 +59,7 @@ public class UpdateStatement extends Statement {
                 Entry[] entries = new Entry[row.getEntries().size()];
                 entries = row.getEntries().toArray(entries);
                 entries[index].value = value;
-                table.update(new Row(entries), entry);
+                table.update(transaction.uuid, new Row(entries), entry);
                 ++count;
             }
         }

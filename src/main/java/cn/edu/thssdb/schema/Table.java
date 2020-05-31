@@ -20,8 +20,10 @@ import cn.edu.thssdb.storage.DbCache;
 import cn.edu.thssdb.storage.Metadata;
 import cn.edu.thssdb.storage.Page;
 import cn.edu.thssdb.transaction.DeleteLog;
+import cn.edu.thssdb.transaction.InsertLog;
 import cn.edu.thssdb.transaction.Log;
 import cn.edu.thssdb.transaction.Transaction;
+import cn.edu.thssdb.transaction.UpdateLog;
 import cn.edu.thssdb.transaction.Log.LogType;
 
 import java.util.Arrays;
@@ -177,7 +179,7 @@ public class Table extends AbstractTable implements Iterable<Pair<Entry, VRow>>,
     dic.put("oldData", page.readRow(index));
     dic.put("newData", bytes);
     try {
-      new Log(uuid, LogType.Normal, dic).serialize();
+      new InsertLog(uuid, dic).serialize();
     } catch (IOException e) {
       e.printStackTrace();
     }
@@ -224,7 +226,7 @@ public class Table extends AbstractTable implements Iterable<Pair<Entry, VRow>>,
     dic.put("oldData", page.readRow(rowIndex));
     dic.put("newData", row.toBytes());
     try {
-      new Log(uuid, LogType.Normal, dic).serialize();
+      new UpdateLog(uuid, dic).serialize();
     } catch (IOException e) {
       e.printStackTrace();
     }

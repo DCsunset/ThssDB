@@ -53,7 +53,7 @@ public class DeleteStatement extends Statement {
             if (condition.satisfy(row)) {
                 count++;
                 Entry entry = item.getKey();
-                table.delete(entry);
+                table.delete(transaction.uuid, entry);
             }
         }
         result = String.format("Deleted %d rows", count);

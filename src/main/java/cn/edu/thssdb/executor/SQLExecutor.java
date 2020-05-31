@@ -5,7 +5,9 @@ import cn.edu.thssdb.parser.SQLParser;
 import cn.edu.thssdb.query.*;
 import cn.edu.thssdb.schema.Manager;
 import cn.edu.thssdb.transaction.Log;
+import cn.edu.thssdb.transaction.SimpleLog;
 import cn.edu.thssdb.transaction.Transaction;
+import cn.edu.thssdb.transaction.Log.LogType;
 
 import java.io.IOException;
 
@@ -48,7 +50,7 @@ public class SQLExecutor {
                 transaction = t;
                 System.out.println("Transaction begins");
                 try {
-                    new Log(transaction.uuid, Log.LogType.Start, null).serialize();
+                    new SimpleLog(transaction.uuid, Log.LogType.Start).serialize();
                 } catch (IOException e) {
                     System.err.println(e.getMessage());
                     e.printStackTrace();
@@ -59,7 +61,7 @@ public class SQLExecutor {
                     return;
                 }
                 try {
-                    new Log(transaction.uuid, Log.LogType.Commit, null).serialize();
+                    new SimpleLog(transaction.uuid, LogType.Commit).serialize();
                 } catch (IOException e) {
                     System.err.println(e.getMessage());
                     e.printStackTrace();

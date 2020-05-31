@@ -31,25 +31,10 @@ public class Log {
         handler = manager.currentDatabase.logFileHandler;
         handler.write(uuid2Bytes(this.transactionId));
         handler.write(this.type.name().getBytes());
-        if (type == Log.LogType.Insert || type == LogType.Update) {
-        } else if (type == Log.LogType.Delete) {
-            handler.writeInt(offset);
-            handler.writeBoolean(newBitValue);
-        } else if (type == Log.LogType.Compensation) {
-            // TODO:
-        }
     }
 
     public Log(UUID id, Log.LogType type) {
         transactionId = id;
         this.type = type;
-
-        if (type == Log.LogType.Insert || type == LogType.Update) {
-        } else if (type == LogType.Delete) {
-            this.offset = (int) data.get("offset");
-            this.newBitValue = (Boolean) data.get("newBitValue");
-        } else if (type == Log.LogType.Compensation) {
-            // TODO:
-        }
     }
 }
