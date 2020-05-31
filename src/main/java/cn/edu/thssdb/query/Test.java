@@ -57,6 +57,7 @@ public class Test {
         CommonTokenStream tokens = new CommonTokenStream(lexer);
         SQLParser parser = new SQLParser(tokens);
         ParseContext root = parser.parse();
+        /*
         for (int i = 0; i < root.sql_stmt_list().sql_stmt().size(); i++) {
             Sql_stmtContext stmtCtx = root.sql_stmt_list().sql_stmt().get(i);
             Statement stmt = null;
@@ -79,6 +80,7 @@ public class Test {
             // System.out.println(stmt.getResult());
 
         }
+         */
         // db.quit();
 
         // check whether stu exists
