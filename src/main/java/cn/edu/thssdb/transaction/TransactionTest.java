@@ -40,7 +40,7 @@ public class TransactionTest {
                 Statement stmt = null;
                 int type = stmtCtx.getStart().getType();
                 if (type == SQLParser.K_CREATE) {
-                    stmt = new CreateTableStatement(manager, stmtCtx);
+                    stmt = new CreateTableStatement(manager, stmtCtx, t);
                 } else if (type == SQLParser.K_INSERT) {
                     stmt = new InsertStatement(manager, stmtCtx, t);
                 } else if (type == SQLParser.K_UPDATE) {

@@ -7,6 +7,7 @@ import cn.edu.thssdb.schema.Column;
 import cn.edu.thssdb.schema.Database;
 import cn.edu.thssdb.schema.Manager;
 import cn.edu.thssdb.schema.Table;
+import cn.edu.thssdb.transaction.Transaction;
 import cn.edu.thssdb.type.ColumnInfo;
 
 import java.util.List;
@@ -14,9 +15,11 @@ import java.util.List;
 public class CreateTableStatement extends Statement {
     private String result = "";
     private SQLParser.Create_table_stmtContext ctx;
+    private Transaction transaction;
 
-    public CreateTableStatement(Manager manager, Sql_stmtContext parseCtx) {
+    public CreateTableStatement(Manager manager, Sql_stmtContext parseCtx, Transaction transaction) {
         super(manager, parseCtx);
+        this.transaction = transaction;
     }
 
     @Override
@@ -79,7 +82,7 @@ public class CreateTableStatement extends Statement {
             }
         }
 
-        db.create(tableName, columns);
+        db.create(transaction.uuid, tableName, columns);
 
         Table tb = db.getTables().get(ctx.table_name().getText());
 

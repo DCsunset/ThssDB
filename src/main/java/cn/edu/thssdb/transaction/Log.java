@@ -3,6 +3,7 @@ package cn.edu.thssdb.transaction;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
+import java.util.Arrays;
 import java.util.Dictionary;
 import java.util.UUID;
 
@@ -10,8 +11,28 @@ import cn.edu.thssdb.schema.Manager;
 import cn.edu.thssdb.schema.Table;
 
 public class Log {
-    public static enum LogType {
-        Start, Commit, Update, Delete, Insert, Compensation
+    public enum LogType {
+        Start(1),
+        Commit(2),
+        Update(3),
+        Delete(4),
+        Insert(5),
+        Compensation(6),
+        Create(7),
+        Drop(8);
+
+        public final int value;
+
+        LogType(int value) {
+            this.value = value;
+        }
+
+        public static LogType getLog(int value) {
+            for (LogType l : LogType.values()) {
+                if (l.value == value) return l;
+            }
+            throw new IllegalArgumentException("Invalid type");
+        }
     }
 
     public UUID transactionId;
@@ -19,18 +40,25 @@ public class Log {
 
     protected RandomAccessFile handler;
 
-    private static byte[] uuid2Bytes(UUID id) {
+    public static byte[] uuid2Bytes(UUID id) {
         ByteBuffer bb = ByteBuffer.wrap(new byte[16]);
         bb.putLong(id.getMostSignificantBits());
         bb.putLong(id.getLeastSignificantBits());
         return bb.array();
     }
 
+    public static UUID uuidFromBytes(byte[] bytes) {
+        ByteBuffer bb = ByteBuffer.wrap(new byte[16]);
+        long firstLong = bb.getLong();
+        long secondLong = bb.getLong();
+        return new UUID(firstLong, secondLong);
+    }
+
     public void serialize() throws IOException {
         Manager manager = Manager.getInstance();
         handler = manager.currentDatabase.logFileHandler;
         handler.write(uuid2Bytes(this.transactionId));
-        handler.write(this.type.name().getBytes());
+        handler.writeInt(this.type.value);
     }
 
     public Log(UUID id, Log.LogType type) {
