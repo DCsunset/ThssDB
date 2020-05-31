@@ -1,10 +1,16 @@
 package cn.edu.thssdb.schema;
 
+import cn.edu.thssdb.executor.SQLExecutor;
 import cn.edu.thssdb.query.QueryResult;
 import cn.edu.thssdb.query.QueryTable;
+import cn.edu.thssdb.rpc.thrift.IService;
+import cn.edu.thssdb.transaction.CreateLog;
+import cn.edu.thssdb.transaction.InsertLog;
+import cn.edu.thssdb.transaction.Log;
 
 import java.io.*;
 import java.util.HashMap;
+import java.util.UUID;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 public class Database {
@@ -44,6 +50,15 @@ public class Database {
         }
         Table table = new Table(this.name, name, columns);
         tables.put(name, table);
+    }
+
+    public void create(UUID uuid, String name, Column[] columns) {
+        create(name, columns);
+        try {
+            new CreateLog(uuid, name, columns).serialize();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public void dropTable(String name) throws Exception {
@@ -90,7 +105,8 @@ public class Database {
                 obj.close();
                 metaFile.close();
 
-                // TODO: recover log
+                logFileHandler = new RandomAccessFile(Manager.baseDir + "/" + name + "/" + name + ".log", "rwd");
+                recoverFromLog();
             } catch (IOException e) {
                 System.err.println(String.format("De-Serialize metadata failed"));
             } catch (ClassNotFoundException c) {
@@ -98,6 +114,7 @@ public class Database {
             }
         } else {
             boolean ok = file.mkdir();
+            persist();
             // Create log
             try {
                 logFileHandler = new RandomAccessFile(Manager.baseDir + "/" + name + "/" + name + ".log", "rwd");
@@ -109,7 +126,78 @@ public class Database {
                 System.err.println(String.format("create db error"));
                 System.exit(-1);
             }
-            persist();
+        }
+    }
+
+    private void recoverFromLog() throws IOException, ClassNotFoundException {
+        System.out.println(logFileHandler.getFilePointer());
+        SQLExecutor executor = new SQLExecutor();
+        while (true) {
+            try {
+                byte bytes[] = new byte[16];
+                logFileHandler.read(bytes);
+                UUID id = Log.uuidFromBytes(bytes);
+                Log.LogType type = Log.LogType.getLog(logFileHandler.readInt());
+
+                if (type == Log.LogType.Insert || type == Log.LogType.Update) {
+                    int tableNameLength = logFileHandler.readInt();
+                    bytes = new byte[tableNameLength];
+                    logFileHandler.read(bytes);
+                    String tableName = new String(bytes);
+                    Table table = tables.get(tableName);
+
+                    int pageId = logFileHandler.readInt();
+                    int rowIndex = logFileHandler.readInt();
+                    int rowLength = logFileHandler.readInt();
+                    bytes = new byte[rowLength];
+                    // old data
+                    logFileHandler.read(bytes);
+                    // new data
+                    logFileHandler.read(bytes);
+                    // REDO
+                    if (type == Log.LogType.Insert)
+                        table.write(pageId, rowIndex, table.createRow(bytes));
+                    else
+                        table.update(pageId, rowIndex, table.createRow(bytes));
+                }
+                else if (type == Log.LogType.Delete) {
+                    int tableNameLength = logFileHandler.readInt();
+                    bytes = new byte[tableNameLength];
+                    logFileHandler.read(bytes);
+                    String tableName = new String(bytes);
+                    Table table = tables.get(tableName);
+
+                    int pageId = logFileHandler.readInt();
+                    int rowIndex = logFileHandler.readInt();
+                    int rowLength = logFileHandler.readInt();
+                    bytes = new byte[rowLength];
+                    // old data
+                    logFileHandler.read(bytes);
+                    Row oldRow = table.createRow(bytes);
+                    Entry key = oldRow.getEntries().get(table.primaryIndex);
+                    table.delete(pageId, rowIndex, key);
+                }
+                else if (type == Log.LogType.Create) {
+                    int tableNameLength = logFileHandler.readInt();
+                    bytes = new byte[tableNameLength];
+                    logFileHandler.read(bytes);
+                    String tableName = new String(bytes);
+
+                    int length = logFileHandler.readInt();
+                    bytes = new byte[length];
+                    logFileHandler.read(bytes);
+                    ObjectInputStream is = new ObjectInputStream(
+                            new ByteArrayInputStream(bytes)
+                    );
+                    Column[] columns = (Column[]) is.readObject();
+                    create(tableName, columns);
+                }
+            }
+            catch (IOException e) {
+                break;
+            }
+
+            System.out.println(logFileHandler.getFilePointer());
         }
     }
 
