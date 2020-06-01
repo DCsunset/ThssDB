@@ -287,7 +287,7 @@ public class Table extends AbstractTable implements Iterable<Pair<Entry, VRow>>,
     this.tableName = input.readUTF();
     this.metadata = (Metadata) input.readObject();
     this.primaryIndex = input.readInt();
-    this.cache = new DbCache(this.tableName, metadata.getRowSize());
+    this.cache = new DbCache(Manager.baseDir + "/" + databaseName + "/" + tableName, metadata.getRowSize());
     this.index = new BPlusTree<>();
     this.lock = new ReentrantLock();
     int size = input.readInt();
