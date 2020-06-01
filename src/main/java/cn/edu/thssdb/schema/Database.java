@@ -137,9 +137,47 @@ public class Database {
         }
     }
 
+    private long lastCheckpoint() throws Exception {
+        long last = 0;
+        while (true) {
+            try {
+                byte bytes[] = new byte[16];
+                logFileHandler.read(bytes);
+                UUID id = Log.uuidFromBytes(bytes);
+                Log.LogType type = Log.LogType.getLog(logFileHandler.readInt());
+
+                if (type == Log.LogType.Insert || type == Log.LogType.Update) {
+                    int tableNameLength = logFileHandler.readInt();
+                    logFileHandler.skipBytes(tableNameLength);
+                    logFileHandler.skipBytes(8);
+                    int rowLength = logFileHandler.readInt();
+                    logFileHandler.skipBytes(rowLength * 2);
+                } else if (type == Log.LogType.Delete) {
+                    int tableNameLength = logFileHandler.readInt();
+                    logFileHandler.skipBytes(tableNameLength);
+                    logFileHandler.skipBytes(8);
+                    int rowLength = logFileHandler.readInt();
+                    logFileHandler.skipBytes(rowLength);
+                } else if (type == Log.LogType.Create) {
+                    int tableNameLength = logFileHandler.readInt();
+                    logFileHandler.skipBytes(tableNameLength);
+                    int length = logFileHandler.readInt();
+                    logFileHandler.skipBytes(length);
+                } else if (type == Log.LogType.Drop) {
+                    int tableNameLength = logFileHandler.readInt();
+                    logFileHandler.skipBytes(tableNameLength);
+                } else if (type == Log.LogType.Savepoint) {
+                    last = logFileHandler.getFilePointer();
+                }
+            } catch (IOException e) {
+                break;
+            }
+        }
+        return last;
+    }
+
     private void recoverFromLog() throws Exception {
-        System.out.println(logFileHandler.getFilePointer());
-        SQLExecutor executor = new SQLExecutor();
+        logFileHandler.seek(lastCheckpoint());
         while (true) {
             try {
                 byte bytes[] = new byte[16];
@@ -205,8 +243,6 @@ public class Database {
             } catch (IOException e) {
                 break;
             }
-
-            System.out.println(logFileHandler.getFilePointer());
         }
     }
 
