@@ -27,7 +27,8 @@ sql_stmt :
     | quit_stmt
     | update_stmt
     | transaction_stmt
-    | commit_stmt ;
+    | commit_stmt
+    | checkpoint_stmt;
 
 create_db_stmt :
     K_CREATE K_DATABASE database_name ;
@@ -175,6 +176,9 @@ transaction_stmt:
 commit_stmt:
     K_COMMIT ;
 
+checkpoint_stmt:
+    K_CHECKPOINT ;
+
 EQ : '=';
 NE : '<>';
 LT : '<';
@@ -236,6 +240,7 @@ K_WHERE : W H E R E;
 K_BEGIN : B E G I N;
 K_TRANSACTION : T R A N S A C T I O N;
 K_COMMIT : C O M M I T;
+K_CHECKPOINT : C H E C K P O I N T;
 
 IDENTIFIER :
     [a-zA-Z_] [a-zA-Z_0-9]* ;
