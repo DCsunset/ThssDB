@@ -5,6 +5,7 @@ import cn.edu.thssdb.parser.SQLParser;
 import cn.edu.thssdb.query.*;
 import cn.edu.thssdb.schema.Manager;
 import cn.edu.thssdb.transaction.Log;
+import cn.edu.thssdb.transaction.Savepoint;
 import cn.edu.thssdb.transaction.SimpleLog;
 import cn.edu.thssdb.transaction.Transaction;
 import cn.edu.thssdb.transaction.Log.LogType;
@@ -71,9 +72,11 @@ public class SQLExecutor {
                 transaction.commit();
                 transaction = null;
                 System.out.println("Transaction committed");
-
             } else if (stmtCtx.delete_stmt() != null) {
                 stmt = new DeleteStatement(manager, stmtCtx, t);
+            } else if (stmtCtx.checkpoint_stmt() != null) {
+                Savepoint.save();
+                System.out.println("Checkpoint saved");
             } else if (stmtCtx.drop_db_stmt() != null) {
                 stmt = new DropDatabaseStatement(manager, stmtCtx);
             } else if (stmtCtx.drop_table_stmt() != null) {
