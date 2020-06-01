@@ -97,6 +97,7 @@ public class SQLExecutor {
             } catch (Exception e) {
                 e.printStackTrace();
                 System.err.println(e.getMessage());
+                return;
             }
         }
     }
