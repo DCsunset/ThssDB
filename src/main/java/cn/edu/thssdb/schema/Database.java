@@ -118,6 +118,7 @@ public class Database {
                 logFileHandler = new RandomAccessFile(Manager.baseDir + "/" + name + "/" + name + ".log", "rwd");
                 recoverFromLog();
             } catch (Exception e) {
+                e.printStackTrace();
                 System.err.println(String.format("De-Serialize metadata failed"));
             }
         } else {
