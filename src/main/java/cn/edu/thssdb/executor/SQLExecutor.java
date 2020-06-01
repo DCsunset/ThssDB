@@ -25,13 +25,13 @@ public class SQLExecutor {
         SQLParser parser = new SQLParser(tokens);
         SQLParser.ParseContext root = parser.parse();
 
-        Transaction t = transaction;
-        if (t == null) {
-            // New temporary transaction
-            t = new Transaction();
-        }
-
         for (int i = 0; i < root.sql_stmt_list().sql_stmt().size(); i++) {
+            Transaction t = transaction;
+            if (t == null) {
+                // New temporary transaction
+                t = new Transaction();
+            }
+
             SQLParser.Sql_stmtContext stmtCtx = root.sql_stmt_list().sql_stmt().get(i);
             Statement stmt = null;
             if (stmtCtx.create_db_stmt() != null) {
