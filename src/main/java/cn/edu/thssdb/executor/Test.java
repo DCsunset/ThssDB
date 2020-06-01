@@ -19,9 +19,9 @@ public class Test {
                         + "delete from person where name='test-1';" + "update person set name='world' where id=2;"
                         + "commit;");
 
-                exec.execute("select * from person;");
                 manager.currentDatabase.quit();
                 System.exit(0);
+
             }
         }).start();
         Savepoint sp = new Savepoint();

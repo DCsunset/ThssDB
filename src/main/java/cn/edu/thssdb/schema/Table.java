@@ -215,7 +215,7 @@ public class Table extends AbstractTable implements Iterable<Pair<Entry, VRow>>,
     // cache.writeBackPage(id); // just for file inspect in test
     Entry key = row.entries.get(primaryIndex);
     if (this.index.contains(key))
-        throw new Exception(String.format("Duplicate Primary key %s", key.value));
+      throw new Exception(String.format("Duplicate Primary key %s", key.value));
     this.index.put(key, new VRow(id, index));
   }
 
@@ -289,6 +289,7 @@ public class Table extends AbstractTable implements Iterable<Pair<Entry, VRow>>,
     this.primaryIndex = input.readInt();
     this.cache = new DbCache(this.tableName, metadata.getRowSize());
     this.index = new BPlusTree<>();
+    this.lock = new ReentrantLock();
     int size = input.readInt();
     for (int i = 0; i < size; ++i) {
       Entry entry = (Entry) input.readObject();
