@@ -1,15 +1,10 @@
 package cn.edu.thssdb.transaction;
 
 import java.io.IOException;
+import java.util.UUID;
 
 public class SavepointLog extends Log {
     public SavepointLog() {
-        super(null, LogType.Savepoint);
+        super(UUID.randomUUID(), LogType.Savepoint);
     }
-
-    @Override
-    public void serialize() throws IOException {
-        handler.writeInt(this.type.value);
-    }
-
 }
