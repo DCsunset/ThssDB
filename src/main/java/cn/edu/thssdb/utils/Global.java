@@ -27,4 +27,5 @@ public class Global {
     EQ, LT, GT, LE, GE, NE
   }
 
+  public static int checkInterval = 500;
 }

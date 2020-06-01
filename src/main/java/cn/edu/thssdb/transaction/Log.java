@@ -12,14 +12,7 @@ import cn.edu.thssdb.schema.Table;
 
 public class Log {
     public enum LogType {
-        Start(1),
-        Commit(2),
-        Update(3),
-        Delete(4),
-        Insert(5),
-        Compensation(6),
-        Create(7),
-        Drop(8);
+        Start(1), Commit(2), Update(3), Delete(4), Insert(5), Compensation(6), Create(7), Drop(8), Savepoint(9);
 
         public final int value;
 
@@ -29,7 +22,8 @@ public class Log {
 
         public static LogType getLog(int value) {
             for (LogType l : LogType.values()) {
-                if (l.value == value) return l;
+                if (l.value == value)
+                    return l;
             }
             throw new IllegalArgumentException("Invalid type");
         }
@@ -55,8 +49,6 @@ public class Log {
     }
 
     public void serialize() throws IOException {
-        Manager manager = Manager.getInstance();
-        handler = manager.currentDatabase.logFileHandler;
         handler.write(uuid2Bytes(this.transactionId));
         handler.writeInt(this.type.value);
     }
@@ -64,5 +56,7 @@ public class Log {
     public Log(UUID id, Log.LogType type) {
         transactionId = id;
         this.type = type;
+        Manager manager = Manager.getInstance();
+        handler = manager.currentDatabase.logFileHandler;
     }
 }

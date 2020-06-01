@@ -167,8 +167,7 @@ public class Database {
                         table.write(pageId, rowIndex, table.createRow(bytes));
                     else
                         table.update(pageId, rowIndex, table.createRow(bytes));
-                }
-                else if (type == Log.LogType.Delete) {
+                } else if (type == Log.LogType.Delete) {
                     int tableNameLength = logFileHandler.readInt();
                     bytes = new byte[tableNameLength];
                     logFileHandler.read(bytes);
@@ -184,8 +183,7 @@ public class Database {
                     Row oldRow = table.createRow(bytes);
                     Entry key = oldRow.getEntries().get(table.primaryIndex);
                     table.delete(pageId, rowIndex, key);
-                }
-                else if (type == Log.LogType.Create) {
+                } else if (type == Log.LogType.Create) {
                     int tableNameLength = logFileHandler.readInt();
                     bytes = new byte[tableNameLength];
                     logFileHandler.read(bytes);
@@ -194,21 +192,17 @@ public class Database {
                     int length = logFileHandler.readInt();
                     bytes = new byte[length];
                     logFileHandler.read(bytes);
-                    ObjectInputStream is = new ObjectInputStream(
-                            new ByteArrayInputStream(bytes)
-                    );
+                    ObjectInputStream is = new ObjectInputStream(new ByteArrayInputStream(bytes));
                     Column[] columns = (Column[]) is.readObject();
                     create(tableName, columns);
-                }
-                else if (type == Log.LogType.Drop) {
+                } else if (type == Log.LogType.Drop) {
                     int tableNameLength = logFileHandler.readInt();
                     bytes = new byte[tableNameLength];
                     logFileHandler.read(bytes);
                     String tableName = new String(bytes);
                     dropTable(tableName);
                 }
-            }
-            catch (IOException e) {
+            } catch (IOException e) {
                 break;
             }
 
@@ -218,5 +212,14 @@ public class Database {
 
     public void quit() {
         persist();
+        for (Table table : this.getTables().values()) {
+            table.getCache().writeBack();
+        }
+        // Clear log
+        try {
+            this.logFileHandler.setLength(0);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
