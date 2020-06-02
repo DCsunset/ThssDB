@@ -81,6 +81,10 @@ public class Client {
               println("Connect <username> <password>");
               break;
             }
+            if (sessionId != -1) {
+              println("Please disconnect first!");
+              break;
+            }
             sessionId = connect(params[1], params[2]);
             println(String.format("sessionId=%d", sessionId));
             break;

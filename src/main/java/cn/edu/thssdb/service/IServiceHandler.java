@@ -23,6 +23,7 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.UUID;
@@ -31,9 +32,11 @@ public class IServiceHandler implements IService.Iface {
   private SQLExecutor executor;
 
   private HashSet<Long> ids = new HashSet<>();
+  private HashMap<String, String> users = new HashMap<>();
 
-  public IServiceHandler() {
+  public IServiceHandler(HashMap<String, String> users) {
     executor = new SQLExecutor();
+    this.users = users;
   }
 
   @Override
@@ -46,16 +49,20 @@ public class IServiceHandler implements IService.Iface {
 
   @Override
   public ConnectResp connect(ConnectReq req) throws TException {
-    // TODO
     String username = req.username;
     String password = req.password;
-    // TODO: authentication
     ConnectResp resp = new ConnectResp();
-    resp.sessionId = System.nanoTime();
-    ids.add(resp.sessionId);
     Status status = new Status();
-    status.code = 0;
-    status.msg = "Connect success!";
+    if (users.get(username) != null && users.get(username).equals(password)) {
+      resp.sessionId = System.nanoTime();
+      ids.add(resp.sessionId);
+      status.code = 0;
+      status.msg = "Connect success!";
+    } else {
+      resp.sessionId = -1;
+      status.code = -1;
+      status.msg = "Invalid user";
+    }
     resp.status = status;
     return resp;
   }
