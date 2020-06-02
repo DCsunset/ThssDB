@@ -1,5 +1,8 @@
 package cn.edu.thssdb.client;
 
+import cn.edu.thssdb.rpc.thrift.ConnectReq;
+import cn.edu.thssdb.rpc.thrift.ConnectResp;
+import cn.edu.thssdb.rpc.thrift.DisconnetReq;
 import cn.edu.thssdb.rpc.thrift.GetTimeReq;
 import cn.edu.thssdb.rpc.thrift.IService;
 import cn.edu.thssdb.utils.Global;
@@ -45,6 +48,7 @@ public class Client {
   private static CommandLine commandLine;
 
   public static void main(String[] args) {
+    long sessionId = -1;
     commandLine = parseCmd(args);
     if (commandLine.hasOption(HELP_ARGS)) {
       showHelp();
@@ -64,12 +68,29 @@ public class Client {
         String msg = SCANNER.nextLine();
 
         long startTime = System.currentTimeMillis();
-        switch (msg.trim()) {
+        switch (msg.trim().split(" ")[0]) {
           case Global.SHOW_TIME:
             getTime();
             break;
           case Global.QUIT:
             open = false;
+            break;
+          case Global.CONNECT:
+            String[] params = msg.split(" ");
+            if (params.length != 3) {
+              println("Connect <username> <password>");
+              break;
+            }
+            sessionId = connect(params[1], params[2]);
+            println(String.format("sessionId=%d", sessionId));
+            break;
+          case Global.DISCONNECT:
+            if (sessionId == -1) {
+              println("Cannot disconnect before connect!");
+              break;
+            }
+            disconnect(sessionId);
+            sessionId = -1;
             break;
           default:
             // SQL statement
@@ -87,6 +108,30 @@ public class Client {
       logger.error(e.getMessage());
     } catch (TException e) {
 
+    }
+  }
+
+  private static void disconnect(long id) {
+    DisconnetReq req = new DisconnetReq();
+    req.sessionId = id;
+    try {
+      client.disconnect(req);
+    } catch (TException e) {
+
+      logger.error(e.getMessage());
+    }
+  }
+
+  private static long connect(String username, String password) {
+    ConnectReq req = new ConnectReq();
+    req.password = password;
+    req.username = username;
+    try {
+      ConnectResp resp = client.connect(req);
+      return resp.sessionId;
+    } catch (TException e) {
+      logger.error(e.getMessage());
+      return -1;
     }
   }
 

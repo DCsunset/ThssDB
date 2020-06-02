@@ -48,10 +48,6 @@ struct ExecuteStatementResp{
 service IService {
   GetTimeResp getTime(1: GetTimeReq req);
   ConnectResp connect(1: ConnectReq req);
-  DisconnetResp disconnect(1: DisconnetResp req);
+  DisconnetResp disconnect(1: DisconnetReq req);
   ExecuteStatementResp executeStatement(1: ExecuteStatementReq req);
-  void Insert(1: binary data);
-  void Update(1: binary data, 2: i32 pageID, 3: i32 rowIndex);
-  binary Select(1: i32 pageId, 2: i32 rowIndex);
-  void Delete(1: i32 pageId, 2: i32 rowIndex);
 }

@@ -1,7 +1,9 @@
 package cn.edu.thssdb.service;
 
+import cn.edu.thssdb.executor.SQLExecutor;
 import cn.edu.thssdb.rpc.thrift.ConnectReq;
 import cn.edu.thssdb.rpc.thrift.ConnectResp;
+import cn.edu.thssdb.rpc.thrift.DisconnetReq;
 import cn.edu.thssdb.rpc.thrift.DisconnetResp;
 import cn.edu.thssdb.rpc.thrift.ExecuteStatementReq;
 import cn.edu.thssdb.rpc.thrift.ExecuteStatementResp;
@@ -18,15 +20,20 @@ import org.apache.thrift.TException;
 import cn.edu.thssdb.storage.*;
 
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.UUID;
 
 public class IServiceHandler implements IService.Iface {
-  private DbCache cache;
+  private SQLExecutor executor;
 
-  public IServiceHandler(DbCache _cache) {
-    this.cache = _cache;
+  private HashSet<Long> ids = new HashSet<>();
+
+  public IServiceHandler() {
+    executor = new SQLExecutor();
   }
 
   @Override
@@ -40,57 +47,41 @@ public class IServiceHandler implements IService.Iface {
   @Override
   public ConnectResp connect(ConnectReq req) throws TException {
     // TODO
-    return null;
+    String username = req.username;
+    String password = req.password;
+    // TODO: authentication
+    ConnectResp resp = new ConnectResp();
+    resp.sessionId = System.nanoTime();
+    ids.add(resp.sessionId);
+    Status status = new Status();
+    status.code = 0;
+    status.msg = "Connect success!";
+    resp.status = status;
+    return resp;
   }
 
   @Override
-  public DisconnetResp disconnect(DisconnetResp req) throws TException {
-    // TODO
-    return null;
+  public DisconnetResp disconnect(DisconnetReq req) throws TException {
+    long id = req.sessionId;
+    Status result = new Status();
+    if (ids.contains(id)) {
+      ids.remove(id);
+      result.code = 0;
+      result.msg = "Disconnect success!";
+    } else {
+      result.code = -1;
+      result.msg = "Not connnected yet!";
+    }
+    DisconnetResp resp = new DisconnetResp();
+    resp.status = result;
+    return resp;
   }
 
   @Override
   public ExecuteStatementResp executeStatement(ExecuteStatementReq req) throws TException {
     // TODO
+    String str = req.statement;
+    executor.execute(str);
     return null;
-  }
-
-  @Override
-  public ByteBuffer Select(int pageId, int rowIndex) throws TException {
-    Page page = cache.readPage(pageId);
-    return ByteBuffer.wrap(page.readRow(rowIndex));
-  }
-
-  @Override
-  public void Delete(int pageId, int rowIndex) throws TException {
-    Page page = cache.readPage(pageId);
-    if (page.isFull()) {
-        cache.metadata.freePageList.add(pageId);
-    }
-    page.bitmap.clear(rowIndex);
-    cache.writePage(pageId, page);
-    // cache.writeBack();
-  }
-
-  @Override
-  public void Insert(java.nio.ByteBuffer data) throws TException {
-    int id = cache.metadata.freePageList.get(0);
-    Page page = cache.readPage(id);
-    BitSet bitmap = page.bitmap;
-    int index = bitmap.nextClearBit(0);
-    page.writeRow(index, data.array());
-    if (page.isFull()) {
-      cache.metadata.freePageList.remove(0);
-    }
-    cache.writePage(id, page);
-    // cache.writeBack();
-  }
-
-  @Override
-  public void Update(java.nio.ByteBuffer data, int pageID, int rowIndex) throws TException {
-    Page page = cache.readPage(pageID);
-    page.writeRow(rowIndex, data.array());
-    cache.writePage(pageID, page);
-    // cache.writeBack();
   }
 }

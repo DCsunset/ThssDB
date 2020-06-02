@@ -18,7 +18,8 @@ import org.antlr.v4.runtime.CommonTokenStream;
 public class SQLExecutor {
     Transaction transaction = null;
 
-    public void execute(String sqlStatement) {
+    public String execute(String sqlStatement) {
+        String result = "";
         Manager manager = Manager.getInstance();
         SQLLexer lexer = new SQLLexer(CharStreams.fromString(sqlStatement));
         CommonTokenStream tokens = new CommonTokenStream(lexer);
@@ -47,7 +48,7 @@ public class SQLExecutor {
             } else if (stmtCtx.transaction_stmt() != null) {
                 if (transaction != null) {
                     System.err.println("Already in transaction");
-                    return;
+                    return result;
                 }
                 // Begin transaction
                 transaction = t;
@@ -61,7 +62,7 @@ public class SQLExecutor {
             } else if (stmtCtx.commit_stmt() != null) {
                 if (transaction == null) {
                     System.err.println("No transaction begins");
-                    return;
+                    return result;
                 }
                 try {
                     new SimpleLog(transaction.uuid, LogType.Commit).serialize();
@@ -83,13 +84,14 @@ public class SQLExecutor {
                 stmt = new DropTableStatement(manager, stmtCtx, t);
             } else {
                 System.err.println("Invalid SQL statement");
-                return;
+                return result;
             }
 
             try {
                 if (stmt != null) {
                     stmt.parse();
                     stmt.execute();
+                    result += (stmt.getResult() + "\n");
                     System.out.println(stmt.getResult());
                     if (transaction == null)
                         t.commit();
@@ -97,8 +99,9 @@ public class SQLExecutor {
             } catch (Exception e) {
                 e.printStackTrace();
                 System.err.println(e.getMessage());
-                return;
+                return result;
             }
         }
+        return result;
     }
 }

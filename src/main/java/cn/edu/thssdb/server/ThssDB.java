@@ -33,22 +33,10 @@ public class ThssDB {
   }
 
   private void start() {
-    String tbName = "table1";
-    try {
-      DbCache cache = new DbCache(tbName, 10);
-      Runtime.getRuntime().addShutdownHook(new Thread() {
-        public void run() {
-          System.out.println("Cache write back to file");
-          cache.writeBack();
-        }
-      });
-      handler = new IServiceHandler(cache);
-      processor = new IService.Processor(handler);
-      Runnable setup = () -> setUp(processor);
-      new Thread(setup).start();
-    } catch (Exception e) {
-      System.err.print("Init cache failed!");
-    }
+    handler = new IServiceHandler();
+    processor = new IService.Processor(handler);
+    Runnable setup = () -> setUp(processor);
+    new Thread(setup).start();
   }
 
   private static void setUp(IService.Processor processor) {
