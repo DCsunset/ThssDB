@@ -1,5 +1,7 @@
 package cn.edu.thssdb.schema;
 
+import cn.edu.thssdb.exception.TableDataFileNotExistException;
+import cn.edu.thssdb.exception.TableNotExistException;
 import cn.edu.thssdb.executor.SQLExecutor;
 import cn.edu.thssdb.query.QueryResult;
 import cn.edu.thssdb.query.QueryTable;
@@ -62,7 +64,7 @@ public class Database {
         }
     }
 
-    public void dropTable(String name) throws Exception {
+    public void dropTable(String name) {
         if (tables.containsKey(name)) {
             // remove file
             File tbFile = new File(Manager.baseDir + "/" + this.name + "/" + name + ".data");
@@ -71,10 +73,10 @@ public class Database {
                 // remove cache and metadata
                 tables.remove(name);
             } else {
-                throw new Exception("no such file:" + tbFile.getPath());
+                throw new TableDataFileNotExistException(tbFile.getPath());
             }
         } else {
-            throw new Exception("no such table:" + name);
+            throw new TableNotExistException(name);
         }
     }
 

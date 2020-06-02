@@ -1,5 +1,6 @@
 package cn.edu.thssdb.schema;
 
+import cn.edu.thssdb.exception.*;
 import cn.edu.thssdb.index.BPlusTree;
 import cn.edu.thssdb.query.QueryTable;
 import cn.edu.thssdb.type.ColumnInfo;
@@ -87,21 +88,21 @@ public class Table extends AbstractTable implements Iterable<Pair<Entry, VRow>>,
     Arrays.fill(entries, null);
     if (names.length == 0) {
       if (values.length != columns.length)
-        throw new Exception("Wrong number of values");
+        throw new InvalidNumberOfValuesException();
       for (int i = 0; i < values.length; ++i) {
         Column col = columns[i];
         entries[i] = new Entry(stringToValue(col, values[i]), col.maxLength);
       }
     } else {
       if (values.length != names.length)
-        throw new Exception("Wrong number of values");
+        throw new InvalidNumberOfValuesException();
 
       boolean inserted[] = new boolean[columns.length];
       Arrays.fill(inserted, false);
       for (int i = 0; i < names.length; ++i) {
         int index = findColumnByName(names[i]);
         if (index == -1)
-          throw new Exception(String.format("Column %s does not exist", names[i]));
+          throw new ColumnNotExistException(names[i]);
         inserted[index] = true;
         Column col = metadata.columns[index];
         entries[index] = new Entry(stringToValue(col, values[i]), col.maxLength);
@@ -110,7 +111,7 @@ public class Table extends AbstractTable implements Iterable<Pair<Entry, VRow>>,
       for (int i = 0; i < columns.length; ++i) {
         if (!inserted[i]) {
           if (columns[i].isPrimary())
-            throw new Exception(String.format("Primary key %s can't be null", columns[i].name));
+            throw new NullPrimaryKeyException(columns[i].name);
           Column col = metadata.columns[i];
           String type = ColumnInfo.getColumnType(col.type);
           if (type.equals("String")) {
@@ -215,7 +216,7 @@ public class Table extends AbstractTable implements Iterable<Pair<Entry, VRow>>,
     // cache.writeBackPage(id); // just for file inspect in test
     Entry key = row.entries.get(primaryIndex);
     if (this.index.contains(key))
-      throw new Exception(String.format("Duplicate Primary key %s", key.value));
+      throw new DuplicatePrimaryKeyException(columns[primaryIndex].name);
     this.index.put(key, new VRow(id, index));
   }
 

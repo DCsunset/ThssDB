@@ -1,5 +1,6 @@
 package cn.edu.thssdb.schema;
 
+import cn.edu.thssdb.exception.DatabaseNotExistException;
 import cn.edu.thssdb.server.ThssDB;
 
 import javax.xml.crypto.Data;
@@ -64,7 +65,7 @@ public class Manager {
       if (currentDatabase.name == name)
         currentDatabase = null;
     } else {
-      System.err.println(String.format("Database %s doesn't exist", name));
+      throw new DatabaseNotExistException(name);
     }
   }
 
@@ -72,7 +73,7 @@ public class Manager {
     if (databases.containsKey(name)) {
       this.currentDatabase = databases.get(name);
     } else {
-      System.err.println(String.format("Database %s doesn't exist", name));
+      throw new DatabaseNotExistException(name);
     }
   }
 

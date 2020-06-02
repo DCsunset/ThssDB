@@ -62,26 +62,6 @@ public class Client {
       while (true) {
         print(Global.CLI_PREFIX);
         String msg = SCANNER.nextLine();
-        if (msg.startsWith("insert")) {
-          String data = msg.split(" ", 0)[1];
-          client.Insert(ByteBuffer.wrap(data.getBytes(StandardCharsets.UTF_8)));
-        } else if (msg.startsWith("update")) {
-          String[] msgs = msg.split(" ", 0);
-          String data = msgs[1];
-          int pageID = Integer.parseInt(msgs[2]);
-          int rowIndex = Integer.parseInt(msgs[3]);
-          client.Update(ByteBuffer.wrap(data.getBytes(StandardCharsets.UTF_8)), pageID, rowIndex);
-        } else if (msg.startsWith("select")) {
-          String[] msgs = msg.split(" ", 0);
-          int pageID = Integer.parseInt(msgs[1]);
-          int rowIndex = Integer.parseInt(msgs[2]);
-          client.Select(pageID, rowIndex);
-        } else if (msg.startsWith("delete")) {
-          String[] msgs = msg.split(" ", 0);
-          int pageID = Integer.parseInt(msgs[1]);
-          int rowIndex = Integer.parseInt(msgs[2]);
-          client.Delete(pageID, rowIndex);
-        }
 
         long startTime = System.currentTimeMillis();
         switch (msg.trim()) {
@@ -92,6 +72,7 @@ public class Client {
             open = false;
             break;
           default:
+            // SQL statement
             println("Invalid statements!");
             break;
         }

@@ -1,5 +1,6 @@
 package cn.edu.thssdb.schema;
 
+import cn.edu.thssdb.exception.ColumnNotExistException;
 import cn.edu.thssdb.schema.Table;
 import cn.edu.thssdb.type.ColumnInfo;
 import cn.edu.thssdb.utils.Global.OpType;
@@ -30,8 +31,8 @@ public class Condition {
         int index1 = table.findColumnByName(attrOrValue1);
         int index2 = table.findColumnByName(attrOrValue2);
         if (index1 == -1 && index2 == -1) {
-            String message = String.format("Invalid column name %s or %s", attrOrValue1, attrOrValue2);
-            throw new Exception(message);
+            String message = String.format("%s or %s", attrOrValue1, attrOrValue2);
+            throw new ColumnNotExistException(message);
         }
 
         Comparable value1 = null, value2 = null;

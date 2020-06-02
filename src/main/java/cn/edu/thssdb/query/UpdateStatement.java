@@ -1,5 +1,7 @@
 package cn.edu.thssdb.query;
 
+import cn.edu.thssdb.exception.ColumnNotExistException;
+import cn.edu.thssdb.exception.TableNotExistException;
 import cn.edu.thssdb.parser.SQLParser;
 import cn.edu.thssdb.parser.SQLParser.Sql_stmtContext;
 import cn.edu.thssdb.schema.*;
@@ -29,14 +31,14 @@ public class UpdateStatement extends Statement {
         Database db = this.manager.currentDatabase;
         String tableName = ctx.table_name().getText();
         if (!db.getTables().containsKey(tableName)) {
-            throw new Exception("Table does not exist");
+            throw new TableNotExistException(tableName);
         }
 
         table = db.getTables().get(tableName);
 
         index = table.findColumnByName(ctx.column_name().getText());
         if (index < 0)
-            throw new Exception(String.format("Column %s does not exist", ctx.column_name().getText()));
+            throw new ColumnNotExistException(ctx.column_name().getText());
 
         // set attr=value
         value = table.stringToValue(table.getMetadata().columns[index], ctx.expression().getText());
