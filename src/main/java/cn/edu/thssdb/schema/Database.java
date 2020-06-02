@@ -182,6 +182,7 @@ public class Database {
     private void recoverFromLog() throws Exception {
         logFileHandler.seek(lastCheckpoint());
         while (true) {
+            long currentPos = logFileHandler.getFilePointer();
             try {
                 byte bytes[] = new byte[16];
                 logFileHandler.read(bytes);
@@ -244,6 +245,7 @@ public class Database {
                     dropTable(tableName);
                 }
             } catch (IOException e) {
+                logFileHandler.seek(currentPos);
                 break;
             }
         }
