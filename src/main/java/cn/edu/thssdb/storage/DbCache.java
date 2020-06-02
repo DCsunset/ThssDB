@@ -109,6 +109,7 @@ public class DbCache {
         for (int id : idIndex.keySet()) {
             writeBackPage(id);
         }
+        dataFile.persist();
         // metaFile.writeMetadata(metadata);
     }
 }

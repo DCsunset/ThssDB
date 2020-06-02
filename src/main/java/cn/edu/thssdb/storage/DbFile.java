@@ -19,9 +19,18 @@ public class DbFile {
 
     public void init() {
         try {
-            writer = new RandomAccessFile(this.filename, "rwd");
+            writer = new RandomAccessFile(this.filename, "rw");
         } catch (IOException e) {
             System.err.println(String.format("Create file error:%s", this.filename));
+            System.exit(-1);
+        }
+    }
+
+    public void persist() {
+        try {
+            writer.getFD().sync();
+        } catch (IOException e) {
+            System.err.println(String.format("Sync file error:%s", this.filename));
             System.exit(-1);
         }
     }
