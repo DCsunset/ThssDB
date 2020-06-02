@@ -10,7 +10,7 @@ import java.util.UUID;
 import cn.edu.thssdb.schema.Manager;
 import cn.edu.thssdb.schema.Table;
 
-public class Log {
+public abstract class Log {
     public enum LogType {
         Start(1), Commit(2), Update(3), Delete(4), Insert(5), Compensation(6), Create(7), Drop(8), Savepoint(9);
 
@@ -51,6 +51,10 @@ public class Log {
     public void serialize() throws IOException {
         handler.write(uuid2Bytes(this.transactionId));
         handler.writeInt(this.type.value);
+    }
+
+    public void persist() throws IOException {
+        handler.getFD().sync();
     }
 
     public Log(UUID id, Log.LogType type) {

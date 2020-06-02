@@ -12,5 +12,6 @@ public class SimpleLog extends Log {
     @Override
     public void serialize() throws IOException {
         super.serialize();
+        persist();
     }
 }

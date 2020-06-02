@@ -20,5 +20,6 @@ public class DropLog extends Log {
         super.serialize();
         handler.writeInt(tableName.length());
         handler.write(tableName.getBytes());
+        persist();
     }
 }

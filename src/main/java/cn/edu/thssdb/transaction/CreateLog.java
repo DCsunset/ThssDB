@@ -29,5 +29,6 @@ public class CreateLog extends Log {
         byte[] bytes = bos.toByteArray();
         handler.writeInt(bytes.length);
         handler.write(bytes);
+        persist();
     }
 }

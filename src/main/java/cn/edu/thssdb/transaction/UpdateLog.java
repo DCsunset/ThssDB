@@ -13,5 +13,6 @@ public class UpdateLog extends InsertUpdateLog {
     @Override
     public void serialize() throws IOException {
         super.serialize();
+        persist();
     }
 }

@@ -117,7 +117,7 @@ public class Database {
                 obj.close();
                 metaFile.close();
 
-                logFileHandler = new RandomAccessFile(Manager.baseDir + "/" + name + "/" + name + ".log", "rwd");
+                logFileHandler = new RandomAccessFile(Manager.baseDir + "/" + name + "/" + name + ".log", "rw");
                 recoverFromLog();
             } catch (Exception e) {
                 e.printStackTrace();
@@ -128,7 +128,7 @@ public class Database {
             persist();
             // Create log
             try {
-                logFileHandler = new RandomAccessFile(Manager.baseDir + "/" + name + "/" + name + ".log", "rwd");
+                logFileHandler = new RandomAccessFile(Manager.baseDir + "/" + name + "/" + name + ".log", "rw");
             } catch (Exception e) {
                 System.err.println(e.getMessage());
                 e.printStackTrace();
