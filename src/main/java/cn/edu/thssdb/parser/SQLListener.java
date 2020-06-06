@@ -467,4 +467,14 @@ public interface SQLListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitCheckpoint_stmt(SQLParser.Checkpoint_stmtContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link SQLParser#rollback_stmt}.
+	 * @param ctx the parse tree
+	 */
+	void enterRollback_stmt(SQLParser.Rollback_stmtContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link SQLParser#rollback_stmt}.
+	 * @param ctx the parse tree
+	 */
+	void exitRollback_stmt(SQLParser.Rollback_stmtContext ctx);
 }
