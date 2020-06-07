@@ -9,7 +9,7 @@ import java.util.UUID;
 
 public class CreateLog extends Log {
     private Column[] columns;
-    private String tableName;
+    public String tableName;
 
     public CreateLog(UUID id, String tableName, Column[] columns) {
         super(id, LogType.Create);

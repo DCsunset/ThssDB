@@ -12,7 +12,8 @@ import cn.edu.thssdb.schema.Table;
 
 public abstract class Log {
     public enum LogType {
-        Start(1), Commit(2), Update(3), Delete(4), Insert(5), Compensation(6), Create(7), Drop(8), Savepoint(9);
+        Start(1), Commit(2), Update(3), Delete(4), Insert(5), Compensation(6), Create(7), Drop(8), Savepoint(9),
+        Rollback(10);
 
         public final int value;
 
@@ -62,5 +63,9 @@ public abstract class Log {
         this.type = type;
         Manager manager = Manager.getInstance();
         handler = manager.currentDatabase.logFileHandler;
+        Transaction ts;
+        if ((ts = Transaction.id2tr.get(id)) != null) {
+            ts.logs.add(this);
+        }
     }
 }

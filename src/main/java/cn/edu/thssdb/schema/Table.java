@@ -82,6 +82,10 @@ public class Table extends AbstractTable implements Iterable<Pair<Entry, VRow>>,
     // TODO
   }
 
+  public Entry getKey(Row row) {
+    return row.entries.get(primaryIndex);
+  }
+
   public Row createRow(String[] names, String[] values) throws Exception {
     // All cols
     Entry entries[] = new Entry[columns.length];
@@ -187,6 +191,34 @@ public class Table extends AbstractTable implements Iterable<Pair<Entry, VRow>>,
       metadata.freePageList.remove(0);
     }
     cache.writePage(pageId, page);
+  }
+
+  // Insert into a specified position(for rollback)
+  public void insert(UUID uuid, Row row, VRow vrow) {
+    int id = vrow.pageID;
+    int index = vrow.rowIndex;
+    Page page = cache.readPage(id);
+    byte[] bytes = row.toBytes();
+    Dictionary dic = new Hashtable<>();
+    dic.put("tableName", this.tableName);
+    dic.put("pageNumber", id);
+    dic.put("rowIndex", index);
+    dic.put("oldData", page.readRow(index));
+    dic.put("newData", bytes);
+    try {
+      new InsertLog(uuid, dic).serialize();
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+    page.writeRow(index, bytes);
+    if (page.isFull()) {
+      metadata.freePageList.remove(Integer.valueOf(id));
+    }
+    cache.writePage(id, page);
+    Entry key = row.entries.get(primaryIndex);
+    if (this.index.contains(key))
+      throw new DuplicatePrimaryKeyException(columns[primaryIndex].name);
+    this.index.put(key, vrow);
   }
 
   public void insert(UUID uuid, Row row) throws Exception {

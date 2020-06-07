@@ -73,6 +73,18 @@ public class SQLExecutor {
                 transaction.commit();
                 transaction = null;
                 System.out.println("Transaction committed");
+            } else if (stmtCtx.rollback_stmt() != null) {
+                if (transaction == null) {
+                    System.err.println("No transaction begins");
+                    return result;
+                }
+                try {
+                    transaction.rollback();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                transaction = null;
+                System.out.println("Transaction rollback");
             } else if (stmtCtx.delete_stmt() != null) {
                 stmt = new DeleteStatement(manager, stmtCtx, t);
             } else if (stmtCtx.checkpoint_stmt() != null) {

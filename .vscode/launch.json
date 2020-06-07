@@ -6,6 +6,20 @@
     "configurations": [
         {
             "type": "java",
+            "name": "CodeLens (Launch) - RollbackTest1",
+            "request": "launch",
+            "mainClass": "cn.edu.thssdb.transaction.RollbackTest1",
+            "projectName": "ThssDB"
+        },
+        {
+            "type": "java",
+            "name": "CodeLens (Launch) - RollbackTest",
+            "request": "launch",
+            "mainClass": "cn.edu.thssdb.transaction.RollbackTest",
+            "projectName": "ThssDB"
+        },
+        {
+            "type": "java",
             "name": "CodeLens (Launch) - Test1",
             "request": "launch",
             "mainClass": "cn.edu.thssdb.executor.Test1",
