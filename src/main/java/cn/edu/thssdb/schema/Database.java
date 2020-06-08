@@ -10,9 +10,12 @@ import cn.edu.thssdb.transaction.CreateLog;
 import cn.edu.thssdb.transaction.DropLog;
 import cn.edu.thssdb.transaction.InsertLog;
 import cn.edu.thssdb.transaction.Log;
+import javafx.util.Pair;
 
 import java.io.*;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
@@ -140,8 +143,39 @@ public class Database {
         }
     }
 
-    private long lastCheckpoint() throws Exception {
+    private void skipLog(Log.LogType type) throws IOException {
+        if (type == Log.LogType.Insert || type == Log.LogType.Update) {
+            int tableNameLength = logFileHandler.readInt();
+            logFileHandler.skipBytes(tableNameLength);
+            logFileHandler.skipBytes(8);
+            int rowLength = logFileHandler.readInt();
+            logFileHandler.skipBytes(rowLength * 2);
+        } else if (type == Log.LogType.Delete) {
+            int tableNameLength = logFileHandler.readInt();
+            logFileHandler.skipBytes(tableNameLength);
+            logFileHandler.skipBytes(8);
+            int rowLength = logFileHandler.readInt();
+            logFileHandler.skipBytes(rowLength);
+        } else if (type == Log.LogType.Create) {
+            int tableNameLength = logFileHandler.readInt();
+            logFileHandler.skipBytes(tableNameLength);
+            int length = logFileHandler.readInt();
+            logFileHandler.skipBytes(length);
+        } else if (type == Log.LogType.Drop) {
+            int tableNameLength = logFileHandler.readInt();
+            logFileHandler.skipBytes(tableNameLength);
+        } else if (type == Log.LogType.Savepoint) {
+            return;
+        } else if (type == Log.LogType.Commit || type == Log.LogType.Rollback) {
+            return;
+        } else if (type == Log.LogType.Start) {
+            return;
+        }
+    }
+
+    private Pair<Long, Set<UUID>> lastCheckpointAndInvalidTransactions() {
         long last = 0;
+        Set<UUID> invalid = new HashSet<>();
         while (true) {
             try {
                 byte bytes[] = new byte[16];
@@ -149,38 +183,26 @@ public class Database {
                 UUID id = Log.uuidFromBytes(bytes);
                 Log.LogType type = Log.LogType.getLog(logFileHandler.readInt());
 
-                if (type == Log.LogType.Insert || type == Log.LogType.Update) {
-                    int tableNameLength = logFileHandler.readInt();
-                    logFileHandler.skipBytes(tableNameLength);
-                    logFileHandler.skipBytes(8);
-                    int rowLength = logFileHandler.readInt();
-                    logFileHandler.skipBytes(rowLength * 2);
-                } else if (type == Log.LogType.Delete) {
-                    int tableNameLength = logFileHandler.readInt();
-                    logFileHandler.skipBytes(tableNameLength);
-                    logFileHandler.skipBytes(8);
-                    int rowLength = logFileHandler.readInt();
-                    logFileHandler.skipBytes(rowLength);
-                } else if (type == Log.LogType.Create) {
-                    int tableNameLength = logFileHandler.readInt();
-                    logFileHandler.skipBytes(tableNameLength);
-                    int length = logFileHandler.readInt();
-                    logFileHandler.skipBytes(length);
-                } else if (type == Log.LogType.Drop) {
-                    int tableNameLength = logFileHandler.readInt();
-                    logFileHandler.skipBytes(tableNameLength);
-                } else if (type == Log.LogType.Savepoint) {
-                    last = logFileHandler.getFilePointer();
+                if (type == Log.LogType.Commit || type == Log.LogType.Rollback) {
+                    if (invalid.contains(id))
+                        invalid.remove(id);
+                } else if (type == Log.LogType.Start) {
+                    invalid.add(id);
+                } else {
+                    skipLog(type);
                 }
             } catch (IOException e) {
                 break;
             }
         }
-        return last;
+        return new Pair<>(last, invalid);
     }
 
     private void recoverFromLog() throws Exception {
-        logFileHandler.seek(lastCheckpoint());
+        Pair<Long, Set<UUID>> result = lastCheckpointAndInvalidTransactions();
+        long last = result.getKey();
+        Set<UUID> invalid = result.getValue();
+        logFileHandler.seek(last);
         while (true) {
             long currentPos = logFileHandler.getFilePointer();
             try {
@@ -188,6 +210,10 @@ public class Database {
                 logFileHandler.read(bytes);
                 UUID id = Log.uuidFromBytes(bytes);
                 Log.LogType type = Log.LogType.getLog(logFileHandler.readInt());
+                if (invalid.contains(id)) {
+                    skipLog(type);
+                    continue;
+                }
 
                 if (type == Log.LogType.Insert || type == Log.LogType.Update) {
                     int tableNameLength = logFileHandler.readInt();
