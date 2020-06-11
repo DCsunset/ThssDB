@@ -3,6 +3,8 @@ package cn.edu.thssdb.executor;
 import cn.edu.thssdb.parser.SQLLexer;
 import cn.edu.thssdb.parser.SQLParser;
 import cn.edu.thssdb.query.*;
+import cn.edu.thssdb.rpc.thrift.ExecuteStatementResp;
+import cn.edu.thssdb.rpc.thrift.Status;
 import cn.edu.thssdb.schema.Manager;
 import cn.edu.thssdb.transaction.Log;
 import cn.edu.thssdb.transaction.Savepoint;
@@ -15,11 +17,12 @@ import java.io.IOException;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 
+import static cn.edu.thssdb.query.Statement.constructErrorResp;
+
 public class SQLExecutor {
     Transaction transaction = null;
 
-    public String execute(String sqlStatement) {
-        String result = "";
+    public ExecuteStatementResp execute(String sqlStatement) {
         Manager manager = Manager.getInstance();
         SQLLexer lexer = new SQLLexer(CharStreams.fromString(sqlStatement));
         CommonTokenStream tokens = new CommonTokenStream(lexer);
@@ -47,8 +50,7 @@ public class SQLExecutor {
                 stmt = new SelectStatement(manager, stmtCtx, t);
             } else if (stmtCtx.transaction_stmt() != null) {
                 if (transaction != null) {
-                    System.err.println("Already in transaction");
-                    return result;
+                    return constructErrorResp("Already in transaction");
                 }
                 // Begin transaction
                 transaction = t;
@@ -61,8 +63,7 @@ public class SQLExecutor {
                 }
             } else if (stmtCtx.commit_stmt() != null) {
                 if (transaction == null) {
-                    System.err.println("No transaction begins");
-                    return result;
+                    return constructErrorResp("No transaction begins");
                 }
                 try {
                     new SimpleLog(transaction.uuid, LogType.Commit).serialize();
@@ -75,8 +76,7 @@ public class SQLExecutor {
                 System.out.println("Transaction committed");
             } else if (stmtCtx.rollback_stmt() != null) {
                 if (transaction == null) {
-                    System.err.println("No transaction begins");
-                    return result;
+                    return constructErrorResp("No transaction begins");
                 }
                 try {
                     transaction.rollback();
@@ -95,25 +95,22 @@ public class SQLExecutor {
             } else if (stmtCtx.drop_table_stmt() != null) {
                 stmt = new DropTableStatement(manager, stmtCtx, t);
             } else {
-                System.err.println("Invalid SQL statement");
-                return result;
+                return constructErrorResp("Invalid SQL statement");
             }
 
             try {
-                if (stmt != null) {
-                    stmt.parse();
-                    stmt.execute();
-                    result += (stmt.getResult() + "\n");
-                    System.out.println(stmt.getResult());
-                    if (transaction == null)
-                        t.commit();
-                }
+                stmt.parse();
+                stmt.execute();
+                if (transaction == null)
+                    t.commit();
+                return stmt.getResult();
             } catch (Exception e) {
                 e.printStackTrace();
                 System.err.println(e.getMessage());
-                return result;
+                return constructErrorResp("Server error");
             }
         }
-        return result;
+
+        return constructErrorResp("Invalid SQL statement");
     }
 }

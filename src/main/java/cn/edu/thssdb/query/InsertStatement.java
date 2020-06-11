@@ -3,6 +3,7 @@ package cn.edu.thssdb.query;
 import java.util.Dictionary;
 import java.util.Hashtable;
 
+import cn.edu.thssdb.exception.TableNotExistException;
 import cn.edu.thssdb.parser.SQLParser;
 import cn.edu.thssdb.parser.SQLParser.Sql_stmtContext;
 import cn.edu.thssdb.schema.*;
@@ -13,7 +14,6 @@ import cn.edu.thssdb.type.ColumnInfo;
 import javafx.scene.control.Tab;
 
 public class InsertStatement extends Statement {
-    private String result = "";
     private SQLParser.Insert_stmtContext ctx;
     private String names[];
     private String values[];
@@ -44,10 +44,8 @@ public class InsertStatement extends Statement {
     public final void execute() throws Exception {
         Database db = this.manager.currentDatabase;
         String tableName = ctx.table_name().getText();
-        if (!db.getTables().containsKey(tableName)) {
-            result = "Table does not exist\n";
-            return;
-        }
+        if (!db.getTables().containsKey(tableName))
+            throw new TableNotExistException(tableName);
         /*
          * else { result = String.format("%s %s", ctx.column_name(),
          * ctx.value_entry(0).literal_value().get(0) ); return; }
@@ -57,11 +55,6 @@ public class InsertStatement extends Statement {
         transaction.acquireLock(table.lock);
         Row row = table.createRow(names, values);
         table.insert(transaction.uuid, row);
-        result = "Insert successfully\n";
-    }
-
-    @Override
-    public final String getResult() {
-        return this.result;
+        result = constructSuccessResp("Insert successfully");
     }
 }

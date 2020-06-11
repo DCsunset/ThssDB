@@ -1,5 +1,6 @@
 package cn.edu.thssdb.query;
 
+import cn.edu.thssdb.exception.TableNotExistException;
 import cn.edu.thssdb.parser.SQLParser;
 import cn.edu.thssdb.parser.SQLParser.Sql_stmtContext;
 import cn.edu.thssdb.schema.*;
@@ -11,7 +12,6 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 
 public class SelectStatement extends Statement {
-    private String result = "";
     private SQLParser.Select_stmtContext ctx;
     private Transaction transaction;
 
@@ -42,8 +42,7 @@ public class SelectStatement extends Statement {
         for (int i = 0; i < tbCtx.table_name().size(); ++i) {
             String tableName = tbCtx.table_name(i).getText();
             if (!db.getTables().containsKey(tableName)) {
-                result = "Table does not exist\n";
-                return;
+                throw new TableNotExistException(tableName);
             }
             tables.add(db.getTables().get(tableName));
             this.transaction.acquireLock(tables.get(tables.size() - 1).lock);
@@ -71,15 +70,15 @@ public class SelectStatement extends Statement {
         }
         if (!columnNames[0].equals("*"))
             resultTable = resultTable.project(columnNames);
-        resultTable.output();
         // release lock after read request
         for (Table table : tables) {
             this.transaction.releaseLock(table.lock);
         }
-    }
 
-    @Override
-    public final String getResult() {
-        return this.result;
+        //resultTable.output();
+        // TODO: set response
+        result = constructSuccessResp("");
+        result.setColumnsList(resultTable.getColumns());
+        result.setRowList(resultTable.getRows());
     }
 }

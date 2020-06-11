@@ -7,9 +7,11 @@ import cn.edu.thssdb.schema.Database;
 import cn.edu.thssdb.schema.Manager;
 import cn.edu.thssdb.schema.Table;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class ShowTableStatement extends Statement {
     private String tablename;
-    private String result = "";
 
     public ShowTableStatement(Manager manager, Sql_stmtContext parseCtx) {
         super(manager, parseCtx);
@@ -26,14 +28,18 @@ public class ShowTableStatement extends Statement {
         Database db = this.manager.currentDatabase;
         Table tb = db.getTables().get(this.tablename);
         Column[] cls = tb.getMetadata().columns;
+        /*
         this.result = String.join("\t", "name", "type", "primary", "not null", "maxlength") + "\n";
         for (int i = 0; i < cls.length; i++) {
             this.result += cls[i].toString() + '\n';
         }
-    }
+         */
+        List<String> columns = new ArrayList<>();
+        for (int i = 0; i < cls.length; i++) {
+            columns.add(cls[i].toString());
+        }
 
-    @Override
-    public final String getResult() {
-        return this.result;
+        result = constructSuccessResp("");
+        result.setColumnsList(columns);
     }
 }

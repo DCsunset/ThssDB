@@ -25,7 +25,6 @@ public class DeleteStatement extends Statement {
     private String tbname;
     private Table table;
     private MultipleCondition condition;
-    private String result;
     private Transaction transaction;
 
     public DeleteStatement(Manager manager, Sql_stmtContext ctx, Transaction transaction) {
@@ -56,11 +55,6 @@ public class DeleteStatement extends Statement {
                 table.delete(transaction.uuid, entry);
             }
         }
-        result = String.format("Deleted %d rows", count);
-    }
-
-    @Override
-    public final String getResult() {
-        return result;
+        result = constructSuccessResp(String.format("Deleted %d rows", count));
     }
 }

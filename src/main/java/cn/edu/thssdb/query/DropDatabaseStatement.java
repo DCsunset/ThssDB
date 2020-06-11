@@ -4,6 +4,8 @@ import cn.edu.thssdb.parser.SQLParser.Drop_db_stmtContext;
 import cn.edu.thssdb.parser.SQLParser.Sql_stmtContext;
 import cn.edu.thssdb.schema.Manager;
 
+import javax.swing.*;
+
 public class DropDatabaseStatement extends Statement {
     private String dbname;
 
@@ -20,10 +22,6 @@ public class DropDatabaseStatement extends Statement {
     @Override
     public final void execute() {
         this.manager.deleteDatabase(this.dbname);
-    }
-
-    @Override
-    public final String getResult() {
-        return String.format("delete database %s success!", this.dbname);
+        result = constructSuccessResp(String.format("Delete database %s success!", this.dbname));
     }
 }

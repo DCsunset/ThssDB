@@ -3,6 +3,7 @@ package cn.edu.thssdb.query;
 import cn.edu.thssdb.parser.SQLParser;
 import cn.edu.thssdb.parser.SQLParser.Show_meta_stmtContext;
 import cn.edu.thssdb.parser.SQLParser.Sql_stmtContext;
+import cn.edu.thssdb.rpc.thrift.ExecuteStatementResp;
 import cn.edu.thssdb.schema.Column;
 import cn.edu.thssdb.schema.Database;
 import cn.edu.thssdb.schema.Manager;
@@ -13,7 +14,6 @@ import cn.edu.thssdb.type.ColumnInfo;
 import java.util.List;
 
 public class CreateTableStatement extends Statement {
-    private String result = "";
     private SQLParser.Create_table_stmtContext ctx;
     private Transaction transaction;
 
@@ -32,7 +32,7 @@ public class CreateTableStatement extends Statement {
         Database db = this.manager.currentDatabase;
         String tableName = ctx.table_name().getText();
         if (db.getTables().containsKey(tableName)) {
-            result = "Table already exists\n";
+            result = constructErrorResp("Table already exists");
             return;
         }
         /*
@@ -87,14 +87,11 @@ public class CreateTableStatement extends Statement {
         Table tb = db.getTables().get(ctx.table_name().getText());
 
         Column[] cls = tb.getMetadata().columns;
-        this.result = String.format("Table %s created successfully\n", tb.tableName);
+        this.result = constructErrorResp(String.format("Table %s created successfully\n", tb.tableName));
+        /*
         for (int i = 0; i < cls.length; i++) {
             this.result += cls[i].toString() + '\n';
         }
-    }
-
-    @Override
-    public final String getResult() {
-        return this.result;
+         */
     }
 }

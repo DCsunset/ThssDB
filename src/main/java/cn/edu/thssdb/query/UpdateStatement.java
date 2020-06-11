@@ -12,7 +12,6 @@ import javafx.util.Pair;
 import java.util.Iterator;
 
 public class UpdateStatement extends Statement {
-    private String result = "";
     private Table table;
     // Column index
     private int index;
@@ -65,11 +64,6 @@ public class UpdateStatement extends Statement {
                 ++count;
             }
         }
-        result = String.format("Updated %d rows", count);
-    }
-
-    @Override
-    public final String getResult() {
-        return this.result;
+        result = constructSuccessResp(String.format("Updated %d rows", count));
     }
 }

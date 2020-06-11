@@ -3,8 +3,8 @@ package cn.edu.thssdb.service;
 import cn.edu.thssdb.executor.SQLExecutor;
 import cn.edu.thssdb.rpc.thrift.ConnectReq;
 import cn.edu.thssdb.rpc.thrift.ConnectResp;
-import cn.edu.thssdb.rpc.thrift.DisconnetReq;
-import cn.edu.thssdb.rpc.thrift.DisconnetResp;
+import cn.edu.thssdb.rpc.thrift.DisconnectReq;
+import cn.edu.thssdb.rpc.thrift.DisconnectResp;
 import cn.edu.thssdb.rpc.thrift.ExecuteStatementReq;
 import cn.edu.thssdb.rpc.thrift.ExecuteStatementResp;
 import cn.edu.thssdb.rpc.thrift.GetTimeReq;
@@ -68,7 +68,7 @@ public class IServiceHandler implements IService.Iface {
   }
 
   @Override
-  public DisconnetResp disconnect(DisconnetReq req) throws TException {
+  public DisconnectResp disconnect(DisconnectReq req) throws TException {
     long id = req.sessionId;
     Status result = new Status();
     if (ids.contains(id)) {
@@ -79,7 +79,7 @@ public class IServiceHandler implements IService.Iface {
       result.code = -1;
       result.msg = "Not connnected yet!";
     }
-    DisconnetResp resp = new DisconnetResp();
+    DisconnectResp resp = new DisconnectResp();
     resp.status = result;
     return resp;
   }

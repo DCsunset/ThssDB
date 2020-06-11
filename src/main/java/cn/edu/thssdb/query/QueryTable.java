@@ -3,10 +3,7 @@ package cn.edu.thssdb.query;
 import cn.edu.thssdb.parser.SQLParser;
 import cn.edu.thssdb.schema.*;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.StringJoiner;
+import java.util.*;
 
 import javafx.util.Pair;
 
@@ -65,6 +62,22 @@ public class QueryTable extends AbstractTable implements Iterator<Row> {
     for (Row row : data) {
       System.out.println(row.toString());
     }
+  }
+
+  public List<String> getColumns() {
+    List<String> result = new ArrayList<>();
+    for (Column c : columns) {
+      result.add(c.name);
+    }
+    return result;
+  }
+
+  public List<List<String>> getRows() {
+    List<List<String>> result = new ArrayList<>();
+    for (Row row : data) {
+        result.add(row.toStringList());
+    }
+    return result;
   }
 
   public static Row combineRow(Row row1, Row row2) {
