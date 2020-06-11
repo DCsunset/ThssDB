@@ -94,6 +94,9 @@ public class SQLExecutor {
                 stmt = new DropDatabaseStatement(manager, stmtCtx);
             } else if (stmtCtx.drop_table_stmt() != null) {
                 stmt = new DropTableStatement(manager, stmtCtx, t);
+            } else if (stmtCtx.use_db_stmt() != null) {
+                stmt = new UseDatabaseStatement(manager, stmtCtx);
+                transaction = null;
             } else {
                 return constructErrorResp("Invalid SQL statement");
             }
@@ -107,7 +110,7 @@ public class SQLExecutor {
             } catch (Exception e) {
                 e.printStackTrace();
                 System.err.println(e.getMessage());
-                return constructErrorResp("Server error");
+                return constructErrorResp(e.getMessage());
             }
         }
 
