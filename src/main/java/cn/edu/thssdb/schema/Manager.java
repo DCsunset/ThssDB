@@ -25,11 +25,11 @@ public class Manager {
   }
 
   public boolean hasDatabase(String name) {
-    return !databases.containsKey(name);
+    return databases.containsKey(name);
   }
 
   public void createDatabaseIfNotExists(String name) {
-    if (hasDatabase(name)) {
+    if (!hasDatabase(name)) {
       Database db = new Database(name);
       databases.put(name, db);
     }

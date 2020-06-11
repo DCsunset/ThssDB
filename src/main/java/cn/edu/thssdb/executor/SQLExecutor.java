@@ -96,7 +96,6 @@ public class SQLExecutor {
                 stmt = new DropTableStatement(manager, stmtCtx, t);
             } else if (stmtCtx.use_db_stmt() != null) {
                 stmt = new UseDatabaseStatement(manager, stmtCtx);
-                transaction = null;
             } else {
                 return constructErrorResp("Invalid SQL statement");
             }
