@@ -23,7 +23,7 @@ public class CreateDatabaseStatement extends Statement {
     @Override
     public final void execute() {
         if (manager.hasDatabase(this.dbname))
-            constructErrorResp(String.format("Database %s already exists", dbname));
+            result = constructErrorResp(String.format("Database %s already exists", dbname));
         else {
             this.manager.createDatabaseIfNotExists(this.dbname);
             result = constructSuccessResp(String.format("Create database %s success!", this.dbname));

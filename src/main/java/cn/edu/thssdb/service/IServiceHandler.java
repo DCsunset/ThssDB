@@ -86,9 +86,7 @@ public class IServiceHandler implements IService.Iface {
 
   @Override
   public ExecuteStatementResp executeStatement(ExecuteStatementReq req) throws TException {
-    // TODO
     String str = req.statement;
-    executor.execute(str);
-    return null;
+    return executor.execute(str);
   }
 }

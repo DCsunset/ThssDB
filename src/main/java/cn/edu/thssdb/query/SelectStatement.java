@@ -76,7 +76,6 @@ public class SelectStatement extends Statement {
         }
 
         //resultTable.output();
-        // TODO: set response
         result = constructSuccessResp("");
         result.setColumnsList(resultTable.getColumns());
         result.setRowList(resultTable.getRows());
