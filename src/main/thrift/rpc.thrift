@@ -45,9 +45,14 @@ struct ExecuteStatementResp{
   5: optional list<list<string>> rowList
 }
 
+struct ExecuteMultiStatementResp{
+  1: required list<ExecuteStatementResp> results;
+}
+
 service IService {
   GetTimeResp getTime(1: GetTimeReq req);
   ConnectResp connect(1: ConnectReq req);
   DisconnectResp disconnect(1: DisconnectReq req);
   ExecuteStatementResp executeStatement(1: ExecuteStatementReq req);
+  ExecuteMultiStatementResp executeMultiStatement(1: ExecuteStatementReq req)
 }
