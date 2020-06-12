@@ -56,11 +56,11 @@ public class IServiceHandler implements IService.Iface {
     if (users.get(username) != null && users.get(username).equals(password)) {
       resp.sessionId = System.nanoTime();
       ids.add(resp.sessionId);
-      status.code = 0;
+      status.code = Global.SUCCESS_CODE;
       status.msg = "Connect success!";
     } else {
       resp.sessionId = -1;
-      status.code = -1;
+      status.code = Global.FAILURE_CODE;
       status.msg = "Invalid user";
     }
     resp.status = status;
@@ -73,10 +73,10 @@ public class IServiceHandler implements IService.Iface {
     Status result = new Status();
     if (ids.contains(id)) {
       ids.remove(id);
-      result.code = 0;
+      result.code = Global.SUCCESS_CODE;
       result.msg = "Disconnect success!";
     } else {
-      result.code = -1;
+      result.code = Global.FAILURE_CODE;
       result.msg = "Not connnected yet!";
     }
     DisconnectResp resp = new DisconnectResp();
