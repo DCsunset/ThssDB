@@ -136,11 +136,11 @@ public class Client {
     ExecuteStatementReq req = new ExecuteStatementReq(id, query);
     try {
       ExecuteMultiStatementResp resp = client.executeMultiStatement(req);
-      System.out.println(resp);
+      //System.out.println(resp);
       for (ExecuteStatementResp r : resp.getResults()) {
         List<Integer> maxWidths = getColumnWidth(r);
         if (r.getStatus().getCode() == Global.FAILURE_CODE) {
-          System.err.println(r.getStatus().getMsg());
+          System.out.println(r.getStatus().getMsg());
           continue;
         }
 
