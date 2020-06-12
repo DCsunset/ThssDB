@@ -16,7 +16,7 @@ public class DropDatabaseStatement extends Statement {
     @Override
     public final void parse() {
         Drop_db_stmtContext ctx = this.parseCtx.drop_db_stmt();
-        this.dbname = ctx.database_name().getText();
+        this.dbname = ctx.database_name().getText().toUpperCase();
     }
 
     @Override

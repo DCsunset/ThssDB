@@ -20,7 +20,7 @@ public class DropTableStatement extends Statement {
     @Override
     public final void parse() {
         Drop_table_stmtContext ctx = this.parseCtx.drop_table_stmt();
-        this.tablename = ctx.table_name().getText();
+        this.tablename = ctx.table_name().getText().toUpperCase();
     }
 
     @Override

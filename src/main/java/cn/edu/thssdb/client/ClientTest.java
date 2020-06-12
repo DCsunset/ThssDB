@@ -120,7 +120,7 @@ public class ClientTest {
       println("Query Data Successfully!");
     }
     println("It costs " + (System.currentTimeMillis() - startTime) + "ms.");
-    if (resp.getColumnsList().equals(columnsList) && resp.getRowList().equals(rowList)) {
+    if (resp.getRowList().equals(rowList)) {
       println("The Result Set is Correct!");
     }
   }

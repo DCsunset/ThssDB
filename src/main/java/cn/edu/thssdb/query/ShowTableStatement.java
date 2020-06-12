@@ -20,7 +20,7 @@ public class ShowTableStatement extends Statement {
     @Override
     public final void parse() {
         Show_meta_stmtContext ctx = this.parseCtx.show_meta_stmt();
-        this.tablename = ctx.table_name().getText();
+        this.tablename = ctx.table_name().getText().toUpperCase();
     }
 
     @Override
