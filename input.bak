@@ -1,0 +1,8 @@
+connect username password
+create database test;
+use test;
+create table person (name String(256), ID Int not null, primary key(ID));
+insert into person values ('Anna', 20);
+insert into person values ('Bob', 22);
+insert into person values ('Cindy', 30);
+select * from person;
