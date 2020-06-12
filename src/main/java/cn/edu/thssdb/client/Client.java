@@ -41,8 +41,7 @@ public class Client {
   static final String PORT_NAME = "port";
 
   private static final PrintStream SCREEN_PRINTER = new PrintStream(System.out);
-  // private static final Scanner SCANNER = new Scanner(System.in);
-  private static Scanner SCANNER = new Scanner(System.in);
+  private static final Scanner SCANNER = new Scanner(System.in);
 
   private static TTransport transport;
   private static TProtocol protocol;
@@ -65,11 +64,6 @@ public class Client {
       protocol = new TBinaryProtocol(transport);
       client = new IService.Client(protocol);
       boolean open = true;
-      try {
-        SCANNER = new Scanner(new File("input"));
-      } catch (IOException e) {
-        e.printStackTrace();
-      }
       while (true) {
         print(Global.CLI_PREFIX);
         String msg = SCANNER.nextLine();
