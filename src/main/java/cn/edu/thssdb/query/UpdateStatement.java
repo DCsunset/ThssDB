@@ -28,19 +28,19 @@ public class UpdateStatement extends Statement {
     public final void parse() throws Exception {
         ctx = this.parseCtx.update_stmt();
         Database db = this.manager.currentDatabase;
-        String tableName = ctx.table_name().getText();
+        String tableName = ctx.table_name().getText().toUpperCase();
         if (!db.getTables().containsKey(tableName)) {
             throw new TableNotExistException(tableName);
         }
 
         table = db.getTables().get(tableName);
 
-        index = table.findColumnByName(ctx.column_name().getText());
+        index = table.findColumnByName(ctx.column_name().getText().toUpperCase());
         if (index < 0)
-            throw new ColumnNotExistException(ctx.column_name().getText());
+            throw new ColumnNotExistException(ctx.column_name().getText().toUpperCase());
 
         // set attr=value
-        value = table.stringToValue(table.getMetadata().columns[index], ctx.expression().getText());
+        value = table.stringToValue(table.getMetadata().columns[index], ctx.expression().getText().toUpperCase());
     }
 
     @Override

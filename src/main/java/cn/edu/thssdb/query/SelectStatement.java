@@ -41,7 +41,7 @@ public class SelectStatement extends Statement {
         ArrayList<Table> tables = new ArrayList<Table>();
 
         for (int i = 0; i < tbCtx.table_name().size(); ++i) {
-            String tableName = tbCtx.table_name(i).getText();
+            String tableName = tbCtx.table_name(i).getText().toUpperCase();
             if (db == null) {
                 throw new CurrentDatabaseNullException();
             }
@@ -70,7 +70,7 @@ public class SelectStatement extends Statement {
 
         String columnNames[] = new String[ctx.result_column().size()];
         for (int i = 0; i < ctx.result_column().size(); ++i) {
-            columnNames[i] = ctx.result_column(i).getText();
+            columnNames[i] = ctx.result_column(i).getText().toUpperCase();
         }
         if (!columnNames[0].equals("*"))
             resultTable = resultTable.project(columnNames);

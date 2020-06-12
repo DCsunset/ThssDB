@@ -17,7 +17,7 @@ public class CreateDatabaseStatement extends Statement {
     @Override
     public final void parse() {
         SQLParser.Create_db_stmtContext ctx = this.parseCtx.create_db_stmt();
-        this.dbname = ctx.database_name().getText();
+        this.dbname = ctx.database_name().getText().toUpperCase();
     }
 
     @Override

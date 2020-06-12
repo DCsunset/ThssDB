@@ -31,7 +31,7 @@ public class InsertStatement extends Statement {
 
         names = new String[ctx.column_name().size()];
         for (int i = 0; i < names.length; ++i) {
-            names[i] = ctx.column_name(i).getText();
+            names[i] = ctx.column_name(i).getText().toUpperCase();
         }
 
         values = new String[ctx.value_entry(0).literal_value().size()];
@@ -43,7 +43,7 @@ public class InsertStatement extends Statement {
     @Override
     public final void execute() throws Exception {
         Database db = this.manager.currentDatabase;
-        String tableName = ctx.table_name().getText();
+        String tableName = ctx.table_name().getText().toUpperCase();
         if (!db.getTables().containsKey(tableName))
             throw new TableNotExistException(tableName);
         /*

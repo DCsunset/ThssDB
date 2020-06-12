@@ -35,7 +35,7 @@ public class DeleteStatement extends Statement {
     @Override
     public final void parse() throws Exception {
         Delete_stmtContext ctx = this.parseCtx.delete_stmt();
-        this.tbname = ctx.table_name().getText();
+        this.tbname = ctx.table_name().getText().toUpperCase();
         this.table = this.manager.currentDatabase.getTables().get(this.tbname);
 
         condition = new MultipleCondition(this.table, ctx.multiple_condition());
