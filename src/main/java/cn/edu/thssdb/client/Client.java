@@ -1,10 +1,7 @@
 package cn.edu.thssdb.client;
 
-import cn.edu.thssdb.rpc.thrift.ConnectReq;
-import cn.edu.thssdb.rpc.thrift.ConnectResp;
-import cn.edu.thssdb.rpc.thrift.DisconnetReq;
-import cn.edu.thssdb.rpc.thrift.GetTimeReq;
-import cn.edu.thssdb.rpc.thrift.IService;
+import cn.edu.thssdb.rpc.thrift.*;
+import cn.edu.thssdb.rpc.thrift.DisconnectReq;
 import cn.edu.thssdb.utils.Global;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -24,6 +21,7 @@ import org.slf4j.LoggerFactory;
 import java.io.PrintStream;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 import java.util.Scanner;
 
 public class Client {
@@ -97,8 +95,12 @@ public class Client {
             sessionId = -1;
             break;
           default:
+            if (sessionId == -1) {
+              println("Cannot execute SQL query before connect!");
+              break;
+            }
             // SQL statement
-            println("Invalid statements!");
+            executeSQL(sessionId, msg);
             break;
         }
         long endTime = System.currentTimeMillis();
@@ -115,8 +117,28 @@ public class Client {
     }
   }
 
+  static void executeSQL(long id, String query) {
+    ExecuteStatementReq req = new ExecuteStatementReq(id, query);
+    try {
+      ExecuteMultiStatementResp resp = client.executeMultiStatement(req);
+      for (ExecuteStatementResp r : resp.getResults()) {
+          for (String c : r.getColumnsList())
+            System.out.print(c + "\t");
+          System.out.println();
+          for (List<String> row : r.getRowList()) {
+            for (String value : row)
+              System.out.print(value + "\t");
+            System.out.println();
+          }
+      }
+    }
+    catch (Exception e) {
+      logger.error(e.getMessage());
+    }
+}
+
   private static void disconnect(long id) {
-    DisconnetReq req = new DisconnetReq();
+    DisconnectReq req = new DisconnectReq();
     req.sessionId = id;
     try {
       client.disconnect(req);
