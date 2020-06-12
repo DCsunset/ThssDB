@@ -4,3 +4,5 @@ target
 rpc
 *.data
 *.meta
+server.sh
+client.sh
