@@ -18,9 +18,12 @@ import org.apache.thrift.transport.TTransportException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
+import java.io.IOException;
 import java.io.PrintStream;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
@@ -38,7 +41,8 @@ public class Client {
   static final String PORT_NAME = "port";
 
   private static final PrintStream SCREEN_PRINTER = new PrintStream(System.out);
-  private static final Scanner SCANNER = new Scanner(System.in);
+  // private static final Scanner SCANNER = new Scanner(System.in);
+  private static Scanner SCANNER = new Scanner(System.in);
 
   private static TTransport transport;
   private static TProtocol protocol;
@@ -61,6 +65,11 @@ public class Client {
       protocol = new TBinaryProtocol(transport);
       client = new IService.Client(protocol);
       boolean open = true;
+      try {
+        SCANNER = new Scanner(new File("input"));
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
       while (true) {
         print(Global.CLI_PREFIX);
         String msg = SCANNER.nextLine();
@@ -117,36 +126,75 @@ public class Client {
     }
   }
 
+  static List<Integer> getColumnWidth(ExecuteStatementResp r) {
+    List<Integer> ret = new ArrayList();
+    for (int i = 0; i < r.getColumnsListSize(); i++) {
+      int maxw = r.getColumnsList().get(i).length();
+      for (int j = 0; j < r.getRowListSize(); j++) {
+        maxw = Math.max(maxw, r.getRowList().get(j).get(i).length());
+      }
+      ret.add(maxw);
+    }
+    return ret;
+  }
+
   static void executeSQL(long id, String query) {
     ExecuteStatementReq req = new ExecuteStatementReq(id, query);
     try {
       ExecuteMultiStatementResp resp = client.executeMultiStatement(req);
       System.out.println(resp);
       for (ExecuteStatementResp r : resp.getResults()) {
-          if (r.getStatus().getCode() == Global.FAILURE_CODE) {
-              System.err.println(r.getStatus().getMsg());
-              continue;
+        List<Integer> maxWidths = getColumnWidth(r);
+        if (r.getStatus().getCode() == Global.FAILURE_CODE) {
+          System.err.println(r.getStatus().getMsg());
+          continue;
+        }
+
+        if (r.hasResult) {
+          // header line
+          for (int w : maxWidths) {
+            System.out.print("+".concat(new String(new char[w + 4]).replace("\0", "-")));
+          }
+          System.out.print("+\n");
+
+          // column list
+          for (int i = 0; i < maxWidths.size(); i++) {
+            String c = r.getColumnsList().get(i);
+            System.out.print(
+                "|".concat(c).concat(new String(new char[maxWidths.get(i) + 4 - c.length()]).replace("\0", " ")));
+          }
+          System.out.print("|\n");
+
+          // seperator
+          for (int w : maxWidths) {
+            System.out.print("+".concat(new String(new char[w + 4]).replace("\0", "-")));
+          }
+          System.out.print("+\n");
+
+          // row
+          for (List<String> row : r.getRowList()) {
+            for (int i = 0; i < maxWidths.size(); i++) {
+              String value = row.get(i);
+              System.out.print("|".concat(value)
+                  .concat(new String(new char[maxWidths.get(i) + 4 - value.length()]).replace("\0", " ")));
+            }
+            System.out.print("|\n");
           }
 
-          if (r.hasResult) {
-            for (String c : r.getColumnsList())
-              System.out.print(c + "\t");
-            System.out.println();
-            for (List<String> row : r.getRowList()) {
-              for (String value : row)
-                System.out.print(value + "\t");
-              System.out.println();
-            }
+          // seperator
+          for (int w : maxWidths) {
+            System.out.print("+".concat(new String(new char[w + 4]).replace("\0", "-")));
           }
-          else {
-            System.out.println(r.getStatus().getMsg());
-          }
+          System.out.print("+\n");
+
+        } else {
+          System.out.println(r.getStatus().getMsg());
+        }
       }
-    }
-    catch (Exception e) {
+    } catch (Exception e) {
       logger.error(e.getMessage());
     }
-}
+  }
 
   private static void disconnect(long id) {
     DisconnectReq req = new DisconnectReq();
