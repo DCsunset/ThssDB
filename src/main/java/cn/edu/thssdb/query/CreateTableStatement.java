@@ -48,7 +48,7 @@ public class CreateTableStatement extends Statement {
 
         SQLParser.Table_constraintContext tbCst = ctx.table_constraint();
         String primaryKey = "";
-        if (tbCst.column_name().size() > 0)
+        if (tbCst != null && tbCst.column_name().size() > 0)
             primaryKey = tbCst.column_name(0).getText().toUpperCase();
 
         Column columns[] = new Column[ctx.column_def().size()];
@@ -94,9 +94,8 @@ public class CreateTableStatement extends Statement {
         Column[] cls = tb.getMetadata().columns;
         this.result = constructSuccessResp(String.format("Table %s created successfully\n", tb.tableName));
         /*
-        for (int i = 0; i < cls.length; i++) {
-            this.result += cls[i].toString() + '\n';
-        }
+         * for (int i = 0; i < cls.length; i++) { this.result += cls[i].toString() +
+         * '\n'; }
          */
     }
 }
