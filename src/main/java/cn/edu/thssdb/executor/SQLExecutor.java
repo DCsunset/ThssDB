@@ -216,8 +216,10 @@ public class SQLExecutor {
                 responses.add(stmt.getResult());
             } catch (Exception e) {
                 e.printStackTrace();
-                System.err.println(e.getMessage());
-                responses.add(constructErrorResp(e.getMessage()));
+                String msg = e.getMessage();
+                if (msg == null)
+                    msg = "Invalid SQL query";
+                responses.add(constructErrorResp(msg));
                 result.setResults(responses);
                 return result;
             }

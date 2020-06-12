@@ -1,5 +1,6 @@
 package cn.edu.thssdb.query;
 
+import cn.edu.thssdb.exception.CurrentDatabaseNullException;
 import cn.edu.thssdb.exception.TableNotExistException;
 import cn.edu.thssdb.parser.SQLParser;
 import cn.edu.thssdb.parser.SQLParser.Sql_stmtContext;
@@ -41,6 +42,9 @@ public class SelectStatement extends Statement {
 
         for (int i = 0; i < tbCtx.table_name().size(); ++i) {
             String tableName = tbCtx.table_name(i).getText();
+            if (db == null) {
+                throw new CurrentDatabaseNullException();
+            }
             if (!db.getTables().containsKey(tableName)) {
                 throw new TableNotExistException(tableName);
             }
@@ -77,6 +81,7 @@ public class SelectStatement extends Statement {
 
         //resultTable.output();
         result = constructSuccessResp("");
+        result.setHasResult(true);
         result.setColumnsList(resultTable.getColumns());
         result.setRowList(resultTable.getRows());
     }

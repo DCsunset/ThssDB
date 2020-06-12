@@ -121,14 +121,25 @@ public class Client {
     ExecuteStatementReq req = new ExecuteStatementReq(id, query);
     try {
       ExecuteMultiStatementResp resp = client.executeMultiStatement(req);
+      System.out.println(resp);
       for (ExecuteStatementResp r : resp.getResults()) {
-          for (String c : r.getColumnsList())
-            System.out.print(c + "\t");
-          System.out.println();
-          for (List<String> row : r.getRowList()) {
-            for (String value : row)
-              System.out.print(value + "\t");
+          if (r.getStatus().getCode() == Global.FAILURE_CODE) {
+              System.err.println(r.getStatus().getMsg());
+              continue;
+          }
+
+          if (r.hasResult) {
+            for (String c : r.getColumnsList())
+              System.out.print(c + "\t");
             System.out.println();
+            for (List<String> row : r.getRowList()) {
+              for (String value : row)
+                System.out.print(value + "\t");
+              System.out.println();
+            }
+          }
+          else {
+            System.out.println(r.getStatus().getMsg());
           }
       }
     }

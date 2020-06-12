@@ -1,5 +1,6 @@
 package cn.edu.thssdb.query;
 
+import cn.edu.thssdb.exception.CurrentDatabaseNullException;
 import cn.edu.thssdb.parser.SQLParser;
 import cn.edu.thssdb.parser.SQLParser.Show_meta_stmtContext;
 import cn.edu.thssdb.parser.SQLParser.Sql_stmtContext;
@@ -30,6 +31,10 @@ public class CreateTableStatement extends Statement {
     @Override
     public final void execute() {
         Database db = this.manager.currentDatabase;
+        if (db == null) {
+            throw new CurrentDatabaseNullException();
+        }
+
         String tableName = ctx.table_name().getText();
         if (db.getTables().containsKey(tableName)) {
             result = constructErrorResp("Table already exists");
@@ -87,7 +92,7 @@ public class CreateTableStatement extends Statement {
         Table tb = db.getTables().get(ctx.table_name().getText());
 
         Column[] cls = tb.getMetadata().columns;
-        this.result = constructErrorResp(String.format("Table %s created successfully\n", tb.tableName));
+        this.result = constructSuccessResp(String.format("Table %s created successfully\n", tb.tableName));
         /*
         for (int i = 0; i < cls.length; i++) {
             this.result += cls[i].toString() + '\n';
