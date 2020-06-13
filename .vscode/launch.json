@@ -6,6 +6,13 @@
     "configurations": [
         {
             "type": "java",
+            "name": "CodeLens (Launch) - OurClient",
+            "request": "launch",
+            "mainClass": "cn.edu.thssdb.client.OurClient",
+            "projectName": "ThssDB"
+        },
+        {
+            "type": "java",
             "name": "CodeLens (Launch) - CustomTest",
             "request": "launch",
             "mainClass": "cn.edu.thssdb.client.CustomTest",

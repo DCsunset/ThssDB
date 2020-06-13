@@ -104,6 +104,8 @@ public class SQLExecutor {
                 stmt = new DropTableStatement(manager, stmtCtx, t);
             } else if (stmtCtx.use_db_stmt() != null) {
                 stmt = new UseDatabaseStatement(manager, stmtCtx);
+            } else if (stmtCtx.show_meta_stmt() != null) {
+                stmt = new ShowTableStatement(manager, stmtCtx);
             } else {
                 return constructErrorResp("Invalid SQL statement");
             }
@@ -215,6 +217,8 @@ public class SQLExecutor {
                 stmt = new DropTableStatement(manager, stmtCtx, t);
             } else if (stmtCtx.use_db_stmt() != null) {
                 stmt = new UseDatabaseStatement(manager, stmtCtx);
+            } else if (stmtCtx.show_meta_stmt() != null) {
+                stmt = new ShowTableStatement(manager, stmtCtx);
             } else {
                 responses.add(constructErrorResp("Invalid SQL statement"));
                 result.setResults(responses);
