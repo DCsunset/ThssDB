@@ -10,6 +10,7 @@ import cn.edu.thssdb.utils.Global;
 public class Metadata implements java.io.Serializable {
     private int rowSize; // number of bytes in one row
     private static final long serialVersionUID = 42L;
+    private int expandCnt = 0;
 
     public Column[] columns;
     public List<Integer> freePageList; // each element is id of page with free rows
@@ -33,8 +34,9 @@ public class Metadata implements java.io.Serializable {
     public void expandFreePageList() {
         assert freePageList.size() == 0;
         int listSize = Global.INIT_FILE_SIZE / Global.PAGE_SIZE;
-        for (int i = 0; i < listSize; i++)
+        for (int i = expandCnt * listSize; i < (expandCnt + 1) * listSize; i++)
             freePageList.add(i);
+        expandCnt++;
     }
 
     public int getRowSize() {

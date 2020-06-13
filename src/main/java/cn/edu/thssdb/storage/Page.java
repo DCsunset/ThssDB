@@ -39,9 +39,13 @@ public class Page {
 
     public void writeRow(int index, byte[] data) {
         assert data.length == rowSize;
-        for (int i = 0; i < data.length; ++i)
-            rowData[index * rowSize + i] = data[i];
-        bitmap.set(index);
+        try {
+            for (int i = 0; i < data.length; ++i)
+                rowData[index * rowSize + i] = data[i];
+            bitmap.set(index);
+        } catch (Exception e) {
+            System.out.print("index=" + index + ",rowSize=" + rowSize);
+        }
     }
 
     public boolean isFull() {
