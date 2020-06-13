@@ -189,7 +189,7 @@ public class Table extends AbstractTable implements Iterable<Pair<Entry, VRow>>,
     byte[] bytes = row.toBytes();
 
     page.writeRow(rowIndex, bytes);
-    if (page.isFull()) {
+    if (page.isFull() && metadata.freePageList.size() > 0 && metadata.freePageList.get(0) == pageId) {
       metadata.freePageList.remove(0);
     }
     cache.writePage(pageId, page);

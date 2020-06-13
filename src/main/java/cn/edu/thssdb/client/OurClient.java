@@ -72,7 +72,7 @@ public class OurClient {
       while (true) {
         print(Global.CLI_PREFIX);
         String msg = SCANNER.nextLine();
-        System.out.println("msg=" + msg);
+        // System.out.println("msg=" + msg);
 
         long startTime = System.currentTimeMillis();
         switch (msg.trim().split(" ")[0]) {

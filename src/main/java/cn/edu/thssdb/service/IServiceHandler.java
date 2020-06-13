@@ -20,13 +20,13 @@ import java.util.Iterator;
 import java.util.UUID;
 
 public class IServiceHandler implements IService.Iface {
-  private SQLExecutor executor;
+  private HashMap<Long, SQLExecutor> executor;
 
   private HashSet<Long> ids = new HashSet<>();
   private HashMap<String, String> users = new HashMap<>();
 
   public IServiceHandler(HashMap<String, String> users) {
-    executor = new SQLExecutor();
+    executor = new HashMap<>();
     this.users = users;
   }
 
@@ -46,6 +46,7 @@ public class IServiceHandler implements IService.Iface {
     Status status = new Status();
     if (users.get(username) != null && users.get(username).equals(password)) {
       resp.sessionId = System.nanoTime();
+      executor.put(resp.sessionId, new SQLExecutor());
       ids.add(resp.sessionId);
       status.code = Global.SUCCESS_CODE;
       status.msg = "Connect success!";
@@ -78,12 +79,12 @@ public class IServiceHandler implements IService.Iface {
   @Override
   public ExecuteStatementResp executeStatement(ExecuteStatementReq req) throws TException {
     String str = req.statement;
-    return executor.execute(str);
+    return executor.get(req.getSessionId()).execute(str);
   }
 
   @Override
   public ExecuteMultiStatementResp executeMultiStatement(ExecuteStatementReq req) {
     String str = req.statement;
-    return executor.executeMultiStatement(str);
+    return executor.get(req.getSessionId()).executeMultiStatement(str);
   }
 }

@@ -191,7 +191,7 @@ public class Database {
                 } else {
                     skipLog(type);
                 }
-            } catch (IOException e) {
+            } catch (Exception e) {
                 break;
             }
         }
@@ -270,7 +270,7 @@ public class Database {
                     String tableName = new String(bytes);
                     dropTable(tableName);
                 }
-            } catch (IOException e) {
+            } catch (Exception e) {
                 logFileHandler.seek(currentPos);
                 break;
             }
