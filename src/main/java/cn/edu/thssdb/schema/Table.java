@@ -116,6 +116,8 @@ public class Table extends AbstractTable implements Iterable<Pair<Entry, VRow>>,
         if (!inserted[i]) {
           if (columns[i].isPrimary())
             throw new NullPrimaryKeyException(columns[i].name);
+          if (columns[i].notNull)
+            throw new NullColumnException(columns[i].name);
           Column col = metadata.columns[i];
           String type = ColumnInfo.getColumnType(col.type);
           if (type.equals("String")) {
