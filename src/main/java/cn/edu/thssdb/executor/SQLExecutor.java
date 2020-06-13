@@ -152,6 +152,12 @@ public class SQLExecutor {
             Statement stmt = null;
             if (stmtCtx.create_db_stmt() != null) {
                 stmt = new CreateDatabaseStatement(manager, stmtCtx);
+            } else if (stmtCtx.create_user_stmt() != null) {
+                stmt = new CreateUserStatement(manager, stmtCtx);
+            } else if (stmtCtx.drop_user_stmt() != null) {
+                stmt = new DropUserStatement(manager, stmtCtx);
+            } else if (stmtCtx.alter_user_stmt() != null) {
+                stmt = new AlterUserStatement(manager, stmtCtx);
             } else if (stmtCtx.create_table_stmt() != null) {
                 stmt = new CreateTableStatement(manager, stmtCtx, t);
             } else if (stmtCtx.insert_stmt() != null) {

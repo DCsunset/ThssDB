@@ -29,6 +29,7 @@ public class ThssDB {
   private static IService.Processor processor;
   private static TServerSocket transport;
   private static TServer server;
+  public HashMap<String, String> users = new HashMap<>();
 
   private Manager manager;
 
@@ -44,7 +45,6 @@ public class ThssDB {
   private void start() {
     // Get users
     BufferedReader reader;
-    HashMap<String, String> users = new HashMap<>();
     try {
       String currentDir = new File("").getAbsolutePath();
       System.out.println("currentDir=" + currentDir);
