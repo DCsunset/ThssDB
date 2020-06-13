@@ -7,3 +7,4 @@ rpc
 server.sh
 client.sh
 test
+*.log
