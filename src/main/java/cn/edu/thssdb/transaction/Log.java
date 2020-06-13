@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.Dictionary;
 import java.util.UUID;
 
+import cn.edu.thssdb.exception.CurrentDatabaseNullException;
 import cn.edu.thssdb.schema.Manager;
 import cn.edu.thssdb.schema.Table;
 
@@ -58,6 +59,9 @@ public abstract class Log {
         transactionId = id;
         this.type = type;
         Manager manager = Manager.getInstance();
+        if (manager.currentDatabase == null) {
+            throw new CurrentDatabaseNullException();
+        }
         handler = manager.currentDatabase.logFileHandler;
         Transaction ts;
         if ((ts = Transaction.id2tr.get(id)) != null) {
