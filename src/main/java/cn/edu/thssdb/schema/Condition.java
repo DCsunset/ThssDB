@@ -28,8 +28,8 @@ public class Condition {
     }
 
     public boolean satisfy(Row row) throws Exception {
-        int index1 = table.findColumnByName(attrOrValue1);
-        int index2 = table.findColumnByName(attrOrValue2);
+        int index1 = table.findColumnByName(attrOrValue1.toUpperCase());
+        int index2 = table.findColumnByName(attrOrValue2.toUpperCase());
         if (index1 == -1 && index2 == -1) {
             String message = String.format("%s or %s", attrOrValue1, attrOrValue2);
             throw new ColumnNotExistException(message);

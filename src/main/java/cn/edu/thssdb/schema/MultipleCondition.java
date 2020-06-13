@@ -28,6 +28,8 @@ public class MultipleCondition {
             type = OpType.LE;
         } else if (opCtx.LT() != null) {
             type = OpType.LT;
+        } else if (opCtx.NE() != null) {
+            type = OpType.NE;
         }
         return type;
     }
@@ -46,9 +48,9 @@ public class MultipleCondition {
         if (ctx.AND() == null) {
             ConditionContext cctx = ctx.condition();
             Condition condition = new Condition(table,
-                    cctx.expression().get(0).getText().toUpperCase(),
+                    cctx.expression().get(0).getText(),
                     ctxtotype(cctx.comparator()),
-                    cctx.expression().get(1).getText().toUpperCase()
+                    cctx.expression().get(1).getText()
             );
             conditions.get(conditions.size() - 1).add(condition);
         } else {
