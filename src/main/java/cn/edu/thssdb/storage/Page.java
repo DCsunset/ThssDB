@@ -42,12 +42,11 @@ public class Page {
         for (int i = 0; i < data.length; ++i)
             rowData[index * rowSize + i] = data[i];
         bitmap.set(index);
-        System.out.println("after set index, bitmap=" + bitmap);
     }
 
     public boolean isFull() {
         if (bitmap.length() == 65) {
-            System.out.print("fullbitset=" + fullBitSet);
+            // System.out.print("fullbitset=" + fullBitSet);
         }
         return fullBitSet.equals(bitmap);
     }

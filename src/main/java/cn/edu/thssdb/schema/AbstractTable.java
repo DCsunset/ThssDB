@@ -19,13 +19,13 @@ public abstract class AbstractTable {
             return null;
         }
         if (col.type == ColumnInfo.ColumnType.INT) {
-            return (Integer) engine.eval(str);
+            return ((Number) engine.eval(str)).intValue();
         } else if (col.type == ColumnInfo.ColumnType.FLOAT) {
             return ((Number) engine.eval(str)).floatValue();
         } else if (col.type == ColumnInfo.ColumnType.DOUBLE) {
             return ((Number) engine.eval(str)).doubleValue();
         } else if (col.type == ColumnInfo.ColumnType.LONG) {
-            return (Long) engine.eval(str);
+            return ((Number) engine.eval(str)).longValue();
         }
         // String
         else {

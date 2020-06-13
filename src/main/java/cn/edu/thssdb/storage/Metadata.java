@@ -30,6 +30,13 @@ public class Metadata implements java.io.Serializable {
         this.rowSize = size;
     }
 
+    public void expandFreePageList() {
+        assert freePageList.size() == 0;
+        int listSize = Global.INIT_FILE_SIZE / Global.PAGE_SIZE;
+        for (int i = 0; i < listSize; i++)
+            freePageList.add(i);
+    }
+
     public int getRowSize() {
         return this.rowSize;
     }
