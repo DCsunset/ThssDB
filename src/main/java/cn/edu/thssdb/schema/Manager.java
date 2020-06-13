@@ -2,6 +2,7 @@ package cn.edu.thssdb.schema;
 
 import cn.edu.thssdb.exception.DatabaseNotExistException;
 import cn.edu.thssdb.server.ThssDB;
+import cn.edu.thssdb.transaction.Savepoint;
 
 import javax.xml.crypto.Data;
 import java.awt.image.DataBuffer;
@@ -14,6 +15,7 @@ public class Manager {
   private HashMap<String, Database> databases;
   private static ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
   public Database currentDatabase = null;
+  private static Boolean flag = false;
 
   public static Manager getInstance() {
     return Manager.ManagerHolder.INSTANCE;
@@ -31,6 +33,12 @@ public class Manager {
   public void createDatabaseIfNotExists(String name) {
     if (!hasDatabase(name)) {
       Database db = new Database(name);
+      if (flag == false) { // start checkpoint only after first database
+        System.out.println("start checkpoint");
+        Savepoint sp = new Savepoint();
+        sp.start();
+        flag = true;
+      }
       databases.put(name, db);
     }
   }

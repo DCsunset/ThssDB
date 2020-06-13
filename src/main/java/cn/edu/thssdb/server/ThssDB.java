@@ -4,6 +4,7 @@ import cn.edu.thssdb.rpc.thrift.IService;
 import cn.edu.thssdb.schema.Manager;
 import cn.edu.thssdb.service.IServiceHandler;
 import cn.edu.thssdb.storage.DbCache;
+import cn.edu.thssdb.transaction.Savepoint;
 import cn.edu.thssdb.utils.Global;
 
 import java.io.BufferedReader;

@@ -2,6 +2,7 @@ package cn.edu.thssdb.client;
 
 import cn.edu.thssdb.rpc.thrift.*;
 import cn.edu.thssdb.rpc.thrift.DisconnectReq;
+import cn.edu.thssdb.transaction.Savepoint;
 import cn.edu.thssdb.utils.Global;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -62,12 +63,12 @@ public class OurClient {
       protocol = new TBinaryProtocol(transport);
       client = new IService.Client(protocol);
       boolean open = true;
-      try {
+      // try {
 
-        SCANNER = new Scanner(new File("input_rollback"));
-      } catch (IOException e) {
-        e.printStackTrace();
-      }
+      // SCANNER = new Scanner(new File("input_rollback"));
+      // } catch (IOException e) {
+      // e.printStackTrace();
+      // }
       while (true) {
         print(Global.CLI_PREFIX);
         String msg = SCANNER.nextLine();

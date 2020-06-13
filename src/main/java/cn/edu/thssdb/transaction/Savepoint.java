@@ -14,16 +14,18 @@ public class Savepoint extends Thread {
         // Write back data page
         Manager manager = Manager.getInstance();
         Database database = manager.currentDatabase;
-        for (Table table : database.getTables().values()) {
-            table.getCache().writeBack();
-        }
-        // Write back metadata
-        database.persist();
-        // Log checkpoint
-        try {
-            new SavepointLog().serialize();
-        } catch (IOException e) {
-            e.printStackTrace();
+        if (database != null) {
+            for (Table table : database.getTables().values()) {
+                table.getCache().writeBack();
+            }
+            // Write back metadata
+            database.persist();
+            // Log checkpoint
+            try {
+                new SavepointLog().serialize();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -32,9 +34,7 @@ public class Savepoint extends Thread {
         // Globally savepoint every 2s
         while (true) {
             try {
-                if (currentThread().getName().equals("savepoint")) {
-                    Thread.sleep(Global.checkInterval);
-                }
+                Thread.sleep(Global.checkInterval);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
