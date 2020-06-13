@@ -6,5 +6,6 @@ rpc
 *.meta
 server.sh
 client.sh
+outclient.sh
 test
 *.log
