@@ -54,10 +54,6 @@ public abstract class Log {
         handler.writeInt(this.type.value);
     }
 
-    public void persist() throws IOException {
-        handler.getFD().sync();
-    }
-
     public Log(UUID id, Log.LogType type) {
         transactionId = id;
         this.type = type;

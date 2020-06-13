@@ -1,5 +1,6 @@
 package cn.edu.thssdb.storage;
 
+import cn.edu.thssdb.schema.Manager;
 import cn.edu.thssdb.utils.Global;
 
 import java.io.IOException;
@@ -99,8 +100,20 @@ public class DbCache {
         int index = indexPair.getKey();
         boolean dirty = indexPair.getValue();
         if (dirty) {
+            // writeback log
+            try {
+                Manager.getInstance().currentDatabase.logFileHandler.getFD().sync();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
             dataFile.writePage(id, cache[index]);
             idIndex.replace(id, new Pair<>(index, false));
+        }
+    }
+
+    public void writeBackWithoutPersist() {
+        for (int id : idIndex.keySet()) {
+            writeBackPage(id);
         }
     }
 

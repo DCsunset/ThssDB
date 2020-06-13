@@ -29,6 +29,5 @@ public class DeleteLog extends Log {
         handler.writeInt(this.rowIndex);
         handler.writeInt(this.oldData.length);
         handler.write(this.oldData);
-        persist();
     }
 }

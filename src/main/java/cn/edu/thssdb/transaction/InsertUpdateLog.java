@@ -33,6 +33,5 @@ public class InsertUpdateLog extends Log {
         handler.writeInt(this.oldData.length);
         handler.write(this.oldData);
         handler.write(this.newData);
-        persist();
     }
 }

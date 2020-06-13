@@ -205,11 +205,11 @@ public class Table extends AbstractTable implements Iterable<Pair<Entry, VRow>>,
     dic.put("rowIndex", index);
     dic.put("oldData", page.readRow(index));
     dic.put("newData", bytes);
-    try {
-      new InsertLog(uuid, dic).serialize();
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
+    // try {
+    // new InsertLog(uuid, dic).serialize();
+    // } catch (IOException e) {
+    // e.printStackTrace();
+    // }
     page.writeRow(index, bytes);
     if (page.isFull()) {
       metadata.freePageList.remove(Integer.valueOf(id));
@@ -224,6 +224,7 @@ public class Table extends AbstractTable implements Iterable<Pair<Entry, VRow>>,
   public void insert(UUID uuid, Row row) throws Exception {
     if (metadata.freePageList.size() == 0) {
       System.out.println("expand free page list");
+      cache.writeBackWithoutPersist();
       metadata.expandFreePageList();
     }
     int id = metadata.freePageList.get(0);
@@ -238,13 +239,15 @@ public class Table extends AbstractTable implements Iterable<Pair<Entry, VRow>>,
     dic.put("rowIndex", index);
     dic.put("oldData", page.readRow(index));
     dic.put("newData", bytes);
-    /*
     try {
       new InsertLog(uuid, dic).serialize();
     } catch (IOException e) {
       e.printStackTrace();
     }
-
+    /*
+     * try { new InsertLog(uuid, dic).serialize(); } catch (IOException e) {
+     * e.printStackTrace(); }
+     * 
      */
 
     page.writeRow(index, bytes);
