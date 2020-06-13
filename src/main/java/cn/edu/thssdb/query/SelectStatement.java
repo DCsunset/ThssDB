@@ -74,10 +74,13 @@ public class SelectStatement extends Statement {
         }
         if (!columnNames[0].equals("*"))
             resultTable = resultTable.project(columnNames);
+
         // release lock after read request
+        /*
         for (Table table : tables) {
             this.transaction.releaseLock(table.lock);
         }
+         */
 
         //resultTable.output();
         result = constructSuccessResp("");

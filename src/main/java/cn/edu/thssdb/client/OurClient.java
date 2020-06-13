@@ -63,16 +63,18 @@ public class OurClient {
       protocol = new TBinaryProtocol(transport);
       client = new IService.Client(protocol);
       boolean open = true;
+      /*
       try {
 
         SCANNER = new Scanner(new File("input_rollback"));
       } catch (IOException e) {
         e.printStackTrace();
       }
+      */
       while (true) {
         print(Global.CLI_PREFIX);
         String msg = SCANNER.nextLine();
-        System.out.println("msg=" + msg);
+        //System.out.println("msg=" + msg);
 
         long startTime = System.currentTimeMillis();
         switch (msg.trim().split(" ")[0]) {
