@@ -93,6 +93,10 @@ public class OurClient {
               break;
             }
             sessionId = connect(params[1], params[2]);
+            if (sessionId == -1) {
+              println("Wrong username or password");
+              break;
+            }
             println(String.format("sessionId=%d", sessionId));
             break;
           case Global.DISCONNECT:
