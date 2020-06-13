@@ -21,9 +21,9 @@ public abstract class AbstractTable {
         if (col.type == ColumnInfo.ColumnType.INT) {
             return (Integer) engine.eval(str);
         } else if (col.type == ColumnInfo.ColumnType.FLOAT) {
-            return (Float) engine.eval(str);
+            return ((Number) engine.eval(str)).floatValue();
         } else if (col.type == ColumnInfo.ColumnType.DOUBLE) {
-            return (Double) engine.eval(str);
+            return ((Number) engine.eval(str)).doubleValue();
         } else if (col.type == ColumnInfo.ColumnType.LONG) {
             return (Long) engine.eval(str);
         }
@@ -37,6 +37,7 @@ public abstract class AbstractTable {
             }
             return str.substring(1, str.length() - 1);
         }
+
     }
 
     public int findColumnByName(String name) throws Exception {
