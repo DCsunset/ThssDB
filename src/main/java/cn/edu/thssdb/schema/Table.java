@@ -205,11 +205,11 @@ public class Table extends AbstractTable implements Iterable<Pair<Entry, VRow>>,
     dic.put("rowIndex", index);
     dic.put("oldData", page.readRow(index));
     dic.put("newData", bytes);
-    // try {
-    // new InsertLog(uuid, dic).serialize();
-    // } catch (IOException e) {
-    // e.printStackTrace();
-    // }
+    try {
+      new InsertLog(uuid, dic).serialize();
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
     page.writeRow(index, bytes);
     if (page.isFull()) {
       metadata.freePageList.remove(Integer.valueOf(id));
