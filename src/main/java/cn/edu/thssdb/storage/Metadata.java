@@ -13,6 +13,7 @@ public class Metadata implements java.io.Serializable {
 
     public Column[] columns;
     public List<Integer> freePageList; // each element is id of page with free rows
+    private int nextPageId;
 
     public Metadata(Column[] cls) {
         this.columns = cls;
@@ -20,10 +21,9 @@ public class Metadata implements java.io.Serializable {
         for (int i = 0; i < cls.length; i++) {
             rowSize += cls[i].getMaxLength();
         }
-        int listSize = Global.INIT_FILE_SIZE / Global.PAGE_SIZE;
         freePageList = new LinkedList<>();
-        for (int i = 0; i < listSize; i++)
-            freePageList.add(i);
+        nextPageId = 0;
+        expandFreePageList();
     }
 
     public void setRowSize(short size) {
@@ -34,7 +34,8 @@ public class Metadata implements java.io.Serializable {
         assert freePageList.size() == 0;
         int listSize = Global.INIT_FILE_SIZE / Global.PAGE_SIZE;
         for (int i = 0; i < listSize; i++)
-            freePageList.add(i);
+            freePageList.add(nextPageId + i);
+        nextPageId += listSize;
     }
 
     public int getRowSize() {
@@ -48,5 +49,6 @@ public class Metadata implements java.io.Serializable {
     public void writeObject(Metadata data) {
         this.rowSize = data.rowSize;
         this.freePageList = data.freePageList;
+        nextPageId = data.nextPageId;
     }
 }

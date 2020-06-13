@@ -222,14 +222,11 @@ public class Table extends AbstractTable implements Iterable<Pair<Entry, VRow>>,
   }
 
   public void insert(UUID uuid, Row row) throws Exception {
-    int id;
-    try {
-      id = metadata.freePageList.get(0);
-    } catch (Exception e) {
+    if (metadata.freePageList.size() == 0) {
       System.out.println("expand free page list");
       metadata.expandFreePageList();
-      id = metadata.freePageList.get(0);
     }
+    int id = metadata.freePageList.get(0);
     Page page = cache.readPage(id);
     BitSet bitmap = page.bitmap;
     int index = bitmap.nextClearBit(0);
