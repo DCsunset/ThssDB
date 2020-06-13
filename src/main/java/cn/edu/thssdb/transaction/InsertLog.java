@@ -9,4 +9,9 @@ public class InsertLog extends InsertUpdateLog {
     public InsertLog(UUID id, Dictionary data) {
         super(id, data);
     }
+
+    @Override
+    public void serialize() throws IOException {
+
+    }
 }
