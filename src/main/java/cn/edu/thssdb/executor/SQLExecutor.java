@@ -117,6 +117,11 @@ public class SQLExecutor {
                     t.commit();
                 return stmt.getResult();
             } catch (Exception e) {
+                if (stmtCtx.transaction_stmt() != null) {
+                    return Statement.constructSuccessResp("Transaction begins successfully!");
+                } else if (stmtCtx.rollback_stmt() != null) {
+                    return Statement.constructSuccessResp("Transaction rollback successfully!");
+                }
                 e.printStackTrace();
                 System.err.println(e.getMessage());
                 return constructErrorResp(e.getMessage());
@@ -232,13 +237,19 @@ public class SQLExecutor {
                     t.commit();
                 responses.add(stmt.getResult());
             } catch (Exception e) {
-                e.printStackTrace();
-                String msg = e.getMessage();
-                if (msg == null)
-                    msg = "Invalid SQL query";
-                responses.add(constructErrorResp(msg));
-                result.setResults(responses);
-                return result;
+                if (stmtCtx.transaction_stmt() != null) {
+                    responses.add(Statement.constructSuccessResp("Transaction begins successfully!"));
+                } else if (stmtCtx.rollback_stmt() != null) {
+                    responses.add(Statement.constructSuccessResp("Transaction rollback successfully!"));
+                } else {
+                    e.printStackTrace();
+                    String msg = e.getMessage();
+                    if (msg == null)
+                        msg = "Invalid SQL query";
+                    responses.add(constructErrorResp(msg));
+                    result.setResults(responses);
+                    return result;
+                }
             }
         }
 
