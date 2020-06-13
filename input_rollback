@@ -1,0 +1,7 @@
+connect username password
+select * from student where s_name='Englund';
+begin transaction;
+insert into student values ('12345','Englund','Physics',10);
+select * from student where s_name='Englund';
+rollback;
+select * from student where s_name='Englund';
