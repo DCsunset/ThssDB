@@ -6,14 +6,7 @@ import java.util.Dictionary;
 import java.util.UUID;
 
 public class InsertLog extends InsertUpdateLog {
-
     public InsertLog(UUID id, Dictionary data) {
         super(id, data);
-    }
-
-    @Override
-    public void serialize() throws IOException {
-        super.serialize();
-        persist();
     }
 }

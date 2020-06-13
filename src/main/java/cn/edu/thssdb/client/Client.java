@@ -155,7 +155,7 @@ public class Client {
         "select course_id, title from course where credits >= 4;",
         "select s_id, s_name from student where dept_name = 'Physics';",
         "select course.course_id, course.title from course join department on course.dept_name = department.dept_name where department.building <> 'Palmer';",
-        "select advisor.s_id from instructor join advisor on instructor.i_id = advisor.i_id where i_name = 'Luo';"
+        "select advisor.s_id from instructor join advisor on instructor.i_id = advisor.i_id where advisor.i_name = 'Luo';"
     };
     int[] results = {2000, 92, 96, 182, 44};
     for (int i = 0; i < statements.length; i++) {

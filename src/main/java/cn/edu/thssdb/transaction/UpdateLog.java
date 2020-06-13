@@ -9,10 +9,4 @@ public class UpdateLog extends InsertUpdateLog {
         super(id, data);
         this.type = LogType.Update;
     }
-
-    @Override
-    public void serialize() throws IOException {
-        super.serialize();
-        persist();
-    }
 }
