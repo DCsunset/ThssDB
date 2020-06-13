@@ -10,6 +10,10 @@ public class Column implements Comparable<Column>, Serializable {
   public boolean notNull;
   public int maxLength;
 
+  public Column(Column col) {
+      this(col.name, col.type, col.primary, col.notNull,  col.maxLength);
+  }
+
   public Column(String name, ColumnInfo.ColumnType type, boolean primary, boolean notNull, int... maxLength) {
     this.name = name;
     this.type = type;

@@ -98,10 +98,11 @@ public class QueryTable extends AbstractTable implements Iterator<Row> {
 
     Column[] columns = table.getMetadata().columns;
     this.columns = new Column[columns.length];
-    System.arraycopy(columns, 0, this.columns, 0, columns.length);
+    for (int i = 0; i < this.columns.length; ++i)
+        this.columns[i] = new Column(columns[i]);
     if (joinable) {
-      for (int i = 0; i < columns.length; ++i) {
-        columns[i].name = table.tableName + "." + columns[i].name;
+      for (int i = 0; i < this.columns.length; ++i) {
+        this.columns[i].name = table.tableName + "." + columns[i].name;
       }
     }
   }
