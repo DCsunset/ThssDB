@@ -46,9 +46,9 @@ public class MultipleCondition {
         if (ctx.AND() == null) {
             ConditionContext cctx = ctx.condition();
             Condition condition = new Condition(table,
-                    cctx.expression().get(0).getText(),
+                    cctx.expression().get(0).getText().toUpperCase(),
                     ctxtotype(cctx.comparator()),
-                    cctx.expression().get(1).getText()
+                    cctx.expression().get(1).getText().toUpperCase()
             );
             conditions.get(conditions.size() - 1).add(condition);
         } else {
