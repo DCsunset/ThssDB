@@ -11,6 +11,7 @@ sql_stmt :
     | create_db_stmt
     | create_user_stmt
     | drop_db_stmt
+    | alter_user_stmt
     | drop_user_stmt
     | delete_stmt
     | drop_table_stmt
@@ -39,6 +40,9 @@ drop_db_stmt :
 
 create_user_stmt :
     K_CREATE K_USER user_name K_IDENTIFIED K_BY password ;
+
+alter_user_stmt :
+    K_ALTER K_USER user_name K_SET K_PASSWORD password ;
 
 drop_user_stmt :
     K_DROP K_USER ( K_IF K_EXISTS )? user_name ;
@@ -246,6 +250,8 @@ K_TRANSACTION : T R A N S A C T I O N;
 K_COMMIT : C O M M I T;
 K_CHECKPOINT : C H E C K P O I N T;
 K_ROLLBACK : R O L L B A C K;
+K_PASSWORD : P A S S W O R D;
+K_ALTER : A L T E R;
 
 IDENTIFIER :
     [a-zA-Z_] [a-zA-Z_0-9]* ;

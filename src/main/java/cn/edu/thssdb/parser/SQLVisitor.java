@@ -47,6 +47,12 @@ public interface SQLVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitCreate_user_stmt(SQLParser.Create_user_stmtContext ctx);
 	/**
+	 * Visit a parse tree produced by {@link SQLParser#alter_user_stmt}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitAlter_user_stmt(SQLParser.Alter_user_stmtContext ctx);
+	/**
 	 * Visit a parse tree produced by {@link SQLParser#drop_user_stmt}.
 	 * @param ctx the parse tree
 	 * @return the visitor result

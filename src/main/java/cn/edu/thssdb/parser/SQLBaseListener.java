@@ -88,6 +88,18 @@ public class SQLBaseListener implements SQLListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
+	@Override public void enterAlter_user_stmt(SQLParser.Alter_user_stmtContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitAlter_user_stmt(SQLParser.Alter_user_stmtContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
 	@Override public void enterDrop_user_stmt(SQLParser.Drop_user_stmtContext ctx) { }
 	/**
 	 * {@inheritDoc}
