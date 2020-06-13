@@ -21,6 +21,7 @@ import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 
 import static cn.edu.thssdb.query.Statement.constructErrorResp;
+import static cn.edu.thssdb.query.Statement.constructSuccessResp;
 
 public class SQLExecutor {
     Transaction transaction = null;
@@ -64,6 +65,7 @@ public class SQLExecutor {
                     System.err.println(e.getMessage());
                     e.printStackTrace();
                 }
+                return constructSuccessResp("Transaction begins");
             } else if (stmtCtx.commit_stmt() != null) {
                 if (transaction == null) {
                     return constructErrorResp("No transaction begins");
@@ -77,6 +79,7 @@ public class SQLExecutor {
                 transaction.commit();
                 transaction = null;
                 System.out.println("Transaction committed");
+                return constructSuccessResp("Transaction committed");
             } else if (stmtCtx.rollback_stmt() != null) {
                 if (transaction == null) {
                     return constructErrorResp("No transaction begins");
@@ -88,11 +91,13 @@ public class SQLExecutor {
                 }
                 transaction = null;
                 System.out.println("Transaction rollback");
+                return constructSuccessResp("Transaction rollback success");
             } else if (stmtCtx.delete_stmt() != null) {
                 stmt = new DeleteStatement(manager, stmtCtx, t);
             } else if (stmtCtx.checkpoint_stmt() != null) {
                 Savepoint.save();
                 System.out.println("Checkpoint saved");
+                return constructSuccessResp("Checkpoint saved");
             } else if (stmtCtx.drop_db_stmt() != null) {
                 stmt = new DropDatabaseStatement(manager, stmtCtx);
             } else if (stmtCtx.drop_table_stmt() != null) {
@@ -170,6 +175,8 @@ public class SQLExecutor {
                     System.err.println(e.getMessage());
                     e.printStackTrace();
                 }
+                responses.add(constructSuccessResp("Transaction begins"));
+                continue;
             } else if (stmtCtx.commit_stmt() != null) {
                 if (transaction == null) {
                     responses.add(constructErrorResp("No transaction begins"));
@@ -185,6 +192,8 @@ public class SQLExecutor {
                 transaction.commit();
                 transaction = null;
                 System.out.println("Transaction committed");
+                responses.add(constructSuccessResp("Transaction committed"));
+                continue;
             } else if (stmtCtx.rollback_stmt() != null) {
                 if (transaction == null) {
                     responses.add(constructErrorResp("No transaction begins"));
@@ -198,11 +207,15 @@ public class SQLExecutor {
                 }
                 transaction = null;
                 System.out.println("Transaction rollback");
+                responses.add(constructSuccessResp("Transaction rollback success"));
+                continue;
             } else if (stmtCtx.delete_stmt() != null) {
                 stmt = new DeleteStatement(manager, stmtCtx, t);
             } else if (stmtCtx.checkpoint_stmt() != null) {
                 Savepoint.save();
                 System.out.println("Checkpoint saved");
+                responses.add(constructSuccessResp("Checkpoint saved"));
+                continue;
             } else if (stmtCtx.drop_db_stmt() != null) {
                 stmt = new DropDatabaseStatement(manager, stmtCtx);
             } else if (stmtCtx.drop_table_stmt() != null) {
