@@ -8,10 +8,15 @@ import cn.edu.thssdb.transaction.Savepoint;
 import cn.edu.thssdb.utils.Global;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 import org.apache.thrift.server.TServer;
 import org.apache.thrift.server.TSimpleServer;
@@ -66,6 +71,24 @@ public class ThssDB {
     processor = new IService.Processor(handler);
     Runnable setup = () -> setUp(processor);
     new Thread(setup).start();
+    Runtime.getRuntime().addShutdownHook(new Thread() {
+      public void run() {
+        try {
+          BufferedWriter writer = new BufferedWriter(new FileWriter("users"));
+          Iterator iter = users.entrySet().iterator();
+          while (iter.hasNext()) {
+            Map.Entry ele = (Map.Entry) iter.next();
+            String username = (String) ele.getKey();
+            String password = (String) ele.getValue();
+            System.out.println("write username=" + username + "password=" + password);
+            writer.write(String.format("%s\t%s\n", username, password));
+          }
+          writer.close();
+        } catch (IOException e) {
+          e.printStackTrace();
+        }
+      }
+    });
   }
 
   private static void setUp(IService.Processor processor) {
