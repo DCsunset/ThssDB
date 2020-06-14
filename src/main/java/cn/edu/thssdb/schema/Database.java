@@ -188,6 +188,8 @@ public class Database {
                         invalid.remove(id);
                 } else if (type == Log.LogType.Start) {
                     invalid.add(id);
+                } else if (type == Log.LogType.Savepoint) {
+                    last = logFileHandler.getFilePointer();
                 } else {
                     skipLog(type);
                 }
