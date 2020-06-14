@@ -5,6 +5,7 @@ import cn.edu.thssdb.index.BPlusTree;
 import cn.edu.thssdb.query.QueryTable;
 import cn.edu.thssdb.type.ColumnInfo;
 import cn.edu.thssdb.utils.Global.OpType;
+import com.sun.javafx.geom.transform.GeneralTransform3D;
 import javafx.util.Pair;
 
 import java.io.IOException;
@@ -144,22 +145,22 @@ public class Table extends AbstractTable implements Iterable<Pair<Entry, VRow>>,
         if (col.type == ColumnInfo.ColumnType.STRING) {
           for (int j = 0; j <= col.maxLength; ++j) {
             if (j == col.maxLength || bytes[j + pos] == 0) {
-              entries[i] = new Entry(new String(Arrays.copyOfRange(bytes, pos, pos + j)), col.maxLength);
+              entries[i] = Entry.fromBytes(Arrays.copyOfRange(bytes, pos, pos + j), col);
               break;
             }
           }
           pos += col.maxLength;
         } else if (col.type == ColumnInfo.ColumnType.INT) {
-          entries[i] = new Entry(ByteBuffer.wrap(Arrays.copyOfRange(bytes, pos, pos + 4)).getInt());
+          entries[i] = Entry.fromBytes(Arrays.copyOfRange(bytes, pos, pos + 4), col);
           pos += 4;
         } else if (col.type == ColumnInfo.ColumnType.LONG) {
-          entries[i] = new Entry(ByteBuffer.wrap(Arrays.copyOfRange(bytes, pos, pos + 8)).getLong());
+          entries[i] = Entry.fromBytes(Arrays.copyOfRange(bytes, pos, pos + 8), col);
           pos += 8;
         } else if (col.type == ColumnInfo.ColumnType.FLOAT) {
-          entries[i] = new Entry(ByteBuffer.wrap(Arrays.copyOfRange(bytes, pos, pos + 4)).getFloat());
+          entries[i] = Entry.fromBytes(Arrays.copyOfRange(bytes, pos, pos + 4), col);
           pos += 4;
         } else if (col.type == ColumnInfo.ColumnType.DOUBLE) {
-          entries[i] = new Entry(ByteBuffer.wrap(Arrays.copyOfRange(bytes, pos, pos + 8)).getDouble());
+          entries[i] = Entry.fromBytes(Arrays.copyOfRange(bytes, pos, pos + 8), col);
           pos += 8;
         }
       } catch (Exception e) {
@@ -338,7 +339,10 @@ public class Table extends AbstractTable implements Iterable<Pair<Entry, VRow>>,
     this.lock = new ReentrantLock();
     int size = input.readInt();
     for (int i = 0; i < size; ++i) {
-      Entry entry = (Entry) input.readObject();
+      int length = input.readInt();
+      byte[] bytes = new byte[length];
+      input.read(bytes);
+      Entry entry = Entry.fromBytes(bytes, columns[i]);
       int pageID = input.readInt();
       int rowIndex = input.readInt();
       VRow vrow = new VRow(pageID, rowIndex);
@@ -358,7 +362,9 @@ public class Table extends AbstractTable implements Iterable<Pair<Entry, VRow>>,
         Pair<Entry, VRow> node = it.next();
         Entry entry = node.getKey();
         VRow vrow = node.getValue();
-        output.writeObject(entry);
+        byte bytes[] = entry.toBytes();
+        output.writeInt(bytes.length);
+        output.write(entry.toBytes());
         output.writeInt(vrow.pageID);
         output.writeInt(vrow.rowIndex);
       }

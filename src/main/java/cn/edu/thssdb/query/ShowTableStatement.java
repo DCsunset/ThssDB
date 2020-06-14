@@ -1,6 +1,7 @@
 package cn.edu.thssdb.query;
 
 import cn.edu.thssdb.exception.CurrentDatabaseNullException;
+import cn.edu.thssdb.exception.TableNotExistException;
 import cn.edu.thssdb.parser.SQLParser.Show_meta_stmtContext;
 import cn.edu.thssdb.parser.SQLParser.Sql_stmtContext;
 import cn.edu.thssdb.rpc.thrift.ExecuteStatementResp;
@@ -37,6 +38,9 @@ public class ShowTableStatement extends Statement {
     public final void execute() {
         Database db = this.manager.currentDatabase;
         Table tb = db.getTables().get(this.tablename);
+        if (tb == null) {
+            throw new TableNotExistException(tablename);
+        }
         Column[] cls = tb.getMetadata().columns;
         List<String> header = new ArrayList<>(Arrays.asList("name", "type", "primary", "not null", "maxLength"));
         List<List<String>> columnInfo = new ArrayList<>();

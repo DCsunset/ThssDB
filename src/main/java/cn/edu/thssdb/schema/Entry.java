@@ -12,7 +12,7 @@ import cn.edu.thssdb.type.ColumnInfo;
 public class Entry implements Comparable<Entry>, Serializable {
   private static final long serialVersionUID = -5809782578272943999L;
   public Comparable value;
-  private int maxLength = -1;
+  public int maxLength = -1;
   private String type = "";
 
   // p[0]: type; p[1]:
@@ -37,6 +37,35 @@ public class Entry implements Comparable<Entry>, Serializable {
         maxLength = (Integer) p[0];
       }
     }
+  }
+
+  public static Entry fromBytes(byte[] bytes, Column column) throws Exception {
+    if (column.type == ColumnInfo.ColumnType.STRING) {
+      boolean isNull = true;
+      for (int i = 0; i < bytes.length; ++i)
+          if (bytes[i] != (byte) 0xff) {
+            isNull = false;
+            break;
+          }
+      return new Entry(isNull ? null : new String(bytes), column.type, column.maxLength);
+    }
+    if (column.type == ColumnInfo.ColumnType.INT) {
+      int num = ByteBuffer.wrap(bytes).getInt();
+      return new Entry(num == Integer.MIN_VALUE ? null : num, column.type, column.maxLength);
+    }
+    if (column.type == ColumnInfo.ColumnType.LONG) {
+      long num = ByteBuffer.wrap(bytes).getLong();
+      return new Entry(num == Long.MIN_VALUE ? null : num, column.type, column.maxLength);
+    }
+    if (column.type == ColumnInfo.ColumnType.FLOAT) {
+      float num = ByteBuffer.wrap(bytes).getFloat();
+      return new Entry(Float.isNaN(num) ? null : num, column.type, column.maxLength);
+    }
+    if (column.type == ColumnInfo.ColumnType.DOUBLE) {
+      double num = ByteBuffer.wrap(bytes).getDouble();
+      return new Entry(Double.isNaN(num) ? null : num, column.type, column.maxLength);
+    }
+    return new Entry(null, column.type, column.maxLength);
   }
 
   public byte[] toBytes() {
@@ -81,6 +110,8 @@ public class Entry implements Comparable<Entry>, Serializable {
   }
 
   public String toString() {
+    if (value == null)
+      return "null";
     return value.toString();
   }
 
