@@ -50,23 +50,9 @@ public class SelectStatement extends Statement {
             }
             tables.add(db.getTables().get(tableName));
             this.transaction.acquireLock(tables.get(tables.size() - 1).lock);
-            if (i == 0)
-                resultTable = new QueryTable(db.getTables().get(tableName), tbCtx.table_name().size() > 1);
-            else {
-                QueryTable newTable = new QueryTable(db.getTables().get(tableName), true);
-                resultTable = resultTable.join(newTable);
-            }
         }
 
-        if (tbCtx.table_name().size() > 1 && tbCtx.multiple_condition() != null) {
-            MultipleCondition onCondition = new MultipleCondition(resultTable, tbCtx.multiple_condition());
-            resultTable.filter(onCondition);
-        }
-
-        if (ctx.multiple_condition() != null) {
-            MultipleCondition condition = new MultipleCondition(resultTable, ctx.multiple_condition());
-            resultTable.filter(condition);
-        }
+        resultTable = QueryTable.join(tables, tbCtx.multiple_condition(), ctx.multiple_condition());
 
         String columnNames[] = new String[ctx.result_column().size()];
         for (int i = 0; i < ctx.result_column().size(); ++i) {
@@ -74,13 +60,6 @@ public class SelectStatement extends Statement {
         }
         if (!columnNames[0].equals("*"))
             resultTable = resultTable.project(columnNames);
-
-        // release lock after read request
-        /*
-        for (Table table : tables) {
-            this.transaction.releaseLock(table.lock);
-        }
-         */
 
         //resultTable.output();
         result = constructSuccessResp("");

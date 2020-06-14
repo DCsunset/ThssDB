@@ -5,18 +5,36 @@ import cn.edu.thssdb.schema.*;
 
 import java.util.*;
 
+import javafx.scene.control.Tab;
 import javafx.util.Pair;
 
 public class QueryTable extends AbstractTable implements Iterator<Row> {
   private ArrayList<Row> data = new ArrayList<Row>();
 
-  public QueryTable(QueryTable tb1, QueryTable tb2) {
+  public QueryTable(List<Table> tables) {
     // combine cls
-    Column[] cls1 = tb1.columns;
-    Column[] cls2 = tb2.columns;
-    this.columns = new Column[cls1.length + cls2.length];
-    System.arraycopy(cls1, 0, this.columns, 0, cls1.length);
-    System.arraycopy(cls2, 0, this.columns, cls1.length, cls2.length);
+    int length = 0;
+    for (int i = 0; i < tables.size(); ++i) {
+        length += tables.get(i).columns.length;
+    }
+    this.columns = new Column[length];
+
+    int current = 0;
+    for (int i = 0; i < tables.size(); ++i) {
+      Column[] columns = tables.get(i).getMetadata().columns;
+      for (int j = 0; j < columns.length; ++j) {
+        this.columns[current + j] = new Column(columns[i]);
+        if (tables.size() > 1)
+          this.columns[current + j].name = tables.get(i).tableName + "." + columns[j].name;
+        else
+          this.columns[current + j].name = columns[j].name;
+        this.columns[current + j].type = columns[j].type;
+        this.columns[current + j].maxLength = columns[j].maxLength;
+        this.columns[current + j].notNull = columns[j].notNull;
+        this.columns[current + j].primary = columns[j].primary;
+      }
+      current += columns.length;
+    }
   }
 
   private QueryTable() {
@@ -87,44 +105,61 @@ public class QueryTable extends AbstractTable implements Iterator<Row> {
     return result;
   }
 
-  public QueryTable(Table table, boolean joinable) { // leaf node
-    // copy data from table
-    Iterator<Pair<Entry, VRow>> it = table.iterator();
-    while (it.hasNext()) {
+  public static QueryTable join(List<Table> tables, SQLParser.Multiple_conditionContext onConditionCtx, SQLParser.Multiple_conditionContext conditionCtx) throws Exception {
+    QueryTable result = new QueryTable(tables);
+
+    MultipleCondition onCondition = null, condition = null;
+    if (onConditionCtx != null)
+      onCondition = new MultipleCondition(result, onConditionCtx);
+    if (conditionCtx != null)
+      condition = new MultipleCondition(result, conditionCtx);
+
+    // Cartesian product
+    ArrayList<Iterator<Pair<Entry, VRow>>> itArray = new ArrayList<>();
+    ArrayList<Row> currentValue = new ArrayList<>();
+    for (Table t : tables) {
+      Iterator<Pair<Entry, VRow>> it = t.iterator();
+      // empty
+      if (!it.hasNext())
+          return result;
+      itArray.add(it);
       Pair<Entry, VRow> item = it.next();
-      Row row = table.read(item.getValue());
-      data.add(row);
+      Row row = t.read(item.getValue());
+      currentValue.add(row);
     }
 
-    Column[] columns = table.getMetadata().columns;
-    this.columns = new Column[columns.length];
-    for (int i = 0; i < this.columns.length; ++i)
-        this.columns[i] = new Column(columns[i]);
-    if (joinable) {
-      for (int i = 0; i < this.columns.length; ++i) {
-        this.columns[i].name = table.tableName + "." + columns[i].name;
+    boolean done = false;
+    while (!done) {
+      Row row = new Row();
+      for (int i = 0; i < tables.size(); ++i) {
+          row = combineRow(row, currentValue.get(i));
       }
-    }
-  }
+      if ((onCondition == null || onCondition.satisfy(row))
+        && (condition == null || condition.satisfy(row)))
+        result.insertRow(row);
 
-  public void filter(MultipleCondition condition) throws Exception {
-    if (condition == null)
-      return;
-    for (int i = 0; i < data.size(); ++i) {
-      if (!condition.satisfy(data.get(i))) {
-        data.remove(i);
-        --i;
-      }
-    }
-  }
+      // Increment index
+      int currentIndex = 0;
+      while (true) {
+          Iterator<Pair<Entry, VRow>> it = itArray.get(currentIndex);
+          if (it.hasNext()) {
+            Pair<Entry, VRow> item = it.next();
+            Row trow = tables.get(currentIndex).read(item.getValue());
+            currentValue.set(currentIndex, trow);
+            break;
+          }
 
-  // another must be constructed by a table
-  public QueryTable join(QueryTable another) {
-    QueryTable me = this;
-    QueryTable result = new QueryTable(me, another);
-    for (Row row : me.data) {
-      for (Row row1 : another.data) {
-        result.insertRow(combineRow(row, row1));
+          it = tables.get(currentIndex).iterator();
+          Pair<Entry, VRow> item = it.next();
+          Row trow = tables.get(currentIndex).read(item.getValue());
+          currentValue.set(currentIndex, trow);
+          itArray.set(currentIndex, it);
+          ++currentIndex;
+
+          if (currentIndex == tables.size()) {
+              done = true;
+              break;
+          }
       }
     }
     return result;
