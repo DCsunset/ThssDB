@@ -23,6 +23,9 @@ public class SelectStatement extends Statement {
 
     @Override
     public final void parse() {
+        if (manager.currentDatabase == null) {
+            throw new CurrentDatabaseNullException();
+        }
         ctx = this.parseCtx.select_stmt();
     }
 

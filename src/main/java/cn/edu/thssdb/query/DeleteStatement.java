@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Iterator;
 
+import cn.edu.thssdb.exception.CurrentDatabaseNullException;
 import cn.edu.thssdb.schema.*;
 import cn.edu.thssdb.transaction.Transaction;
 import javafx.util.Pair;
@@ -34,6 +35,9 @@ public class DeleteStatement extends Statement {
 
     @Override
     public final void parse() throws Exception {
+        if (manager.currentDatabase == null) {
+            throw new CurrentDatabaseNullException();
+        }
         Delete_stmtContext ctx = this.parseCtx.delete_stmt();
         this.tbname = ctx.table_name().getText().toUpperCase();
         this.table = this.manager.currentDatabase.getTables().get(this.tbname);

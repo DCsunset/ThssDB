@@ -1,6 +1,7 @@
 package cn.edu.thssdb.query;
 
 import cn.edu.thssdb.exception.ColumnNotExistException;
+import cn.edu.thssdb.exception.CurrentDatabaseNullException;
 import cn.edu.thssdb.exception.TableNotExistException;
 import cn.edu.thssdb.parser.SQLParser;
 import cn.edu.thssdb.parser.SQLParser.Sql_stmtContext;
@@ -22,6 +23,9 @@ public class UpdateStatement extends Statement {
     public UpdateStatement(Manager manager, Sql_stmtContext parseCtx, Transaction transaction) {
         super(manager, parseCtx);
         this.transaction = transaction;
+        if (manager.currentDatabase == null) {
+            throw new CurrentDatabaseNullException();
+        }
     }
 
     @Override

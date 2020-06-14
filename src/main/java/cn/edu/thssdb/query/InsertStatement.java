@@ -3,6 +3,7 @@ package cn.edu.thssdb.query;
 import java.util.Dictionary;
 import java.util.Hashtable;
 
+import cn.edu.thssdb.exception.CurrentDatabaseNullException;
 import cn.edu.thssdb.exception.TableNotExistException;
 import cn.edu.thssdb.parser.SQLParser;
 import cn.edu.thssdb.parser.SQLParser.Sql_stmtContext;
@@ -27,6 +28,9 @@ public class InsertStatement extends Statement {
 
     @Override
     public final void parse() {
+        if (manager.currentDatabase == null) {
+            throw new CurrentDatabaseNullException();
+        }
         ctx = this.parseCtx.insert_stmt();
 
         names = new String[ctx.column_name().size()];

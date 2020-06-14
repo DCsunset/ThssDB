@@ -1,5 +1,6 @@
 package cn.edu.thssdb.query;
 
+import cn.edu.thssdb.exception.CurrentDatabaseNullException;
 import cn.edu.thssdb.parser.SQLParser.Show_meta_stmtContext;
 import cn.edu.thssdb.parser.SQLParser.Sql_stmtContext;
 import cn.edu.thssdb.rpc.thrift.ExecuteStatementResp;
@@ -27,6 +28,9 @@ public class ShowTableStatement extends Statement {
     public final void parse() {
         Show_meta_stmtContext ctx = this.parseCtx.show_meta_stmt();
         this.tablename = ctx.table_name().getText().toUpperCase();
+        if (manager.currentDatabase == null) {
+            throw new CurrentDatabaseNullException();
+        }
     }
 
     @Override
