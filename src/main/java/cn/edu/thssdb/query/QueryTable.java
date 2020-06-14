@@ -23,7 +23,7 @@ public class QueryTable extends AbstractTable implements Iterator<Row> {
     for (int i = 0; i < tables.size(); ++i) {
       Column[] columns = tables.get(i).getMetadata().columns;
       for (int j = 0; j < columns.length; ++j) {
-        this.columns[current + j] = new Column(columns[i]);
+        this.columns[current + j] = new Column(columns[j]);
         if (tables.size() > 1)
           this.columns[current + j].name = tables.get(i).tableName + "." + columns[j].name;
         else
