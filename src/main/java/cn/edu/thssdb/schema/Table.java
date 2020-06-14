@@ -339,10 +339,7 @@ public class Table extends AbstractTable implements Iterable<Pair<Entry, VRow>>,
     this.lock = new ReentrantLock();
     int size = input.readInt();
     for (int i = 0; i < size; ++i) {
-      int length = input.readInt();
-      byte[] bytes = new byte[length];
-      input.read(bytes);
-      Entry entry = Entry.fromBytes(bytes, columns[i]);
+      Entry entry = (Entry) input.readObject();
       int pageID = input.readInt();
       int rowIndex = input.readInt();
       VRow vrow = new VRow(pageID, rowIndex);
@@ -362,9 +359,7 @@ public class Table extends AbstractTable implements Iterable<Pair<Entry, VRow>>,
         Pair<Entry, VRow> node = it.next();
         Entry entry = node.getKey();
         VRow vrow = node.getValue();
-        byte bytes[] = entry.toBytes();
-        output.writeInt(bytes.length);
-        output.write(entry.toBytes());
+        output.writeObject(entry);
         output.writeInt(vrow.pageID);
         output.writeInt(vrow.rowIndex);
       }
