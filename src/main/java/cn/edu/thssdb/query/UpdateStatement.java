@@ -40,7 +40,7 @@ public class UpdateStatement extends Statement {
             throw new ColumnNotExistException(ctx.column_name().getText().toUpperCase());
 
         // set attr=value
-        value = table.stringToValue(table.getMetadata().columns[index], ctx.expression().getText().toUpperCase());
+        value = table.stringToValue(table.getMetadata().columns[index], ctx.expression().getText());
     }
 
     @Override
